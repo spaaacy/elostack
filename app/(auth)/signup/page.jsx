@@ -7,11 +7,13 @@ import { UserContext } from "@/context/UserContext";
 import { supabase } from "@/utils/supabase";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import React, { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 const Page = () => {
   const { session } = useContext(UserContext);
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
