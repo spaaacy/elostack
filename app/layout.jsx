@@ -1,7 +1,7 @@
-import { Roboto } from "next/font/google";
+import { Inter } from "next/font/google";
 import "@/styles/globals.css";
 
-const inter = Roboto({ subsets: ["latin"], weight: "400" });
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "EloStack",
