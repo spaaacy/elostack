@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Kanit } from "next/font/google";
 import { usePathname, useRouter } from "next/navigation";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { UserContext } from "@/context/UserContext";
 import { supabase } from "@/utils/supabase";
 const kanit = Kanit({ subsets: ["latin"], weight: "600" });
@@ -12,6 +12,31 @@ const kanit = Kanit({ subsets: ["latin"], weight: "600" });
 const NavBar = () => {
   const { session } = useContext(UserContext);
   const router = useRouter();
+  const [user, setUser] = useState();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const userId = session.data.session?.user.id;
+      if (userId) {
+        const response = await fetch(`/api/user/${userId}`, {
+          headers: {
+            "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+          },
+          method: "GET",
+        });
+        if (response.status === 200) {
+          const { user } = await response.json();
+          setUser(user);
+        } else {
+          router.push("/signup?google_oauth=true");
+        }
+      }
+    };
+
+    if (session && window.location.pathname !== "/signup") {
+      fetchUser();
+    }
+  }, [session]);
 
   const signOut = async () => {
     try {
