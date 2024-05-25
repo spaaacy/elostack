@@ -7,7 +7,7 @@ import { UserContext } from "@/context/UserContext";
 import { supabase } from "@/utils/supabase";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import React, { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
