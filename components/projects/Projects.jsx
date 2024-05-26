@@ -29,7 +29,7 @@ const Projects = () => {
   return (
     <div className="flex flex-col h-screen">
       <NavBar />
-      <main className="mx-auto w-full lg:max-w-[1260px] py-4 px-8">
+      <main>
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-semibold">Find Projects</h1>
           <button className="px-2 py-1 bg-orangeaccent hover:bg-orangedark rounded-full text-sm hover:text-gray-300 shadow shadow-black">
@@ -42,7 +42,7 @@ const Projects = () => {
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder={"Search..."}
             type="text"
-            className="w-96 text-sm p-1 rounded border bg-gray-900 bg-opacity-50 hover:bg-gray-800 border-gray-400"
+            className="w-96 text-sm p-1 rounded border bg-gray-900 bg-opacity-50 focus:bg-gray-800 border-gray-400"
           />
           <select
             name="selectedStatus"
@@ -59,7 +59,7 @@ const Projects = () => {
             return (
               <li key={i}>
                 <Link
-                  href={"/"}
+                  href={`/projects/${p.id}`}
                   className="shadow-md shadow-black h-36 p-2 flex flex-col border bg-gray-900 bg-opacity-50 rounded hover:bg-gray-800 border-gray-400 text-xs font-light"
                 >
                   <div className="flex justify-between items-start ">
@@ -93,6 +93,7 @@ export default Projects;
 
 const projects = [
   {
+    id: 1,
     title: "Social Media App",
     description: "Develop a user-friendly social media application",
     members: ["John Doe", "Jane Smith", "Michael Johnson"],
@@ -104,6 +105,7 @@ const projects = [
     technology: ["JavaScript", "React", "Node.js", "MongoDB"],
   },
   {
+    id: 2,
     title: "E-commerce Platform",
     description: "Build an online shopping platform with secure payment integration",
     members: ["Emily Davis", "David Lee", "Jessica Garcia"],
@@ -115,6 +117,7 @@ const projects = [
     technology: ["Python", "Django", "PostgreSQL", "HTML", "CSS"],
   },
   {
+    id: 3,
     title: "AI-powered Chatbot",
     description: "Develop an intelligent chatbot using natural language processing",
     members: ["Daniel Wilson", "Olivia Taylor", "Matthew Anderson"],
@@ -126,6 +129,7 @@ const projects = [
     technology: ["Python", "TensorFlow", "Natural Language Processing"],
   },
   {
+    id: 4,
     title: "Mobile Game Development",
     description: "Create an addictive and visually appealing mobile game",
     members: ["Jacob Martinez", "Sophia Rodriguez", "William Gonzalez"],
@@ -137,6 +141,7 @@ const projects = [
     technology: ["C++", "OpenGL", "Unity"],
   },
   {
+    id: 5,
     title: "Data Analytics Dashboard",
     description: "Build an interactive dashboard for data visualization and analysis",
     members: ["Ava Perez", "Benjamin Torres", "Isabella Ramirez"],
@@ -148,6 +153,7 @@ const projects = [
     technology: ["JavaScript", "React", "D3.js", "Python"],
   },
   {
+    id: 6,
     title: "Cloud-based File Storage",
     description: "Develop a secure and scalable cloud-based file storage solution",
     members: ["Liam Rivera", "Emma Gomez", "Noah Castro"],
@@ -159,6 +165,7 @@ const projects = [
     technology: ["Java", "Spring Boot", "AWS S3"],
   },
   {
+    id: 7,
     title: "Educational Web Platform",
     description: "Create an interactive online learning platform for students",
     members: ["Michael Reyes", "Sophia Gutierrez", "Daniel Salazar"],
@@ -170,6 +177,7 @@ const projects = [
     technology: ["JavaScript", "React", "Node.js", "MongoDB"],
   },
   {
+    id: 8,
     title: "Virtual Reality Experience",
     description: "Develop an immersive virtual reality experience for gaming or training",
     members: ["Ethan Garcia", "Mia Jimenez", "Jacob Sanchez"],
@@ -181,6 +189,7 @@ const projects = [
     technology: ["C++", "OpenGL", "Unity", "Unreal Engine"],
   },
   {
+    id: 9,
     title: "AI-powered Personal Assistant",
     description: "Build an intelligent personal assistant using artificial intelligence",
     members: ["Isabella Alvarez", "Liam Castillo", "Emma Dominguez"],
@@ -192,6 +201,7 @@ const projects = [
     technology: ["Python", "TensorFlow", "Natural Language Processing"],
   },
   {
+    id: 10,
     title: "Healthcare Management System",
     description: "Develop a comprehensive healthcare management system for hospitals and clinics",
     members: ["Sophia Chavez", "Daniel Mendoza", "Ava Ramos"],
@@ -203,6 +213,7 @@ const projects = [
     technology: ["Java", "Spring Boot", "PostgreSQL", "Angular"],
   },
   {
+    id: 11,
     title: "Blockchain-based Cryptocurrency",
     description: "Create a secure and decentralized cryptocurrency using blockchain technology",
     members: ["Michael Rivera", "Emma Velasquez", "Liam Ortiz"],
@@ -214,6 +225,7 @@ const projects = [
     technology: ["Go", "Blockchain", "Cryptography"],
   },
   {
+    id: 12,
     title: "Smart Home Automation System",
     description: "Develop an intelligent home automation system with voice control and remote access",
     members: ["Daniel Pena", "Ava Robles", "Isabella Soto"],
@@ -225,6 +237,7 @@ const projects = [
     technology: ["Python", "Raspberry Pi", "Home Automation Protocols"],
   },
   {
+    id: 13,
     title: "Augmented Reality Navigation App",
     description: "Create an augmented reality navigation app for pedestrians and drivers",
     members: ["Jacob Vazquez", "Mia Rangel", "Benjamin Lozano"],
@@ -236,6 +249,7 @@ const projects = [
     technology: ["Swift", "ARKit", "Google Maps API"],
   },
   {
+    id: 14,
     title: "Online Collaboration Platform",
     description: "Build a collaborative platform for teams to work together remotely",
     members: ["Michael Guerrero", "Emma Aguilar", "Liam Espinoza"],
@@ -247,6 +261,7 @@ const projects = [
     technology: ["JavaScript", "React", "Node.js", "WebRTC"],
   },
   {
+    id: 15,
     title: "AI-powered Language Translation",
     description: "Develop an intelligent language translation system using artificial intelligence",
     members: ["Daniel Valencia", "Ava Beltran", "Isabella Vega"],
