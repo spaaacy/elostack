@@ -9,7 +9,7 @@ export default function Home() {
       <NavBar />
       <main>
         <div className="flex flex-col justify-center items-center mt-8 flex-1">
-          <p className="mx-auto">Site under construction! Join the community now.</p>
+          <p className="mx-auto">Coming soon. Checkout our Discord community.</p>
           <Link className="mt-4" href={"https://discord.gg/Re8W4Kp5ae"} target="_blank">
             <Image src={"/discord.png"} alt="discord" width={30} height={30} />
           </Link>
