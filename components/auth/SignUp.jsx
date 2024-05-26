@@ -73,13 +73,11 @@ const SignUp = () => {
         email: data.email,
         password: data.password,
         options: {
-          data: {
-            first_name: data.username,
-          },
           emailRedirectTo: window.location.origin,
         },
       });
       if (error) throw error;
+      console.log(data);
 
       const response = await fetch("/api/user/create", {
         method: "POST",
@@ -100,6 +98,7 @@ const SignUp = () => {
         router.push("/");
       }, 2000);
     } catch (error) {
+      toast.error("Oops, something went wrong...");
       console.error(error);
     }
   };
