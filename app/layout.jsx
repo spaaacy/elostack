@@ -1,7 +1,8 @@
-import { Roboto } from "next/font/google";
+import { Inter } from "next/font/google";
 import "@/styles/globals.css";
+import { UserProvider } from "@/context/UserContext";
 
-const inter = Roboto({ subsets: ["latin"], weight: "400" });
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "EloStack",
@@ -11,7 +12,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <UserProvider>{children}</UserProvider>
+      </body>
     </html>
   );
 }
