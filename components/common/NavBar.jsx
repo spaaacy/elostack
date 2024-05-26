@@ -58,6 +58,14 @@ const NavBar = () => {
         <Image src={"/logo.png"} alt={"logo"} width={50} height={50} />
         EloStack
       </Link>
+      <div className="ml-12">
+        <Link
+          href={"/projects"}
+          className="p-2 border-b-2 border-transparent hover:border-b-gray-300 hover:text-gray-300"
+        >
+          Projects
+        </Link>
+      </div>
       {showSignIn &&
         (session?.data.session ? (
           <button

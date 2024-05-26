@@ -10,7 +10,8 @@ module.exports = {
       colors: {
         purpledark: "#291E2A",
         orangeaccent: "#FF4500",
-        orangedark: "#cc3600",
+        orangedark: "#CC3600",
+        foreground: "#EBEBEB",
       },
     },
   },

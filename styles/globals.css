@@ -4,6 +4,7 @@
 
 @layer base {
   :root {
+    color-scheme: dark;
     --foreground-rgb: 235, 235, 235;
     --background-rgb: 41, 30, 42;
   }
