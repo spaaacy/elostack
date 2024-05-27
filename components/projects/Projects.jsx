@@ -188,10 +188,11 @@ const Projects = () => {
       <Footer />
       {showModal && (
         <ProjectModal
-          joined={memberList.some((m) => m.project_id === modalProject.id)}
+          joined={session?.data.session ? memberList.some((m) => m.project_id === modalProject.id) : false}
           project={modalProject}
           setShowModal={setShowModal}
           handleJoin={handleJoin}
+          session={session}
         />
       )}
       <Toaster />

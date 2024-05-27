@@ -2,7 +2,7 @@ import { formatDuration } from "@/utils/formatDuration";
 import Link from "next/link";
 import { IoMdClose } from "react-icons/io";
 
-const ProjectModal = ({ setShowModal, project, handleJoin, joined }) => {
+const ProjectModal = ({ setShowModal, project, handleJoin, joined, session }) => {
   const handleModalClose = (e) => {
     if (e.target === e.currentTarget) {
       setShowModal(false);
@@ -36,27 +36,38 @@ const ProjectModal = ({ setShowModal, project, handleJoin, joined }) => {
             <p className=" text-xs">{project.technologies}</p>
           </div>
 
-          {joined ? (
+          {session?.data.session ? (
+            joined ? (
+              <Link
+                href={`/projects/${project.id}`}
+                className={
+                  "bg-orangeaccent hover:bg-orangedark hover:text-gray-300 mt-auto self-end px-3 py-1  rounded-full text-sm  shadow shadow-black"
+                }
+              >
+                Open Project
+              </Link>
+            ) : (
+              <button
+                onClick={handleJoin}
+                disabled={project.status.toLowerCase() !== "looking for members"}
+                className={`${
+                  project.status.toLowerCase() !== "looking for members"
+                    ? "bg-gray-600 text-gray-400"
+                    : "bg-orangeaccent hover:bg-orangedark hover:text-gray-300"
+                } mt-auto self-end px-3 py-1  rounded-full text-sm  shadow shadow-black`}
+              >
+                Join
+              </button>
+            )
+          ) : (
             <Link
-              href={`/projects/${project.id}`}
+              href={"/signin"}
               className={
                 "bg-orangeaccent hover:bg-orangedark hover:text-gray-300 mt-auto self-end px-3 py-1  rounded-full text-sm  shadow shadow-black"
               }
             >
-              Open Project
-            </Link>
-          ) : (
-            <button
-              onClick={handleJoin}
-              disabled={project.status.toLowerCase() !== "looking for members"}
-              className={`${
-                project.status.toLowerCase() !== "looking for members"
-                  ? "bg-gray-600 text-gray-400"
-                  : "bg-orangeaccent hover:bg-orangedark hover:text-gray-300"
-              } mt-auto self-end px-3 py-1  rounded-full text-sm  shadow shadow-black`}
-            >
               Join
-            </button>
+            </Link>
           )}
         </div>
       </div>
