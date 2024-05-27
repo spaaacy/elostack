@@ -49,7 +49,7 @@ const ProjectView = () => {
                   })}
               </ul>
               <p className="mt-4 font-semibold">Technologies</p>
-              <p>{project.technology.map((t, i) => (i === project.technology.length - 1 ? t : `${t}, `))}</p>
+              <p>{project.technologies}</p>
               <p className="text-orangeaccent mt-4">
                 {`Duration: ${formatDuration(project.duration_length, project.duration_type)}`}
               </p>

@@ -24,9 +24,7 @@ const ProjectModal = ({ setShowModal, project }) => {
           </p>
         </div>
         <p className=" text-xs text-orangeaccent">Technologies</p>
-        <p className=" text-xs">
-          {project.technology.map((t, i) => (i === project.technology.length - 1 ? t : `${t}, `))}
-        </p>
+        <p className=" text-xs">{project.technologyies}</p>
         <div className="w-full flex justify-between items-end">
           <div className="flex flex-col justify-center items-start">
             <p className="  mt-1 text-xs text-orangeaccent">Members</p>

@@ -36,22 +36,32 @@
   }
 }
 
+/* Disable arrows for number input */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Scrollable Div */
 /* width */
 #scrollableDiv::-webkit-scrollbar {
   width: 10px;
 }
-
 /* Track */
 #scrollableDiv::-webkit-scrollbar-track {
   background: #111827;
 }
-
 /* Handle */
 #scrollableDiv::-webkit-scrollbar-thumb {
   background: #ff4500;
   border-radius: 5px;
 }
-
 /* Handle on hover */
 #scrollableDiv::-webkit-scrollbar-thumb:hover {
   background: #cc3600;
