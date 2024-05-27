@@ -58,12 +58,18 @@ const NavBar = () => {
         <Image src={"/logo.png"} alt={"logo"} width={50} height={50} />
         EloStack
       </Link>
-      <div className="ml-12">
+      <div className="ml-12 flex justify-center items-center gap-4">
         <Link
           href={"/projects"}
           className="p-2 border-b-2 border-transparent hover:border-b-gray-300 hover:text-gray-300"
         >
           Projects
+        </Link>
+        <Link
+          href={"/create-project"}
+          className="p-2 border-b-2 border-transparent hover:border-b-gray-300 hover:text-gray-300"
+        >
+          Create Project
         </Link>
       </div>
       {showSignIn &&

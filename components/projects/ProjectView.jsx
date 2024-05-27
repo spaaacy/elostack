@@ -24,8 +24,8 @@ const ProjectView = () => {
           </Link>
         </div>
         <p className="ml-12 font-light ">{project.status}</p>
-        <hr className="border-0 h-[1px] bg-gray-400 mt-4" />
-        <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 mt-8">
+        <hr className="border-0 h-[1px] bg-gray-400 my-4" />
+        <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 ">
           <div>
             <div className="p-2 rounded border bg-gray-900 bg-opacity-50 border-gray-400 flex flex-col font-light text-sm ">
               <p>

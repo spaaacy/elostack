@@ -109,14 +109,17 @@ const SignUp = () => {
       {loading ? (
         <Loader />
       ) : (
-        <main className="flex flex-col px-8 md:w-[480px] mx-auto">
+        <main className="flex flex-col md:w-[480px]">
           <h1 className="text-lg mx-auto">Sign Up</h1>
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="mt-4 px-8 py-6 rounded-lg bg-gray-900 bg-opacity-50 flex flex-col gap-2 border-gray-400 border-[1px]"
           >
-            <label className="text-sm">Username</label>
+            <label htmlFor="username" className="text-sm">
+              Username
+            </label>
             <input
+              id="username"
               {...register("username", { required: "Username is required" })}
               type="text"
               className="rounded-md bg-gray-900 p-2 text-sm border-[1px] border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
@@ -126,8 +129,11 @@ const SignUp = () => {
                 {errors.username?.message}
               </p>
             )}
-            <label className="text-sm">Email</label>
+            <label htmlFor="email" className="text-sm">
+              Email
+            </label>
             <input
+              id="email"
               {...register("email", { required: "Email is required" })}
               type="text"
               className="rounded-md bg-gray-900 p-2 text-sm border-[1px] border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
@@ -137,8 +143,11 @@ const SignUp = () => {
                 {errors.email?.message}
               </p>
             )}
-            <label className="text-sm">Password</label>
+            <label htmlFor="password" className="text-sm">
+              Password
+            </label>
             <input
+              id="password"
               {...register("password", { required: "Password is required", min: 6 })}
               type="password"
               className="rounded-md bg-gray-900 p-2 text-sm border-[1px] border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
@@ -148,8 +157,11 @@ const SignUp = () => {
                 {errors.password?.message}
               </p>
             )}
-            <label className="text-sm">Confirm Password</label>
+            <label htmlFor="confirmPassword" className="text-sm">
+              Confirm Password
+            </label>
             <input
+              id="confirmPassword"
               {...register("confirmPassword", {
                 required: "Confirm password is required",
                 min: 6,
