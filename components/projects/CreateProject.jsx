@@ -3,19 +3,26 @@
 import { useForm } from "react-hook-form";
 import Footer from "../common/Footer";
 import NavBar from "../common/NavBar";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { IoAddCircleSharp } from "react-icons/io5";
 import { UserContext } from "@/context/UserContext";
 import toast, { Toaster } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import Loader from "../common/Loader";
+import { BsStars } from "react-icons/bs";
 
 const CreateProject = () => {
   const { session } = useContext(UserContext);
   const [technologies, setTechnologies] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [ideaPrompt, setIdeaPrompt] = useState();
+  const [showIdeaPrompt, setShowIdeaPrompt] = useState(false);
+  const [showClear, setShowClear] = useState(false);
+  const ideaPromptRef = useRef(null);
   const router = useRouter();
   const {
+    watch,
+    reset,
     getValues,
     clearErrors,
     register,
@@ -23,6 +30,12 @@ const CreateProject = () => {
     setValue,
     formState: { errors },
   } = useForm();
+
+  useEffect(() => {
+    watch(() => {
+      setShowClear(true);
+    });
+  }, [watch]);
 
   const onSubmit = async (data, e) => {
     e.preventDefault();
@@ -57,6 +70,31 @@ const CreateProject = () => {
     }
   };
 
+  const generateIdea = async () => {
+    setShowIdeaPrompt(false);
+    try {
+      const response = await fetch("/api/gemini/generate-idea", {
+        method: "POST",
+        body: JSON.stringify({ ideaPrompt: ideaPrompt ? ideaPrompt : "Full-Stack React" }),
+      });
+      if (response.status === 200) {
+        const { idea } = await response.json();
+        setValue("title", idea.title);
+        setValue("description", idea.description);
+        setValue("durationType", idea.durationType);
+        setValue("durationLength", idea.durationLength);
+        setValue("teamSize", idea.teamSize);
+        setTechnologies(idea.technologies);
+      } else {
+        const { error } = await response.json();
+        throw error;
+      }
+    } catch (error) {
+      toast.error("Oops, something went wrong...");
+      console.error(error);
+    }
+  };
+
   const addTechnology = () => {
     const technology = getValues("technology");
     if (technology === "") return;
@@ -76,6 +114,18 @@ const CreateProject = () => {
     }
   };
 
+  const generateIdeaKeyDown = (e) => {
+    if (e.key === "Enter") {
+      generateIdea();
+    }
+  };
+
+  const clearValues = () => {
+    reset();
+    setTechnologies([]);
+    setShowClear(false);
+  };
+
   return (
     <div className="flex flex-col h-screen">
       <NavBar />
@@ -83,7 +133,30 @@ const CreateProject = () => {
         <Loader />
       ) : (
         <main className="md:w-[720px]">
-          <h1 className="text-2xl font-semibold">Create Project</h1>
+          <div className="flex justify-between items-center relative">
+            <h1 className="text-2xl font-semibold">Create Project</h1>
+            <button
+              onClick={() => setShowIdeaPrompt(!showIdeaPrompt)}
+              className="px-2 py-1 bg-orangeaccent hover:bg-orangedark rounded-full text-sm hover:text-gray-300 shadow shadow-black flex items-center"
+            >
+              <BsStars className="inline mr-2" />
+              Generate Idea
+            </button>
+            {showIdeaPrompt && (
+              <div ref={ideaPromptRef} className="absolute top-10 right-0 bg-gray-900 rounded px-2 py-1 w-60 flex">
+                <input
+                  onKeyDown={generateIdeaKeyDown}
+                  onChange={(e) => setIdeaPrompt(e.target.value)}
+                  className="bg-transparent text-xs flex-1"
+                  type="text"
+                  placeholder="Prompt (e.g., Full-Stack React)"
+                />
+                <button type="button" onClick={generateIdea} className="text-xs p-1 bg-orangeaccent rounded ml-2">
+                  Go
+                </button>
+              </div>
+            )}
+          </div>
           <hr className="border-0 h-[1px] bg-gray-400 my-4" />
           <form
             className="mt-4 px-8 py-6 rounded-lg bg-gray-900 bg-opacity-50 flex flex-col gap-2 border-gray-400 border-[1px]"
@@ -178,14 +251,14 @@ const CreateProject = () => {
                 Technologies is required
               </p>
             )}
-            <ul className="flex gap-1 items-center">
+            <ul className="flex gap-1 items-center flex-wrap">
               {technologies.length > 0 &&
                 technologies.map((t, i) => {
                   return (
                     <li
                       onClick={() => removeTechnology(t)}
                       key={i}
-                      className="hover:cursor-pointer text-xs bg-orangeaccent px-2 py-1 rounded-full"
+                      className="hover:cursor-pointer flex-shrink-0 text-xs bg-orangeaccent px-2 py-1 rounded-full"
                     >
                       {t}
                     </li>
@@ -193,12 +266,23 @@ const CreateProject = () => {
                 })}
             </ul>
 
-            <button
-              className="mt-4 ml-auto px-2 py-1 bg-orangeaccent hover:bg-orangedark rounded-full text-sm hover:text-gray-300 shadow shadow-black"
-              type="submit"
-            >
-              Create
-            </button>
+            <div className="flex justify-between items-center">
+              {showClear && (
+                <button
+                  onClick={clearValues}
+                  className="mt-4 px-2 py-1 bg-orangeaccent hover:bg-orangedark rounded-full text-sm hover:text-gray-300 shadow shadow-black"
+                  type="button"
+                >
+                  Clear
+                </button>
+              )}
+              <button
+                className="mt-4 ml-auto px-2 py-1 bg-orangeaccent hover:bg-orangedark rounded-full text-sm hover:text-gray-300 shadow shadow-black"
+                type="submit"
+              >
+                Create
+              </button>
+            </div>
           </form>
         </main>
       )}
