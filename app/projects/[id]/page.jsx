@@ -1,9 +1,11 @@
-import Project from "@/components/projects/Project";
+import ProjectView from "@/components/projects/ProjectView";
 
-// TODO: Generate metadata
+export const metadata = {
+  title: "Project View | EloStack",
+};
 
 const Page = () => {
-  return <Project />;
+  return <ProjectView />;
 };
 
 export default Page;

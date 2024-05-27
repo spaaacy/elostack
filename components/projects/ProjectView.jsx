@@ -8,7 +8,7 @@ import { IoMdArrowBack } from "react-icons/io";
 import { FaGithub } from "react-icons/fa";
 import { formatDuration } from "@/utils/formatDuration";
 
-const Project = () => {
+const ProjectView = () => {
   const projectId = useParams();
   return (
     <div className="flex flex-col h-screen">
@@ -16,11 +16,11 @@ const Project = () => {
       <main>
         <div className="flex justify-start items-center">
           <Link href={"/projects"}>
-            <IoMdArrowBack className="text-3xl" />
+            <IoMdArrowBack className="text-3xl hover:text-gray-300" />
           </Link>
           <h1 className="ml-4 font-bold text-2xl">{project.title}</h1>
           <Link href={project.github} target="_blank">
-            <FaGithub className="ml-4 text-3xl" />
+            <FaGithub className="ml-4 text-3xl hover:text-gray-300" />
           </Link>
         </div>
         <p className="ml-12 font-light ">{project.status}</p>
@@ -35,15 +35,15 @@ const Project = () => {
               </p>
               <p className="mt-4 font-semibold">Members</p>
               <ul>
-                <Link href={"/"} className="hover:underline ">{`${project.leader} (Leader)`}</Link>
+                <p href={"/"} className=" ">{`${project.leader} (Leader)`}</p>
                 {project.members
                   .filter((member) => member !== project.leader)
                   .map((member, i) => {
                     return (
                       <li key={i}>
-                        <Link href={"/"} className="hover:underline ">
+                        <p href={"/"} className=" ">
                           {member}
-                        </Link>
+                        </p>
                       </li>
                     );
                   })}
@@ -68,7 +68,7 @@ const Project = () => {
                     }`}
                   >
                     <p key={i} className="text-sm">
-                      <Link href={"/"} className="font-semibold hover:underline ">{`${message.username}`}</Link>
+                      <span href={"/"} className="font-semibold  ">{`${message.username}`}</span>
                       <br />
                       {message.message}
                     </p>
@@ -92,7 +92,7 @@ const Project = () => {
   );
 };
 
-export default Project;
+export default ProjectView;
 
 const project = {
   id: 15,

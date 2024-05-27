@@ -6,28 +6,42 @@ import NavBar from "../common/NavBar";
 import { formatDuration } from "@/utils/formatDuration";
 import { FaCircleInfo } from "react-icons/fa6";
 import { useEffect, useState } from "react";
+import ProjectModal from "./ProjectModal";
 
 const Projects = () => {
   const [filteredProjects, setFilteredProjects] = useState(projects);
   const [searchInput, setSearchInput] = useState("");
   const [statusInput, setStatusInput] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [modalProject, setModalProject] = useState();
 
   useEffect(() => {
-    console.log({ searchInput, statusInput });
+    if (showModal) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
     const filteredProjects = projects.filter(
       (project) =>
         (statusInput === "" ? true : project.status.toLowerCase() === statusInput) &&
         (searchInput === ""
           ? true
           : project.title.toLowerCase().includes(searchInput) ||
-            project.description.toLowerCase().includes(searchInput))
+            project.description.toLowerCase().includes(searchInput) ||
+            project.technology.some((tech) => tech.toLowerCase().includes(searchInput)))
     );
 
     setFilteredProjects(filteredProjects);
-  }, [searchInput, statusInput]);
+  }, [searchInput, statusInput, showModal]);
+
+  const handleClick = (project) => {
+    setShowModal(true);
+    setModalProject(project);
+  };
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen relative">
       <NavBar />
       <main>
         <div className="flex justify-between items-center">
@@ -42,33 +56,33 @@ const Projects = () => {
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder={"Search..."}
             type="text"
-            className="w-96 text-sm p-1 rounded border bg-gray-900 bg-opacity-50 focus:bg-gray-800 border-gray-400"
+            className="w-96 text-sm p-2 rounded border bg-gray-900 bg-opacity-50 focus:bg-gray-800 border-gray-400"
           />
           <select
             name="selectedStatus"
             onChange={(e) => setStatusInput(e.target.value)}
-            className="text-sm p-1 rounded border bg-gray-900 bg-opacity-50 hover:bg-gray-800 border-gray-400"
+            className="text-sm p-2 rounded border bg-gray-900 bg-opacity-50 hover:bg-gray-800 border-gray-400"
           >
             <option value={""}>Show All</option>
             <option value={"in progress"}>In Progress</option>
             <option value={"looking for members"}>Looking for members</option>
           </select>
         </div>
-        <ul className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 grid gap-4 mt-4">
+        <ul className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 grid gap-4 mt-4">
           {filteredProjects.map((p, i) => {
             return (
               <li key={i}>
-                <Link
-                  href={`/projects/${p.id}`}
-                  className="shadow-md shadow-black h-36 p-2 flex flex-col border bg-gray-900 bg-opacity-50 rounded hover:bg-gray-800 border-gray-400 text-xs font-light"
+                <div
+                  onClick={() => handleClick(p)}
+                  className="hover:cursor-pointer h-48 p-2 flex flex-col border bg-gray-900 bg-opacity-50 rounded hover:bg-gray-800 border-gray-400 text-xs font-light"
                 >
                   <div className="flex justify-between items-start ">
-                    <h3 className="text-sm font-medium">{p.title}</h3>
+                    <h3 className="text-base font-medium">{p.title}</h3>
                     <p className="text-right flex-shrink-0 bg-orangeaccent px-2 py-1 rounded-full ml-2 shadow shadow-black">
                       {p.status}
                     </p>
                   </div>
-                  <p className="text-xs mt-2 line-clamp-4">{p.description}</p>
+                  <p className="text-sm mt-2 line-clamp-4">{p.description}</p>
                   <div className="mt-auto flex justify-between items-center ">
                     <p className="text-orangeaccent">{formatDuration(p.duration_length, p.duration_type)}</p>
                     <div className="relative group">
@@ -78,13 +92,14 @@ const Projects = () => {
                       </p>
                     </div>
                   </div>
-                </Link>
+                </div>
               </li>
             );
           })}
         </ul>
       </main>
       <Footer />
+      {showModal && <ProjectModal project={modalProject} setShowModal={setShowModal} />}
     </div>
   );
 };

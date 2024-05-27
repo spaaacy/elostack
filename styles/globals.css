@@ -27,6 +27,15 @@
   }
 }
 
+@layer utilities {
+  .line-clamp-14 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 14;
+  }
+}
+
 /* width */
 #scrollableDiv::-webkit-scrollbar {
   width: 10px;
