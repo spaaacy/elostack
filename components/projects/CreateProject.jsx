@@ -10,6 +10,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import Loader from "../common/Loader";
 import { BsStars } from "react-icons/bs";
+import Link from "next/link";
 
 const CreateProject = () => {
   const { session } = useContext(UserContext);
@@ -276,12 +277,21 @@ const CreateProject = () => {
                   Clear
                 </button>
               )}
-              <button
-                className="mt-4 ml-auto px-2 py-1 bg-orangeaccent hover:bg-orangedark rounded-full text-sm hover:text-gray-300 shadow shadow-black"
-                type="submit"
-              >
-                Create
-              </button>
+              {session?.data.session ? (
+                <button
+                  className="mt-4 ml-auto px-2 py-1 bg-orangeaccent hover:bg-orangedark rounded-full text-sm hover:text-gray-300 shadow shadow-black"
+                  type="submit"
+                >
+                  Create
+                </button>
+              ) : (
+                <Link
+                  href={"/signin"}
+                  className="mt-4 ml-auto px-2 py-1 bg-orangeaccent hover:bg-orangedark rounded-full text-sm hover:text-gray-300 shadow shadow-black"
+                >
+                  Create
+                </Link>
+              )}
             </div>
           </form>
         </main>
