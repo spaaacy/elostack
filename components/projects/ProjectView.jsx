@@ -7,106 +7,147 @@ import Link from "next/link";
 import { IoMdArrowBack } from "react-icons/io";
 import { FaGithub } from "react-icons/fa";
 import { formatDuration } from "@/utils/formatDuration";
+import { useContext, useEffect, useState } from "react";
+import { UserContext } from "@/context/UserContext";
+import Loader from "../common/Loader";
 
 const ProjectView = () => {
-  const projectId = useParams();
+  const { id } = useParams();
+  const { session } = useContext(UserContext);
+  const [project, setProject] = useState();
+  const [loading, setLoading] = useState(true);
+  const [members, setMembers] = useState();
+  const [dataLoaded, setDataLoaded] = useState(false);
+
+  useEffect(() => {
+    if (session?.data.session && !dataLoaded) {
+      fetchProject();
+      fetchMembers();
+      setDataLoaded(true);
+    }
+  }, [session]);
+
+  const fetchProject = async () => {
+    try {
+      const response = await fetch(`/api/project/${id}`, {
+        method: "GET",
+      });
+      if (response.status === 200) {
+        const { project } = await response.json();
+        setProject(project);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchMembers = async () => {
+    try {
+      const response = await fetch(`/api/project/${id}/member`, {
+        method: "GET",
+      });
+      if (response.status === 200) {
+        const { members } = await response.json();
+        setMembers(members);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div className="flex flex-col h-screen">
       <NavBar />
-      <main>
-        <div className="flex justify-start items-center">
-          <Link href={"/projects"}>
-            <IoMdArrowBack className="text-3xl hover:text-gray-300" />
-          </Link>
-          <h1 className="ml-4 font-bold text-2xl">{project.title}</h1>
-          <Link href={project.github} target="_blank">
-            <FaGithub className="ml-4 text-3xl hover:text-gray-300" />
-          </Link>
-        </div>
-        <p className="ml-12 font-light ">{project.status}</p>
-        <hr className="border-0 h-[1px] bg-gray-400 my-4" />
-        <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 ">
-          <div>
-            <div className="p-2 rounded border bg-gray-900 bg-opacity-50 border-gray-400 flex flex-col font-light text-sm ">
-              <p>
-                <span className="font-semibold ">Description</span>
-                <br />
-                {project.description}
-              </p>
-              <p className="mt-4 font-semibold">Members</p>
-              <ul>
-                <p href={"/"} className=" ">{`${project.leader} (Leader)`}</p>
-                {project.members
-                  .filter((member) => member !== project.leader)
-                  .map((member, i) => {
-                    return (
-                      <li key={i}>
-                        <p href={"/"} className=" ">
-                          {member}
-                        </p>
-                      </li>
-                    );
-                  })}
-              </ul>
-              <p className="mt-4 font-semibold">Technologies</p>
-              <p>{project.technologies}</p>
-              <p className="text-orangeaccent mt-4">
-                {`Duration: ${formatDuration(project.duration_length, project.duration_type)}`}
-              </p>
+      {loading ? (
+        <Loader />
+      ) : (
+        <main>
+          <div className="flex justify-start items-center">
+            <Link href={"/projects"}>
+              <IoMdArrowBack className="text-3xl hover:text-gray-300" />
+            </Link>
+            <h1 className="ml-4 font-bold text-2xl">{project.title}</h1>
+            {project.github && (
+              <Link href={project.github} target="_blank">
+                <FaGithub className="ml-4 text-3xl hover:text-gray-300" />
+              </Link>
+            )}
+          </div>
+          <p className="ml-12 font-light ">{project.status}</p>
+          <hr className="border-0 h-[1px] bg-gray-400 my-4" />
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 ">
+            <div>
+              <div className="p-2 rounded border bg-gray-900 bg-opacity-50 border-gray-400 flex flex-col font-light text-sm ">
+                <p>
+                  <span className="font-semibold ">Description</span>
+                  <br />
+                  {project.description}
+                </p>
+                <p className="mt-4 font-semibold">Members</p>
+                <ul>
+                  {console.log(project)}
+                  <p href={"/"} className=" ">{`${project.user[0].username} (Leader)`}</p>
+                  {members &&
+                    members
+                      .filter((member) => member.user_id !== project.leader)
+                      .map((member, i) => {
+                        return (
+                          <li key={i}>
+                            <p href={"/"} className=" ">
+                              {member.user.username}
+                            </p>
+                          </li>
+                        );
+                      })}
+                </ul>
+                <p className="mt-4 font-semibold">Technologies</p>
+                <p>{project.technologies}</p>
+                <p className="text-orangeaccent mt-4">
+                  {`Duration: ${formatDuration(project.duration_length, project.duration_type)}`}
+                </p>
+              </div>
+            </div>
+            <div className="sm:ml-4 max-sm:mt-4 sm:col-span-2 lg:col-span-4 ">
+              <div
+                id="scrollableDiv"
+                className="h-[600px]  p-4 rounded border bg-gray-900 bg-opacity-50 border-gray-400 flex flex-col items-start justify-start overflow-y-auto"
+              >
+                {chat.map((message, i) => {
+                  return (
+                    <div
+                      key={i}
+                      className={`px-3 py-2 rounded-lg bg-gray-700 bg-opacity-50 mb-4 ${
+                        message.username === "Alice" ? "self-end text-right" : ""
+                      }`}
+                    >
+                      <p key={i} className="text-sm">
+                        <span href={"/"} className="font-semibold  ">{`${message.username}`}</span>
+                        <br />
+                        {message.message}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="flex items-center gap-2 justify-center mt-2">
+                <input
+                  type="text"
+                  placeholder="Send a message..."
+                  className="w-full text-sm p-2 rounded border bg-gray-900 bg-opacity-50 focus:bg-gray-800 border-gray-400"
+                />
+                <button className="rounded-full px-3 py-2 bg-orangeaccent text-sm hover:bg-orangedark">Send</button>
+              </div>
             </div>
           </div>
-          <div className="sm:ml-4 max-sm:mt-4 sm:col-span-2 lg:col-span-4 ">
-            <div
-              id="scrollableDiv"
-              className="h-[600px]  p-4 rounded border bg-gray-900 bg-opacity-50 border-gray-400 flex flex-col items-start justify-start overflow-y-auto"
-            >
-              {chat.map((message, i) => {
-                return (
-                  <div
-                    className={`px-3 py-2 rounded-lg bg-gray-700 bg-opacity-50 mb-4 ${
-                      message.username === "Alice" ? "self-end text-right" : ""
-                    }`}
-                  >
-                    <p key={i} className="text-sm">
-                      <span href={"/"} className="font-semibold  ">{`${message.username}`}</span>
-                      <br />
-                      {message.message}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="flex items-center gap-2 justify-center mt-2">
-              <input
-                type="text"
-                placeholder="Send a message..."
-                className="w-full text-sm p-2 rounded border bg-gray-900 bg-opacity-50 focus:bg-gray-800 border-gray-400"
-              />
-              <button className="rounded-full px-3 py-2 bg-orangeaccent text-sm hover:bg-orangedark">Send</button>
-            </div>
-          </div>
-        </div>
-      </main>
+        </main>
+      )}
       <Footer />
     </div>
   );
 };
 
 export default ProjectView;
-
-const project = {
-  id: 15,
-  title: "AI-powered Language Translation",
-  description: "Develop an intelligent language translation system using artificial intelligence",
-  members: ["Daniel Valencia", "Ava Beltran", "Isabella Vega", "Ethan Sandoval"],
-  duration_length: 16,
-  duration_type: "week",
-  team_size: 8,
-  status: "In Progress",
-  leader: "Ethan Sandoval",
-  technology: ["Python", "TensorFlow", "Natural Language Processing"],
-  github: "https://github.com/spaaacy/elostack",
-};
 
 const chat = [
   {

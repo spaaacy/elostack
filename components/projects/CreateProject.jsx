@@ -47,6 +47,9 @@ const CreateProject = () => {
       });
       if (response.status === 201) {
         router.push("/projects");
+      } else {
+        const { error } = await response.json();
+        throw error;
       }
     } catch (error) {
       console.error(error);

@@ -9,6 +9,8 @@ import { useContext, useEffect, useState } from "react";
 import ProjectModal from "./ProjectModal";
 import Loader from "../common/Loader";
 import { UserContext } from "@/context/UserContext";
+import { useRouter } from "next/navigation";
+import toast, { Toaster } from "react-hot-toast";
 
 const Projects = () => {
   const { session } = useContext(UserContext);
@@ -19,10 +21,15 @@ const Projects = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalProject, setModalProject] = useState();
   const [projects, setProjects] = useState([]);
+  const router = useRouter();
+  const [dataLoaded, setDataLoaded] = useState(false);
+  const [memberList, setMemberList] = useState();
 
   useEffect(() => {
-    if (session && projects.length === 0) {
+    if (session && !dataLoaded) {
       fetchProjects();
+      fetchUserMemberList();
+      setDataLoaded(true);
     }
 
     if (showModal) {
@@ -44,12 +51,58 @@ const Projects = () => {
     setFilteredProjects(filteredProjects);
   }, [searchInput, statusInput, showModal, session]);
 
+  const handleJoin = async () => {
+    if (!session.data.session) return;
+    try {
+      setShowModal(false);
+      setLoading(true);
+      const response = await fetch("/api/member/create", {
+        method: "POST",
+        headers: {
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+        },
+        body: JSON.stringify({
+          userId: session.data.session.user.id,
+          projectId: modalProject.id,
+        }),
+      });
+      if (response.status === 201) {
+        router.push(`/projects/${modalProject.id}`);
+      } else {
+        const { error } = await response.json();
+        throw error;
+      }
+    } catch (error) {
+      setLoading(false);
+      toast.error("Oops, something went wrong...");
+      console.error(error);
+    }
+  };
+
+  const fetchUserMemberList = async () => {
+    const userId = session.data.session?.user.id;
+    if (!userId) return;
+    try {
+      const response = await fetch(`/api/member/${userId}`, {
+        method: "GET",
+        headers: {
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+        },
+      });
+      if (response.status === 200) {
+        const { data } = await response.json();
+        setMemberList(data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const fetchProjects = async () => {
     try {
       const response = await fetch("/api/project", {
         method: "GET",
       });
-      console.log(response);
       if (response.status === 200) {
         const { projects } = await response.json();
         setProjects(projects);
@@ -133,7 +186,15 @@ const Projects = () => {
         </main>
       )}
       <Footer />
-      {showModal && <ProjectModal project={modalProject} setShowModal={setShowModal} />}
+      {showModal && (
+        <ProjectModal
+          joined={memberList.some((m) => m.project_id === modalProject.id)}
+          project={modalProject}
+          setShowModal={setShowModal}
+          handleJoin={handleJoin}
+        />
+      )}
+      <Toaster />
     </div>
   );
 };

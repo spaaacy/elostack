@@ -4,7 +4,6 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 export async function POST(req, res) {
   try {
-    console.log("ASDASD");
     // Authentication
     const auth = await supabase.auth.signInWithPassword({
       email: process.env.SUPABASE_ADMIN_EMAIL,
