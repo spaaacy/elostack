@@ -127,15 +127,8 @@ const Projects = () => {
         <Loader />
       ) : (
         <main>
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-semibold">Find Projects</h1>
-            <Link
-              href={"/create-project"}
-              className="px-2 py-1 bg-orangeaccent hover:bg-orangedark rounded-full text-sm hover:text-gray-300 shadow shadow-black"
-            >
-              Create a project
-            </Link>
-          </div>
+          <h1 className="text-2xl font-semibold">Find Projects</h1>
+
           <hr className="border-0 h-[1px] bg-gray-400 my-4" />
           <div className="flex items-center justify-between gap-2">
             <input

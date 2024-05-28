@@ -1,11 +1,11 @@
 import React from "react";
-import { ClimbingBoxLoader } from "react-spinners";
+import { BounceLoader } from "react-spinners";
 
 const Loader = () => {
   return (
     <div className="flex flex-1 ">
       <div className="m-auto">
-        <ClimbingBoxLoader color={"#EBEBEB"} />
+        <BounceLoader color={"#FF4500"} />
       </div>
     </div>
   );

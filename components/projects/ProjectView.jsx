@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import NavBar from "../common/NavBar";
 import Footer from "../common/Footer";
 import Link from "next/link";
@@ -18,12 +18,21 @@ const ProjectView = () => {
   const [loading, setLoading] = useState(true);
   const [members, setMembers] = useState();
   const [dataLoaded, setDataLoaded] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    if (session?.data.session && !dataLoaded) {
-      fetchProject();
-      fetchMembers();
+    const loadData = async () => {
+      await fetchProject();
+      await fetchMembers();
       setDataLoaded(true);
+    };
+
+    if (session) {
+      if (session.data.session) {
+        if (!dataLoaded) loadData();
+      } else {
+        router.push("/signin");
+      }
     }
   }, [session]);
 
@@ -35,7 +44,6 @@ const ProjectView = () => {
       if (response.status === 200) {
         const { project } = await response.json();
         setProject(project);
-        setLoading(false);
       }
     } catch (error) {
       console.error(error);
@@ -50,6 +58,14 @@ const ProjectView = () => {
       if (response.status === 200) {
         const { members } = await response.json();
         setMembers(members);
+        let access = false;
+        const userId = session.data.session?.user.id;
+        for (const member of members) {
+          if (member.user_id === userId) access = true;
+        }
+        if (!access) {
+          router.push("/projects");
+        } else setLoading(false);
       }
     } catch (error) {
       console.error(error);
@@ -57,12 +73,12 @@ const ProjectView = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen overflow-y-auto">
       <NavBar />
       {loading ? (
         <Loader />
       ) : (
-        <main>
+        <main className="">
           <div className="flex justify-start items-center">
             <Link href={"/projects"}>
               <IoMdArrowBack className="text-3xl hover:text-gray-300" />
@@ -86,7 +102,6 @@ const ProjectView = () => {
                 </p>
                 <p className="mt-4 font-semibold">Members</p>
                 <ul>
-                  {console.log(project)}
                   <p href={"/"} className=" ">{`${project.user[0].username} (Leader)`}</p>
                   {members &&
                     members
@@ -111,7 +126,7 @@ const ProjectView = () => {
             <div className="sm:ml-4 max-sm:mt-4 sm:col-span-2 lg:col-span-4 ">
               <div
                 id="scrollableDiv"
-                className="h-[600px]  p-4 rounded border bg-gray-900 bg-opacity-50 border-gray-400 flex flex-col items-start justify-start overflow-y-auto"
+                className="h-[600px] p-4 rounded border bg-gray-900 bg-opacity-50 border-gray-400 flex flex-col items-start justify-start overflow-y-auto"
               >
                 {chat.map((message, i) => {
                   return (

@@ -21,6 +21,7 @@ const CreateProject = () => {
   const [showClear, setShowClear] = useState(false);
   const ideaPromptRef = useRef(null);
   const router = useRouter();
+
   const {
     watch,
     reset,
@@ -73,6 +74,7 @@ const CreateProject = () => {
 
   const generateIdea = async () => {
     setShowIdeaPrompt(false);
+    setLoading(true);
     try {
       const response = await fetch("/api/gemini/generate-idea", {
         method: "POST",
@@ -93,6 +95,8 @@ const CreateProject = () => {
     } catch (error) {
       toast.error("Oops, something went wrong...");
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 

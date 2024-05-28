@@ -11,7 +11,10 @@ const ProjectModal = ({ setShowModal, project, handleJoin, joined, session }) =>
 
   return (
     <div onClick={handleModalClose} className="bg-gray-900 bg-opacity-50 h-screen w-screen fixed">
-      <div className="flex flex-col items-start justify-start fixed h-1/2 w-[480px] bg-gray-900 rounded p-4 left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
+      <div
+        id="scrollableDiv"
+        className="flex flex-col items-start justify-start fixed h-1/2 w-[480px] bg-gray-900 rounded p-4 left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 overflow-y-auto"
+      >
         <div className="flex justify-between items-center w-full">
           <h3 className="font-semibold ">{project.title}</h3>
           <button className="ml-auto" onClick={() => setShowModal(false)}>
@@ -41,7 +44,7 @@ const ProjectModal = ({ setShowModal, project, handleJoin, joined, session }) =>
               <Link
                 href={`/projects/${project.id}`}
                 className={
-                  "bg-orangeaccent hover:bg-orangedark hover:text-gray-300 mt-auto self-end px-3 py-1  rounded-full text-sm  shadow shadow-black"
+                  "bg-orangeaccent hover:bg-orangedark hover:text-gray-300 mt-auto self-end px-3 py-1  rounded-full text-sm  shadow shadow-black flex-shrink-0"
                 }
               >
                 Open Project
