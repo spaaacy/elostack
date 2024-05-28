@@ -13,7 +13,7 @@ const ProjectModal = ({ setShowModal, project, handleJoin, joined, session }) =>
     <div onClick={handleModalClose} className="bg-gray-900 bg-opacity-50 h-screen w-screen fixed">
       <div
         id="scrollableDiv"
-        className="flex flex-col items-start justify-start fixed h-1/2 w-[480px] bg-gray-900 rounded p-4 left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 overflow-y-auto"
+        className="flex flex-col items-start justify-start fixed h-1/2 max-sm:w-full sm:w-[480px] bg-gray-900 rounded p-4 left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 overflow-y-auto"
       >
         <div className="flex justify-between items-center w-full">
           <h3 className="font-semibold ">{project.title}</h3>

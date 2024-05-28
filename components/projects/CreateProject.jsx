@@ -138,7 +138,7 @@ const CreateProject = () => {
         <Loader />
       ) : (
         <main className="md:w-[720px]">
-          <div className="flex justify-between items-center relative">
+          <div className="flex justify-between items-center relative flex-wrap gap-1">
             <h1 className="text-2xl font-semibold">Create Project</h1>
             <button
               onClick={() => setShowIdeaPrompt(!showIdeaPrompt)}
@@ -156,7 +156,11 @@ const CreateProject = () => {
                   type="text"
                   placeholder="Prompt (e.g., Full-Stack React)"
                 />
-                <button type="button" onClick={generateIdea} className="text-xs p-1 bg-orangeaccent rounded ml-2">
+                <button
+                  type="button"
+                  onClick={generateIdea}
+                  className="text-xs p-1 bg-orangeaccent hover:bg-orangedark hover:text-gray-300  rounded ml-2"
+                >
                   Go
                 </button>
               </div>
@@ -192,7 +196,7 @@ const CreateProject = () => {
               </p>
             )}
 
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center justify-between gap-2 flex-wrap">
               <div className="flex gap-2 items-center justify-start">
                 <label htmlFor="teamSize" className="text-sm">
                   Team size
@@ -205,7 +209,7 @@ const CreateProject = () => {
                   {...register("teamSize", { required: "Team size is required" })}
                 />
               </div>
-              <div className="flex gap-2 items-center justify-start">
+              <div className="flex gap-2 items-center justify-start flex-wrap">
                 <label htmlFor="durationLength" className="text-sm">
                   Duration
                 </label>
@@ -243,7 +247,7 @@ const CreateProject = () => {
                 {...register("technology", {
                   validate: (value, formvalues) => technologies.length > 0,
                 })}
-                className="flex-1 text-sm p-1 rounded border bg-gray-900 bg-opacity-50 focus:bg-gray-800 border-gray-400"
+                className="flex-1 text-sm p-1 rounded border bg-gray-900 bg-opacity-50 focus:bg-gray-800 border-gray-400 min-w-0"
                 type="text"
                 onKeyDown={technologyKeyDown}
               />

@@ -10,11 +10,8 @@ import { formatDuration } from "@/utils/formatDuration";
 import { useContext, useEffect, useRef, useState } from "react";
 import { UserContext } from "@/context/UserContext";
 import Loader from "../common/Loader";
-import { BsThreeDotsVertical } from "react-icons/bs";
-import { Tooltip } from "react-tooltip";
 import toast, { Toaster } from "react-hot-toast";
-
-const status = ["In Progress", "Looking for members", "Complete"];
+import SettingsDropdown from "./SettingsDropdown";
 
 const ProjectView = () => {
   const { id } = useParams();
@@ -25,11 +22,7 @@ const ProjectView = () => {
   const [dataLoaded, setDataLoaded] = useState(false);
   const router = useRouter();
   const [isLeader, setIsLeader] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const dropdownRef = useRef();
-  const statusRef = useRef();
   const [showLeaderModal, setShowLeaderModal] = useState(false);
-  const [showChangeStatus, setShowChangeStatus] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -45,11 +38,6 @@ const ProjectView = () => {
         router.push("/signin");
       }
     }
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
   }, [session]);
 
   const fetchProject = async () => {
@@ -91,33 +79,6 @@ const ProjectView = () => {
     }
   };
 
-  const leaveProject = async () => {
-    if (!session.data.session) return;
-    try {
-      setLoading(true);
-      const response = await fetch("/api/member/delete", {
-        method: "DELETE",
-        headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
-        },
-        body: JSON.stringify({
-          userId: session.data.session.user.id,
-          projectId: project.id,
-        }),
-      });
-      if (response.status === 200) {
-        router.push("/projects");
-      } else {
-        const { error } = await response.json();
-        throw error;
-      }
-    } catch (error) {
-      setLoading(false);
-      toast.error("Oops, something went wrong...");
-      console.error(error);
-    }
-  };
-
   const changeLeader = async (id) => {
     if (!session.data.session) return;
     try {
@@ -148,45 +109,6 @@ const ProjectView = () => {
     }
   };
 
-  const changeStatus = async (status) => {
-    if (!session.data.session) return;
-    try {
-      setShowChangeStatus(false);
-      setLoading(true);
-      const response = await fetch("/api/project/change-status", {
-        method: "PATCH",
-        headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
-        },
-        body: JSON.stringify({
-          status,
-          projectId: project.id,
-        }),
-      });
-      if (response.status === 200) {
-        toast.success("Status changed");
-        setTimeout(() => window.location.reload(), 1000);
-      } else {
-        const { error } = await response.json();
-        throw error;
-      }
-    } catch (error) {
-      toast.error("Oops, something went wrong...");
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleClickOutside = (event) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-      setShowDropdown(false);
-    }
-    if (statusRef.current && !statusRef.current.contains(event.target)) {
-      setShowChangeStatus(false);
-    }
-  };
-
   return (
     <div className="flex flex-col h-screen overflow-y-auto">
       <NavBar />
@@ -194,7 +116,7 @@ const ProjectView = () => {
         <Loader />
       ) : (
         <main className="">
-          <div className="flex justify-start items-center relative">
+          <div className="flex justify-start items-end relative">
             <Link href={"/projects"}>
               <IoMdArrowBack className="text-3xl hover:text-gray-300" />
             </Link>
@@ -204,91 +126,14 @@ const ProjectView = () => {
                 <FaGithub className="ml-4 text-3xl hover:text-gray-300" />
               </Link>
             )}
-            <button
-              type="button"
-              disabled={showDropdown || showChangeStatus}
-              onClick={() => setShowDropdown(true)}
-              className="ml-auto"
-            >
-              <BsThreeDotsVertical className="text-xl" />
-            </button>
-            {showDropdown && (
-              <div
-                ref={dropdownRef}
-                className="absolute top-10 border-gray-400 border right-0 bg-gray-900 rounded p-2 text-sm flex flex-col hover:text-gray-200 text-gray-300 justify-center items-end"
-              >
-                {isLeader && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowChangeStatus(true);
-                      setShowDropdown(false);
-                    }}
-                    className="hover:bg-gray-800 px-2 py-1 rounded"
-                  >
-                    Change status
-                  </button>
-                )}
-                {isLeader && members.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowLeaderModal(true);
-                      setShowDropdown(false);
-                    }}
-                    className="hover:bg-gray-800 px-2 py-1 rounded"
-                  >
-                    Change leader
-                  </button>
-                )}
-                <button
-                  type="button"
-                  disabled={isLeader}
-                  onClick={leaveProject}
-                  data-tooltip-id="leader-tooltip"
-                  data-tooltip-content="Leader cannot leave project"
-                  className={`${
-                    isLeader ? "text-gray-500 hover:cursor-not-allowed" : "hover:bg-gray-800 text-red-500"
-                  }  p-1 `}
-                >
-                  Leave project
-                </button>
-                {isLeader && <Tooltip id="leader-tooltip" place="bottom" type="dark" effect="float" />}
-              </div>
-            )}
-            {showChangeStatus && (
-              <div
-                ref={statusRef}
-                className="absolute top-10 border-gray-400 border right-0 bg-gray-900 rounded p-2 text-sm flex flex-col hover:text-gray-200 text-gray-300 justify-center items-end"
-              >
-                {status
-                  .filter((s) => s.toLowerCase() !== project.status.toLowerCase())
-                  .map((status) => {
-                    return (
-                      <button
-                        key={status}
-                        type="button"
-                        onClick={() => changeStatus(status)}
-                        className={"hover:bg-gray-800 py-1 px-2 w-full text-right rounded"}
-                      >
-                        {status}
-                      </button>
-                    );
-                  })}
-                <hr className="border-0 h-[1px] bg-gray-600 w-full my-1 rounded-full" />
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowChangeStatus(false);
-                    setShowDropdown(true);
-                  }}
-                  className={"hover:bg-gray-800 py-1 px-2 w-full text-right rounded"}
-                >
-                  Back
-                </button>
-                {isLeader && <Tooltip id="leader-tooltip" place="bottom" type="dark" effect="float" />}
-              </div>
-            )}
+            <SettingsDropdown
+              setShowLeaderModal={setShowLeaderModal}
+              isLeader={isLeader}
+              project={project}
+              members={members}
+              session={session}
+              setLoading={setLoading}
+            />
           </div>
           <p className="ml-12 font-light ">{project.status}</p>
           <hr className="border-0 h-[1px] bg-gray-400 my-4" />

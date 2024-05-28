@@ -130,17 +130,17 @@ const Projects = () => {
           <h1 className="text-2xl font-semibold">Find Projects</h1>
 
           <hr className="border-0 h-[1px] bg-gray-400 my-4" />
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
             <input
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder={"Search..."}
               type="text"
-              className="w-96 text-sm p-2 rounded border bg-gray-900 bg-opacity-50 focus:bg-gray-800 border-gray-400"
+              className="min-w-0 w-96 text-sm p-2 rounded border bg-gray-900 bg-opacity-50 focus:bg-gray-800 border-gray-400"
             />
             <select
               name="selectedStatus"
               onChange={(e) => setStatusInput(e.target.value)}
-              className="text-sm p-2 rounded border bg-gray-900 bg-opacity-50 hover:bg-gray-800 border-gray-400"
+              className="min-w-0  text-sm p-2 rounded border bg-gray-900 bg-opacity-50 hover:bg-gray-800 border-gray-400"
             >
               <option value={""}>Show All</option>
               <option value={"looking for members"}>Looking for members</option>
@@ -156,14 +156,14 @@ const Projects = () => {
                     onClick={() => handleClick(p)}
                     className="hover:cursor-pointer h-48 p-2 flex flex-col border bg-gray-900 bg-opacity-50 rounded hover:bg-gray-800 border-gray-400 text-xs font-light"
                   >
-                    <div className="flex justify-between items-start ">
+                    <div className="flex flex-col justify-start items-start">
                       <h3 className="text-base font-medium">{p.title}</h3>
-                      <p className="text-right flex-shrink-0 bg-orangeaccent px-2 py-1 rounded-full ml-2 shadow shadow-black">
+                      <p className="text-right flex-shrink-0 bg-orangeaccent mt-1 px-2 py-1 rounded-full shadow shadow-black">
                         {p.status}
                       </p>
                     </div>
-                    <p className="text-sm mt-2 line-clamp-4">{p.description}</p>
-                    <div className="mt-auto flex justify-between items-center ">
+                    <p className="text-sm mt-2 line-clamp-4 ">{p.description}</p>
+                    <div className="mt-auto flex justify-between items-center pt-1">
                       <p className="text-orangeaccent">{formatDuration(p.duration_length, p.duration_type)}</p>
                       <div className="relative group">
                         <FaCircleInfo className="text-sm text-orangeaccent" />
