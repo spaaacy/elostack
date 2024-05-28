@@ -7,9 +7,14 @@ import Link from "next/link";
 import { IoMdArrowBack } from "react-icons/io";
 import { FaGithub } from "react-icons/fa";
 import { formatDuration } from "@/utils/formatDuration";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { UserContext } from "@/context/UserContext";
 import Loader from "../common/Loader";
+import { BsThreeDotsVertical } from "react-icons/bs";
+import { Tooltip } from "react-tooltip";
+import toast, { Toaster } from "react-hot-toast";
+
+const status = ["In Progress", "Looking for members", "Complete"];
 
 const ProjectView = () => {
   const { id } = useParams();
@@ -19,6 +24,12 @@ const ProjectView = () => {
   const [members, setMembers] = useState();
   const [dataLoaded, setDataLoaded] = useState(false);
   const router = useRouter();
+  const [isLeader, setIsLeader] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef();
+  const statusRef = useRef();
+  const [showLeaderModal, setShowLeaderModal] = useState(false);
+  const [showChangeStatus, setShowChangeStatus] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -34,6 +45,11 @@ const ProjectView = () => {
         router.push("/signin");
       }
     }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, [session]);
 
   const fetchProject = async () => {
@@ -44,6 +60,9 @@ const ProjectView = () => {
       if (response.status === 200) {
         const { project } = await response.json();
         setProject(project);
+        if (project.leader === session.data.session.user.id) setIsLeader(true);
+      } else {
+        router.push("/projects");
       }
     } catch (error) {
       console.error(error);
@@ -72,6 +91,102 @@ const ProjectView = () => {
     }
   };
 
+  const leaveProject = async () => {
+    if (!session.data.session) return;
+    try {
+      setLoading(true);
+      const response = await fetch("/api/member/delete", {
+        method: "DELETE",
+        headers: {
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+        },
+        body: JSON.stringify({
+          userId: session.data.session.user.id,
+          projectId: project.id,
+        }),
+      });
+      if (response.status === 200) {
+        router.push("/projects");
+      } else {
+        const { error } = await response.json();
+        throw error;
+      }
+    } catch (error) {
+      setLoading(false);
+      toast.error("Oops, something went wrong...");
+      console.error(error);
+    }
+  };
+
+  const changeLeader = async (id) => {
+    if (!session.data.session) return;
+    try {
+      setShowLeaderModal(false);
+      setLoading(true);
+      const response = await fetch("/api/project/change-leader", {
+        method: "PATCH",
+        headers: {
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+        },
+        body: JSON.stringify({
+          leader: id,
+          projectId: project.id,
+        }),
+      });
+      if (response.status === 200) {
+        toast.success("Leader changed");
+        setTimeout(() => window.location.reload(), 1000);
+      } else {
+        const { error } = await response.json();
+        throw error;
+      }
+    } catch (error) {
+      toast.error("Oops, something went wrong...");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const changeStatus = async (status) => {
+    if (!session.data.session) return;
+    try {
+      setShowChangeStatus(false);
+      setLoading(true);
+      const response = await fetch("/api/project/change-status", {
+        method: "PATCH",
+        headers: {
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+        },
+        body: JSON.stringify({
+          status,
+          projectId: project.id,
+        }),
+      });
+      if (response.status === 200) {
+        toast.success("Status changed");
+        setTimeout(() => window.location.reload(), 1000);
+      } else {
+        const { error } = await response.json();
+        throw error;
+      }
+    } catch (error) {
+      toast.error("Oops, something went wrong...");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClickOutside = (event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setShowDropdown(false);
+    }
+    if (statusRef.current && !statusRef.current.contains(event.target)) {
+      setShowChangeStatus(false);
+    }
+  };
+
   return (
     <div className="flex flex-col h-screen overflow-y-auto">
       <NavBar />
@@ -79,7 +194,7 @@ const ProjectView = () => {
         <Loader />
       ) : (
         <main className="">
-          <div className="flex justify-start items-center">
+          <div className="flex justify-start items-center relative">
             <Link href={"/projects"}>
               <IoMdArrowBack className="text-3xl hover:text-gray-300" />
             </Link>
@@ -88,6 +203,91 @@ const ProjectView = () => {
               <Link href={project.github} target="_blank">
                 <FaGithub className="ml-4 text-3xl hover:text-gray-300" />
               </Link>
+            )}
+            <button
+              type="button"
+              disabled={showDropdown || showChangeStatus}
+              onClick={() => setShowDropdown(true)}
+              className="ml-auto"
+            >
+              <BsThreeDotsVertical className="text-xl" />
+            </button>
+            {showDropdown && (
+              <div
+                ref={dropdownRef}
+                className="absolute top-10 border-gray-400 border right-0 bg-gray-900 rounded p-2 text-sm flex flex-col hover:text-gray-200 text-gray-300 justify-center items-end"
+              >
+                {isLeader && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowChangeStatus(true);
+                      setShowDropdown(false);
+                    }}
+                    className="hover:bg-gray-800 px-2 py-1 rounded"
+                  >
+                    Change status
+                  </button>
+                )}
+                {isLeader && members.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowLeaderModal(true);
+                      setShowDropdown(false);
+                    }}
+                    className="hover:bg-gray-800 px-2 py-1 rounded"
+                  >
+                    Change leader
+                  </button>
+                )}
+                <button
+                  type="button"
+                  disabled={isLeader}
+                  onClick={leaveProject}
+                  data-tooltip-id="leader-tooltip"
+                  data-tooltip-content="Leader cannot leave project"
+                  className={`${
+                    isLeader ? "text-gray-500 hover:cursor-not-allowed" : "hover:bg-gray-800 text-red-500"
+                  }  p-1 `}
+                >
+                  Leave project
+                </button>
+                {isLeader && <Tooltip id="leader-tooltip" place="bottom" type="dark" effect="float" />}
+              </div>
+            )}
+            {showChangeStatus && (
+              <div
+                ref={statusRef}
+                className="absolute top-10 border-gray-400 border right-0 bg-gray-900 rounded p-2 text-sm flex flex-col hover:text-gray-200 text-gray-300 justify-center items-end"
+              >
+                {status
+                  .filter((s) => s.toLowerCase() !== project.status.toLowerCase())
+                  .map((status) => {
+                    return (
+                      <button
+                        key={status}
+                        type="button"
+                        onClick={() => changeStatus(status)}
+                        className={"hover:bg-gray-800 py-1 px-2 w-full text-right rounded"}
+                      >
+                        {status}
+                      </button>
+                    );
+                  })}
+                <hr className="border-0 h-[1px] bg-gray-600 w-full my-1 rounded-full" />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowChangeStatus(false);
+                    setShowDropdown(true);
+                  }}
+                  className={"hover:bg-gray-800 py-1 px-2 w-full text-right rounded"}
+                >
+                  Back
+                </button>
+                {isLeader && <Tooltip id="leader-tooltip" place="bottom" type="dark" effect="float" />}
+              </div>
             )}
           </div>
           <p className="ml-12 font-light ">{project.status}</p>
@@ -103,18 +303,15 @@ const ProjectView = () => {
                 <p className="mt-4 font-semibold">Members</p>
                 <ul>
                   <p href={"/"} className=" ">{`${project.user[0].username} (Leader)`}</p>
-                  {members &&
-                    members
-                      .filter((member) => member.user_id !== project.leader)
-                      .map((member, i) => {
-                        return (
-                          <li key={i}>
-                            <p href={"/"} className=" ">
-                              {member.user.username}
-                            </p>
-                          </li>
-                        );
-                      })}
+                  {members
+                    .filter((member) => member.user_id !== project.leader)
+                    .map((member, i) => {
+                      return (
+                        <li key={i}>
+                          <p className=" ">{member.user.username}</p>
+                        </li>
+                      );
+                    })}
                 </ul>
                 <p className="mt-4 font-semibold">Technologies</p>
                 <p>{project.technologies}</p>
@@ -151,18 +348,61 @@ const ProjectView = () => {
                   placeholder="Send a message..."
                   className="w-full text-sm p-2 rounded border bg-gray-900 bg-opacity-50 focus:bg-gray-800 border-gray-400"
                 />
-                <button className="rounded-full px-3 py-2 bg-orangeaccent text-sm hover:bg-orangedark">Send</button>
+                <button type="button" className="rounded-full px-3 py-2 bg-orangeaccent text-sm hover:bg-orangedark">
+                  Send
+                </button>
               </div>
             </div>
           </div>
         </main>
       )}
       <Footer />
+      <Toaster />
+      {showLeaderModal && (
+        <LeaderModal
+          setShowModal={setShowLeaderModal}
+          changeLeader={changeLeader}
+          members={members}
+          leader={project.leader}
+        />
+      )}
     </div>
   );
 };
 
 export default ProjectView;
+
+const LeaderModal = ({ setShowModal, changeLeader, members, leader }) => {
+  const handleModalClose = (e) => {
+    if (e.target === e.currentTarget) {
+      setShowModal(false);
+    }
+  };
+
+  return (
+    <div onClick={handleModalClose} className="bg-gray-900 bg-opacity-50 h-screen w-screen fixed">
+      <div
+        id="scrollableDiv"
+        className="flex flex-col items-start justify-start fixed bg-gray-900 rounded p-4 left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 overflow-y-auto"
+      >
+        {members
+          .filter((m) => m.user_id !== leader)
+          .map((m, i) => {
+            return (
+              <button
+                onClick={() => changeLeader(m.user_id)}
+                type="button"
+                className="hover:bg-gray-800 px-2 py-1 rounded w-full text-left"
+                key={i}
+              >
+                {m.user.username}
+              </button>
+            );
+          })}
+      </div>
+    </div>
+  );
+};
 
 const chat = [
   {

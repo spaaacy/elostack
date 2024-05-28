@@ -143,8 +143,9 @@ const Projects = () => {
               className="text-sm p-2 rounded border bg-gray-900 bg-opacity-50 hover:bg-gray-800 border-gray-400"
             >
               <option value={""}>Show All</option>
-              <option value={"in progress"}>In Progress</option>
               <option value={"looking for members"}>Looking for members</option>
+              <option value={"in progress"}>In Progress</option>
+              <option value={"complete"}>Complete</option>
             </select>
           </div>
           <ul className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 grid gap-4 mt-4">

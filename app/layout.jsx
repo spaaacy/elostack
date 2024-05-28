@@ -1,5 +1,6 @@
 import { Inter } from "next/font/google";
 import "@/styles/globals.css";
+import "react-tooltip/dist/react-tooltip.css";
 import { UserProvider } from "@/context/UserContext";
 import GoogleAnalytics from "@/components/common/GoogleAnalytics";
 

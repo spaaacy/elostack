@@ -3,6 +3,13 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req, res) {
   try {
+    // Authentication
+    const auth = await supabase.auth.signInWithPassword({
+      email: process.env.SUPABASE_ADMIN_EMAIL,
+      password: process.env.SUPABASE_ADMIN_PASSWORD,
+    });
+    if (auth.error) throw auth.error;
+
     const { projectId } = res.params;
     const { data, error } = await supabase.from("project").select("*, user(*)").eq("id", projectId).single();
     if (error) throw error;
