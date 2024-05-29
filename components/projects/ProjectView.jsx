@@ -44,7 +44,13 @@ const ProjectView = () => {
         router.push("/signin");
       }
     }
-  }, [session]);
+
+    // Scrolls the chat to the bottom
+    if (chat) {
+      var chatDiv = document.getElementById("scrollableDiv");
+      chatDiv.scrollTop = chatDiv.scrollHeight;
+    }
+  }, [session, chat]);
 
   const fetchProject = async () => {
     try {
@@ -120,7 +126,7 @@ const ProjectView = () => {
         body: JSON.stringify(newMessage),
       });
       if (response.status === 201) {
-        setChat([...chat, newMessage]);
+        setChat([...chat, { ...newMessage, created_at: new Date().toISOString() }]);
       } else {
         const { error } = await response.json();
         throw error;
