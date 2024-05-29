@@ -22,7 +22,6 @@ const ProjectView = () => {
   const [dataLoaded, setDataLoaded] = useState(false);
   const router = useRouter();
   const [isLeader, setIsLeader] = useState(false);
-  const [showLeaderModal, setShowLeaderModal] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -79,36 +78,6 @@ const ProjectView = () => {
     }
   };
 
-  const changeLeader = async (id) => {
-    if (!session.data.session) return;
-    try {
-      setShowLeaderModal(false);
-      setLoading(true);
-      const response = await fetch("/api/project/change-leader", {
-        method: "PATCH",
-        headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
-        },
-        body: JSON.stringify({
-          leader: id,
-          projectId: project.id,
-        }),
-      });
-      if (response.status === 200) {
-        toast.success("Leader changed");
-        setTimeout(() => window.location.reload(), 1000);
-      } else {
-        const { error } = await response.json();
-        throw error;
-      }
-    } catch (error) {
-      toast.error("Oops, something went wrong...");
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="flex flex-col h-screen overflow-y-auto">
       <NavBar />
@@ -127,7 +96,6 @@ const ProjectView = () => {
               </Link>
             )}
             <SettingsDropdown
-              setShowLeaderModal={setShowLeaderModal}
               isLeader={isLeader}
               project={project}
               members={members}
@@ -147,9 +115,11 @@ const ProjectView = () => {
                 </p>
                 <p className="mt-4 font-semibold">Members</p>
                 <ul>
-                  <p href={"/"} className=" ">{`${project.user[0].username} (Leader)`}</p>
+                  <p href={"/"} className=" ">{`${
+                    members.find((m) => m.user.user_id === project.leader).user.username
+                  } (Leader)`}</p>
                   {members
-                    .filter((member) => member.user_id !== project.leader)
+                    .filter((member) => member.user_id !== project.leader && !member.removed)
                     .map((member, i) => {
                       return (
                         <li key={i}>
@@ -203,14 +173,6 @@ const ProjectView = () => {
       )}
       <Footer />
       <Toaster />
-      {showLeaderModal && (
-        <LeaderModal
-          setShowModal={setShowLeaderModal}
-          changeLeader={changeLeader}
-          members={members}
-          leader={project.leader}
-        />
-      )}
     </div>
   );
 };

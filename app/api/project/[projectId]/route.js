@@ -11,7 +11,7 @@ export async function GET(req, res) {
     if (auth.error) throw auth.error;
 
     const { projectId } = res.params;
-    const { data, error } = await supabase.from("project").select("*, user(*)").eq("id", projectId).single();
+    const { data, error } = await supabase.from("project").select("*").eq("id", projectId).single();
     if (error) throw error;
     return NextResponse.json({ project: data }, { status: 200 });
   } catch (error) {

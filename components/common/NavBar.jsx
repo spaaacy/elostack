@@ -61,7 +61,7 @@ const NavBar = () => {
           <Image src={"/logo.png"} alt={"logo"} width={50} height={50} />
           <span className="max-sm:hidden">EloStack</span>
         </Link>
-        <DesktopNav showSignIn={showSignIn} signOut={signOut} session={session} />
+        <DesktopNav showSignIn={showSignIn} signOut={signOut} session={session} user={user} />
         <button type="button" className="sm:hidden  ml-auto" onClick={() => setShowMobileNav(!showMobileNav)}>
           <IoMenu className="text-2xl" />
         </button>
@@ -73,7 +73,7 @@ const NavBar = () => {
 
 export default NavBar;
 
-const DesktopNav = ({ showSignIn, signOut, session }) => {
+const DesktopNav = ({ showSignIn, signOut, session, user }) => {
   return (
     <div className="ml-12 flex justify-start items-center gap-4 max-sm:hidden w-full">
       <Link
@@ -88,14 +88,17 @@ const DesktopNav = ({ showSignIn, signOut, session }) => {
       >
         Create Project
       </Link>
-      {showSignIn && (
-        <div
-          className="hover:bg-gray-600 hover:bg-opacity-50 text-gray-200 px-3 py-1 rounded-full ml-auto
+      <div className="flex justify-center items-baseline ml-auto">
+        {user && <p className="italic text-sm text-gray-300">{`${user.username}`}</p>}
+        {showSignIn && (
+          <div
+            className="ml-4 hover:bg-gray-600 hover:bg-opacity-50 text-gray-200 px-3 py-1 rounded-full 
           text-sm"
-        >
-          {session?.data.session ? <button onClick={signOut}>Log out</button> : <Link href={"/signin"}>Sign In</Link>}
-        </div>
-      )}
+          >
+            {session?.data.session ? <button onClick={signOut}>Log out</button> : <Link href={"/signin"}>Sign In</Link>}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
