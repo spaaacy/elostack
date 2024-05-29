@@ -14,6 +14,7 @@ import toast, { Toaster } from "react-hot-toast";
 import SettingsDropdown from "./SettingsDropdown";
 import { useForm } from "react-hook-form";
 import { formatTime } from "@/utils/formatTime";
+import { supabase } from "@/utils/supabase";
 
 const ProjectView = () => {
   const { id } = useParams();
@@ -22,6 +23,9 @@ const ProjectView = () => {
   const [loading, setLoading] = useState(true);
   const [members, setMembers] = useState();
   const [chat, setChat] = useState();
+  const [nextMessagePage, setNextMessagePage] = useState(1);
+  const [loadMoreMessages, setLoadMoreMessages] = useState(false);
+  const [showLoadMoreMessages, setShowLoadMoreMessages] = useState(true);
 
   const [dataLoaded, setDataLoaded] = useState(false);
   const router = useRouter();
@@ -31,10 +35,11 @@ const ProjectView = () => {
 
   useEffect(() => {
     const loadData = async () => {
+      setDataLoaded(true);
       await fetchProject();
       await fetchMembers();
       await fetchChat();
-      setDataLoaded(true);
+      await listenToMessages();
     };
 
     if (session) {
@@ -46,7 +51,7 @@ const ProjectView = () => {
     }
 
     // Scrolls the chat to the bottom
-    if (chat) {
+    if (chat && !loadMoreMessages) {
       var chatDiv = document.getElementById("scrollableDiv");
       chatDiv.scrollTop = chatDiv.scrollHeight;
     }
@@ -93,15 +98,32 @@ const ProjectView = () => {
 
   const fetchChat = async () => {
     try {
-      const response = await fetch(`/api/chat/${id}/`, {
-        method: "GET",
+      const response = await fetch(`/api/chat/`, {
+        method: "POST",
         headers: {
           "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
         },
+        body: JSON.stringify({
+          projectId: id,
+          pageNumber: nextMessagePage,
+        }),
       });
       if (response.status === 200) {
+        setNextMessagePage(nextMessagePage + 1);
         const { chat } = await response.json();
-        setChat(chat);
+        const chatReversed = chat.reverse();
+
+        if (nextMessagePage > 1) {
+          console.log(chatReversed.length);
+          if (chatReversed.length === 0) {
+            setShowLoadMoreMessages(false);
+          } else {
+            setChat((prevChat) => [...chatReversed, ...prevChat]);
+            if (chatReversed.length < 15) setShowLoadMoreMessages(false);
+          }
+        } else {
+          setChat(chat.reverse());
+        }
       }
     } catch (error) {
       console.error(error);
@@ -114,7 +136,7 @@ const ProjectView = () => {
     if (!session.data.session) return;
     try {
       const newMessage = {
-        message: data.message,
+        message: data.message.trim(),
         user_id: session.data.session.user.id,
         project_id: project.id,
       };
@@ -126,6 +148,7 @@ const ProjectView = () => {
         body: JSON.stringify(newMessage),
       });
       if (response.status === 201) {
+        setLoadMoreMessages(false);
         setChat([...chat, { ...newMessage, created_at: new Date().toISOString() }]);
       } else {
         const { error } = await response.json();
@@ -135,6 +158,32 @@ const ProjectView = () => {
       toast.error("Oops, something went wrong...");
       console.error(error);
     }
+  };
+
+  const listenToMessages = async () => {
+    if (!session.data.session) return;
+    const auth = await supabase.auth.setSession({
+      access_token: session.data.session.access_token,
+      refresh_token: session.data.session.refresh_token,
+    });
+    if (auth.error) throw auth.error;
+
+    supabase
+      .channel("messages")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "chat",
+          filter: `user_id=neq.${session.data.session.user.id}`,
+        },
+        (payload) => {
+          setLoadMoreMessages(false);
+          setChat((prevChat) => [...prevChat, payload.new]);
+        }
+      )
+      .subscribe();
   };
 
   return (
@@ -199,6 +248,17 @@ const ProjectView = () => {
                 id="scrollableDiv"
                 className="h-[600px] p-4 rounded border bg-gray-900 bg-opacity-50 border-gray-400 flex flex-col items-start justify-start overflow-y-auto"
               >
+                {showLoadMoreMessages && (
+                  <button
+                    onClick={() => {
+                      setLoadMoreMessages(true);
+                      fetchChat();
+                    }}
+                    className="text-sm mx-auto mb-8 text-gray-400 hover:underline"
+                  >
+                    Load more messages...
+                  </button>
+                )}
                 {chat &&
                   chat.map((message, i) => {
                     return (
@@ -223,7 +283,15 @@ const ProjectView = () => {
               </div>
               <form onSubmit={handleSubmit(sendMessage)} className="flex items-center gap-2 justify-center mt-2">
                 <input
-                  {...register("message", { required: "Message cannot be empty" })}
+                  {...register("message", {
+                    required: "Message cannot be empty",
+                    validate: (value, formValues) => {
+                      const trimmed = value.trim();
+                      const valid = trimmed.length > 0;
+                      if (!valid) setValue("message", "");
+                      return valid;
+                    },
+                  })}
                   type="text"
                   placeholder="Send a message..."
                   className="w-full text-sm p-2 rounded border bg-gray-900 bg-opacity-50 focus:bg-gray-800 border-gray-400"
@@ -243,35 +311,3 @@ const ProjectView = () => {
 };
 
 export default ProjectView;
-
-const LeaderModal = ({ setShowModal, changeLeader, members, leader }) => {
-  const handleModalClose = (e) => {
-    if (e.target === e.currentTarget) {
-      setShowModal(false);
-    }
-  };
-
-  return (
-    <div onClick={handleModalClose} className="bg-gray-900 bg-opacity-50 h-screen w-screen fixed">
-      <div
-        id="scrollableDiv"
-        className="flex flex-col items-start justify-start fixed bg-gray-900 rounded p-4 left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 overflow-y-auto"
-      >
-        {members
-          .filter((m) => m.user_id !== leader)
-          .map((m, i) => {
-            return (
-              <button
-                onClick={() => changeLeader(m.user_id)}
-                type="button"
-                className="hover:bg-gray-800 px-2 py-1 rounded w-full text-left"
-                key={i}
-              >
-                {m.user.username}
-              </button>
-            );
-          })}
-      </div>
-    </div>
-  );
-};

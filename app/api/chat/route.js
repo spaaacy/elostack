@@ -1,7 +1,7 @@
 import { supabase } from "@/utils/supabase";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req, res) {
+export async function POST(req, res) {
   try {
     // Authentication
     const access_token = req.headers.get("x-supabase-auth").split(" ")[0];
@@ -10,8 +10,12 @@ export async function GET(req, res) {
     const auth = await supabase.auth.setSession({ access_token, refresh_token });
     if (auth.error) throw auth.error;
 
-    const { projectId } = res.params;
-    const { data, error } = await supabase.from("chat").select().eq("project_id", projectId);
+    const { projectId, pageNumber } = await req.json();
+    const { data, error } = await supabase.rpc("get_messages", {
+      p_project_id: projectId,
+      p_page_size: 15,
+      p_page_number: pageNumber ? pageNumber : 1,
+    });
 
     if (error) throw error;
     return NextResponse.json({ chat: data }, { status: 200 });

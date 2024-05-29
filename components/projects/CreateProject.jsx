@@ -245,7 +245,7 @@ const CreateProject = () => {
             <div className="flex gap-2 items-center justify-start">
               <input
                 {...register("technology", {
-                  validate: (value, formvalues) => technologies.length > 0,
+                  validate: (value, formValues) => technologies.length > 0,
                 })}
                 className="flex-1 text-sm p-1 rounded border bg-gray-900 bg-opacity-50 focus:bg-gray-800 border-gray-400 min-w-0"
                 type="text"
