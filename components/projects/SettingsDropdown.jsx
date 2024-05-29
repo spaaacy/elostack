@@ -14,6 +14,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
   const githubRef = useRef();
   const removeMemberRef = useRef();
   const changeLeaderRef = useRef();
+  const deleteProjectRef = useRef();
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [showChangeStatus, setShowChangeStatus] = useState(false);
@@ -22,6 +23,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
   const [confirmRemoveMember, setConfirmRemoveMember] = useState();
   const [showChangeLeader, setShowChangeLeader] = useState(false);
   const [confirmChangeLeader, setConfirmChangeLeader] = useState();
+  const [showDeleteProject, setShowDeleteProject] = useState();
 
   const router = useRouter();
   const {
@@ -185,6 +187,33 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
     }
   };
 
+  const deleteProject = async () => {
+    if (!session.data.session) return;
+    try {
+      setShowDeleteProject(false);
+      setLoading(true);
+      const response = await fetch("/api/project/delete", {
+        method: "DELETE",
+        headers: {
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+        },
+        body: JSON.stringify({
+          project: project,
+        }),
+      });
+      if (response.status === 200) {
+        router.push("/projects");
+      } else {
+        const { error } = await response.json();
+        throw error;
+      }
+    } catch (error) {
+      setLoading(false);
+      toast.error("Oops, something went wrong...");
+      console.error(error);
+    }
+  };
+
   const handleClickOutside = (event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
       setShowDropdown(false);
@@ -200,6 +229,9 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
     }
     if (changeLeaderRef.current && !changeLeaderRef.current.contains(event.target)) {
       setShowChangeLeader(false);
+    }
+    if (deleteProjectRef.current && !deleteProjectRef.current.contains(event.target)) {
+      setShowDeleteProject(false);
     }
   };
 
@@ -278,7 +310,29 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
           >
             Leave project
           </button>
+          {isLeader && (
+            <button
+              disabled={members.some((m) => !m.removed && m.user_id !== project.leader)}
+              data-tooltip-id="delete-tooltip"
+              data-tooltip-content="Members are in this project"
+              type="button"
+              onClick={() => {
+                setShowDeleteProject(true);
+                setShowDropdown(false);
+              }}
+              className={`${
+                members.some((m) => !m.removed && m.user_id !== project.leader)
+                  ? "text-gray-500 hover:cursor-not-allowed"
+                  : "hover:bg-gray-800 text-red-500  hover:text-red-600"
+              }  p-1 w-full text-right`}
+            >
+              Delete project
+            </button>
+          )}
           {isLeader && <Tooltip id="leader-tooltip" place="bottom" type="dark" effect="float" />}
+          {members.some((m) => !m.removed && m.user_id !== project.leader) && (
+            <Tooltip id="delete-tooltip" place="bottom" type="dark" effect="float" />
+          )}
         </div>
       )}
       {showGithubDropdown && (
@@ -460,6 +514,33 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
               </button>
             </>
           )}
+        </div>
+      )}
+      {showDeleteProject && (
+        <div
+          ref={deleteProjectRef}
+          className="absolute top-10 border-gray-400 border right-0 bg-gray-900 rounded p-2 text-sm flex flex-col text-gray-300 justify-center items-end"
+        >
+          <p className="text-red-500">Are you sure? Changes cannot be undone.</p>
+          <div className="flex justify-center mx-auto gap-4 mt-2">
+            <button
+              type="button"
+              onClick={deleteProject}
+              className="hover:bg-gray-800 py-1 px-2 text-right rounded  hover:text-gray-200"
+            >
+              Yes
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setShowDeleteProject(false);
+                setShowDropdown(true);
+              }}
+              className="hover:bg-gray-800 py-1 px-2 text-right rounded  hover:text-gray-200"
+            >
+              No
+            </button>
+          </div>
         </div>
       )}
     </div>
