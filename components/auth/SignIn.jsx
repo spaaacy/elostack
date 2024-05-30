@@ -79,7 +79,7 @@ const Page = () => {
               id="email"
               {...register("email", { required: "Email is required" })}
               type="text"
-              className="rounded-md bg-gray-200 dark:bg-gray-900 p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
+              className="rounded-md bg-gray-200 dark:bg-gray-900 p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none  focus:bg-gray-300 dark:focus:bg-gray-800"
               aria-invalid={errors.email ? "true" : "false"}
             />
             {errors.email && (
@@ -94,7 +94,7 @@ const Page = () => {
               id="password"
               {...register("password", { required: "Password is required" })}
               type="password"
-              className="rounded-md bg-gray-200 dark:bg-gray-900 p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
+              className="rounded-md bg-gray-200 dark:bg-gray-900 p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none focus:bg-gray-300 dark:focus:bg-gray-800"
               aria-invalid={errors.password ? "true" : "false"}
             />
             {errors.password && (

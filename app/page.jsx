@@ -1,7 +1,7 @@
 import Footer from "@/components/common/Footer";
 import NavBar from "@/components/common/NavBar";
-import Image from "next/image";
 import Link from "next/link";
+import { FaDiscord } from "react-icons/fa";
 
 export default function Home() {
   return (
@@ -11,7 +11,7 @@ export default function Home() {
         <div className="flex flex-col justify-center items-center mt-8 flex-1">
           <p className="mx-auto">Coming soon. Checkout our Discord community.</p>
           <Link className="mt-4" href={"https://discord.gg/Re8W4Kp5ae"} target="_blank">
-            <Image src={"/discord.png"} alt="discord" width={30} height={30} />
+            <FaDiscord className="text-3xl " />
           </Link>
         </div>
       </main>

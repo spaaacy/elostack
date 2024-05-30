@@ -111,7 +111,7 @@ const DesktopNav = ({ showSignIn, signOut, session, user }) => {
           onClick={() => (theme == "dark" ? toggleTheme("light") : toggleTheme("dark"))}
           className="mr-4 self-center text-xl"
         >
-          {currentTheme === "light" ? <MdDarkMode /> : <MdLightMode />}
+          {currentTheme && currentTheme === "light" ? <MdDarkMode /> : <MdLightMode />}
         </button>
         {user && <p className="italic text-sm text-gray-600 dark:text-gray-300">{`${user.username}`}</p>}
         {showSignIn && (

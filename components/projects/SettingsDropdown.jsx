@@ -13,6 +13,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
   const removeMemberRef = useRef();
   const changeLeaderRef = useRef();
   const deleteProjectRef = useRef();
+  const leaveProjectRef = useRef();
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [showGithubDropdown, setShowGithubDropdown] = useState(false);
@@ -21,6 +22,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
   const [showChangeLeader, setShowChangeLeader] = useState(false);
   const [confirmChangeLeader, setConfirmChangeLeader] = useState();
   const [showDeleteProject, setShowDeleteProject] = useState();
+  const [showLeaveProject, setShowLeaveProject] = useState();
 
   const router = useRouter();
   const {
@@ -226,6 +228,9 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
     if (deleteProjectRef.current && !deleteProjectRef.current.contains(event.target)) {
       setShowDeleteProject(false);
     }
+    if (leaveProjectRef.current && !leaveProjectRef.current.contains(event.target)) {
+      setShowLeaveProject(false);
+    }
   };
 
   return (
@@ -240,13 +245,13 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
       {showDropdown && (
         <div
           ref={dropdownRef}
-          className="absolute top-10 border-gray-400 border right-0 bg-gray-900 rounded p-2 text-sm flex flex-col text-gray-300 justify-center items-end"
+          className="absolute top-10 bg-gray-100 border-gray-400 border right-0 dark:bg-gray-900 rounded p-2 text-sm flex flex-col text-black dark:text-gray-300 justify-center items-end"
         >
           {isLeader && (
             <button
               type="button"
               onClick={() => changeOpen(!project.is_open)}
-              className={"hover:bg-gray-800 py-1 px-2 w-full text-right rounded  hover:text-gray-200"}
+              className="hover:bg-gray-200 dark:hover:bg-gray-800 px-2 py-1 rounded  dark:hover:text-gray-200  w-full text-right"
             >
               {project.is_open ? "Close project to new members" : "Open project to new members"}
             </button>
@@ -258,7 +263,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
                 setShowChangeLeader(true);
                 setShowDropdown(false);
               }}
-              className="hover:bg-gray-800 px-2 py-1 rounded  hover:text-gray-200  w-full text-right"
+              className="hover:bg-gray-200 dark:hover:bg-gray-800 px-2 py-1 rounded  dark:hover:text-gray-200  w-full text-right"
             >
               Change leader
             </button>
@@ -270,7 +275,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
                 setShowGithubDropdown(true);
                 setShowDropdown(false);
               }}
-              className="hover:bg-gray-800 px-2 py-1 rounded  hover:text-gray-200  w-full text-right"
+              className="hover:bg-gray-200 dark:hover:bg-gray-800 px-2 py-1 rounded  dark:hover:text-gray-200  w-full text-right"
             >
               Set GitHub URL
             </button>
@@ -283,19 +288,24 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
                 setShowRemoveMember(true);
                 setShowDropdown(false);
               }}
-              className="hover:bg-gray-800 text-red-500  hover:text-red-600 px-2 py-1 rounded w-full text-right"
+              className="hover:bg-gray-200 dark:hover:bg-gray-800 font-medium text-red-600 dark:font-normal dark:text-red-500  hover:text-red-600 p-1 w-full text-right"
             >
               Remove member
             </button>
           )}
           <button
             type="button"
-            disabled={isLeader}
-            onClick={leaveProject}
+            // disabled={isLeader}
+            onClick={() => {
+              setShowLeaveProject(true);
+              setShowDropdown(false);
+            }}
             data-tooltip-id="leader-tooltip"
             data-tooltip-content="Leader cannot leave project"
             className={`${
-              isLeader ? "text-gray-500 hover:cursor-not-allowed" : "hover:bg-gray-800 text-red-500  hover:text-red-600"
+              isLeader
+                ? "text-gray-500 hover:cursor-not-allowed"
+                : "hover:bg-gray-200 dark:hover:bg-gray-800 font-medium text-red-600 dark:font-normal dark:text-red-500  hover:text-red-600"
             }  p-1 w-full text-right`}
           >
             Leave project
@@ -313,7 +323,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
               className={`${
                 members.some((m) => !m.removed && m.user_id !== project.leader)
                   ? "text-gray-500 hover:cursor-not-allowed"
-                  : "hover:bg-gray-800 text-red-500  hover:text-red-600"
+                  : "hover:bg-gray-200 dark:hover:bg-gray-800 font-medium text-red-600 dark:font-normal dark:text-red-500  hover:text-red-600"
               }  p-1 w-full text-right`}
             >
               Delete project
@@ -325,21 +335,77 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
           )}
         </div>
       )}
+      {showChangeLeader && (
+        <div
+          ref={changeLeaderRef}
+          className="absolute top-10 bg-gray-100 border-gray-400 border right-0 dark:bg-gray-900 rounded p-2 text-sm flex flex-col text-black dark:text-gray-300 justify-center items-end"
+        >
+          {confirmChangeLeader ? (
+            <>
+              <p className="font-medium text-red-600 dark:font-normal dark:text-red-500">Are you sure?</p>
+              <div className="flex justify-center mx-auto gap-4 mt-2">
+                <button
+                  type="button"
+                  onClick={() => changeLeader(confirmChangeLeader)}
+                  className=" hover:bg-gray-200 dark:hover:bg-gray-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
+                >
+                  Yes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmChangeLeader(false)}
+                  className=" hover:bg-gray-200 dark:hover:bg-gray-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
+                >
+                  No
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              {members
+                .filter((m) => m.user_id !== project.leader && !m.removed)
+                .map((m) => {
+                  return (
+                    <button
+                      key={m.user.user_id}
+                      type="button"
+                      onClick={() => setConfirmChangeLeader(m.user_id)}
+                      className="w-full hover:bg-gray-200 dark:hover:bg-gray-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
+                    >
+                      {m.user.username}
+                    </button>
+                  );
+                })}
+              <hr className="border-0 h-[1px] bg-gray-600 w-full my-1 rounded-full" />
+              <button
+                type="button"
+                onClick={() => {
+                  setShowChangeLeader(false);
+                  setShowDropdown(true);
+                }}
+                className="w-full hover:bg-gray-200 dark:hover:bg-gray-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
+              >
+                Back
+              </button>
+            </>
+          )}
+        </div>
+      )}
       {showGithubDropdown && (
         <div
           ref={githubRef}
-          className="absolute top-10 border-gray-400 border right-0 bg-gray-900 rounded p-2 text-sm flex flex-col hover:text-gray-200 text-gray-300 justify-center items-end"
+          className="absolute top-10 bg-gray-100 border-gray-400 border right-0 dark:bg-gray-900 rounded p-2 text-sm flex flex-col justify-center items-end"
         >
-          <form onSubmit={handleSubmit(changeGithub)} className="bg-gray-900 rounded px-2 py-1 w-60 flex">
+          <form onSubmit={handleSubmit(changeGithub)} className="rounded py-1 w-60 flex">
             <input
               {...register("github", { required: "URL must be provided", pattern: githubUrlPattern })}
-              className="bg-transparent text-xs flex-1 p-1"
+              className="dark:border-gray-400 dark:border rounded bg-gray-200 dark:bg-gray-900 dark:focus:bg-gray-800 focus:ring-0 focus:outline-none text-xs flex-1 p-1"
               type="text"
               placeholder={project.github ? project.github : "GitHub URL"}
             />
             <button
               type="submit"
-              className="text-xs p-1 bg-primary hover:bg-primarydark hover:text-gray-300 rounded ml-2"
+              className="text-xs p-1 text-gray-100 bg-primary hover:bg-primarydark hover:text-gray-200 rounded ml-2"
             >
               Enter
             </button>
@@ -356,7 +422,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
               setShowGithubDropdown(false);
               setShowDropdown(true);
             }}
-            className={"hover:bg-gray-800 py-1 px-2 text-right rounded"}
+            className="w-full hover:bg-gray-200 dark:hover:bg-gray-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
           >
             Back
           </button>
@@ -365,23 +431,23 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
       {showRemoveMember && (
         <div
           ref={removeMemberRef}
-          className="absolute top-10 border-gray-400 border right-0 bg-gray-900 rounded p-2 text-sm flex flex-col text-gray-300 justify-center items-end"
+          className="absolute top-10 bg-gray-100 border-gray-400 border right-0 dark:bg-gray-900 rounded p-2 text-sm flex flex-col text-black dark:text-gray-300 justify-center items-end"
         >
           {confirmRemoveMember ? (
             <>
-              <p className="text-red-500">Are you sure?</p>
+              <p className="font-medium text-red-600 dark:font-normal dark:text-red-500">Are you sure?</p>
               <div className="flex justify-center mx-auto gap-4 mt-2">
                 <button
                   type="button"
                   onClick={() => removeMember(confirmRemoveMember)}
-                  className="hover:bg-gray-800 py-1 px-2 text-right rounded  hover:text-gray-200"
+                  className="hover:bg-gray-200 dark:hover:bg-gray-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
                 >
                   Yes
                 </button>
                 <button
                   type="button"
                   onClick={() => setConfirmRemoveMember(false)}
-                  className="hover:bg-gray-800 py-1 px-2 text-right rounded  hover:text-gray-200"
+                  className="hover:bg-gray-200 dark:hover:bg-gray-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
                 >
                   No
                 </button>
@@ -397,7 +463,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
                       key={m.user.user_id}
                       type="button"
                       onClick={() => setConfirmRemoveMember(m.user_id)}
-                      className={"hover:bg-gray-800 py-1 px-2 w-full text-right rounded  hover:text-gray-200"}
+                      className="w-full hover:bg-gray-200 dark:hover:bg-gray-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
                     >
                       {m.user.username}
                     </button>
@@ -410,7 +476,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
                   setShowRemoveMember(false);
                   setShowDropdown(true);
                 }}
-                className={"hover:bg-gray-800 py-1 px-2 w-full text-right rounded  hover:text-gray-200"}
+                className="w-full hover:bg-gray-200 dark:hover:bg-gray-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
               >
                 Back
               </button>
@@ -418,73 +484,46 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
           )}
         </div>
       )}
-      {showChangeLeader && (
+      {showLeaveProject && (
         <div
-          ref={changeLeaderRef}
-          className="absolute top-10 border-gray-400 border right-0 bg-gray-900 rounded p-2 text-sm flex flex-col text-gray-300 justify-center items-end"
+          ref={leaveProjectRef}
+          className="absolute top-10 bg-gray-100 border-gray-400 border right-0 dark:bg-gray-900 rounded p-2 text-sm flex flex-col text-black dark:text-gray-300 justify-center items-end"
         >
-          {confirmChangeLeader ? (
-            <>
-              <p className="text-red-500">Are you sure?</p>
-              <div className="flex justify-center mx-auto gap-4 mt-2">
-                <button
-                  type="button"
-                  onClick={() => changeLeader(confirmChangeLeader)}
-                  className="hover:bg-gray-800 py-1 px-2 text-right rounded  hover:text-gray-200"
-                >
-                  Yes
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setConfirmChangeLeader(false)}
-                  className="hover:bg-gray-800 py-1 px-2 text-right rounded  hover:text-gray-200"
-                >
-                  No
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
-              {members
-                .filter((m) => m.user_id !== project.leader && !m.removed)
-                .map((m) => {
-                  return (
-                    <button
-                      key={m.user.user_id}
-                      type="button"
-                      onClick={() => setConfirmChangeLeader(m.user_id)}
-                      className={"hover:bg-gray-800 py-1 px-2 w-full text-right rounded  hover:text-gray-200"}
-                    >
-                      {m.user.username}
-                    </button>
-                  );
-                })}
-              <hr className="border-0 h-[1px] bg-gray-600 w-full my-1 rounded-full" />
-              <button
-                type="button"
-                onClick={() => {
-                  setShowChangeLeader(false);
-                  setShowDropdown(true);
-                }}
-                className={"hover:bg-gray-800 py-1 px-2 w-full text-right rounded  hover:text-gray-200"}
-              >
-                Back
-              </button>
-            </>
-          )}
+          <p className="font-medium text-red-600 dark:font-normal dark:text-red-500">Confirm leave project?</p>
+          <div className="flex justify-center mx-auto gap-4 mt-2">
+            <button
+              type="button"
+              onClick={leaveProject}
+              className="hover:bg-gray-200 dark:hover:bg-gray-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
+            >
+              Yes
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setShowLeaveProject(false);
+                setShowDropdown(true);
+              }}
+              className="hover:bg-gray-200 dark:hover:bg-gray-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
+            >
+              No
+            </button>
+          </div>
         </div>
       )}
       {showDeleteProject && (
         <div
           ref={deleteProjectRef}
-          className="absolute top-10 border-gray-400 border right-0 bg-gray-900 rounded p-2 text-sm flex flex-col text-gray-300 justify-center items-end"
+          className="absolute top-10 bg-gray-100 border-gray-400 border right-0 dark:bg-gray-900 rounded p-2 text-sm flex flex-col text-black dark:text-gray-300 justify-center items-end"
         >
-          <p className="text-red-500">Are you sure? Changes cannot be undone.</p>
+          <p className="font-medium text-red-600 dark:font-normal dark:text-red-500">
+            Are you sure? Changes cannot be undone.
+          </p>
           <div className="flex justify-center mx-auto gap-4 mt-2">
             <button
               type="button"
               onClick={deleteProject}
-              className="hover:bg-gray-800 py-1 px-2 text-right rounded  hover:text-gray-200"
+              className="hover:bg-gray-200 dark:hover:bg-gray-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
             >
               Yes
             </button>
@@ -494,7 +533,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
                 setShowDeleteProject(false);
                 setShowDropdown(true);
               }}
-              className="hover:bg-gray-800 py-1 px-2 text-right rounded  hover:text-gray-200"
+              className="hover:bg-gray-200 dark:hover:bg-gray-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
             >
               No
             </button>

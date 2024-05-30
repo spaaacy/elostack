@@ -240,7 +240,7 @@ const ProjectView = () => {
           <hr className="border-0 h-[1px] bg-gray-400 my-4" />
           <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 ">
             <div>
-              <div className="p-2 rounded border bg-gray-900 bg-opacity-50 border-gray-400 flex flex-col font-light text-sm ">
+              <div className="p-2 rounded dark:border bg-gray-300 dark:bg-gray-900  dark:border-gray-400 flex flex-col font-light text-sm ">
                 <p>
                   <span className="font-semibold ">Description</span>
                   <br />
@@ -263,7 +263,7 @@ const ProjectView = () => {
                 </ul>
                 <p className="mt-4 font-semibold">Technologies</p>
                 <p>{project.technologies}</p>
-                <p className="text-primary mt-4">
+                <p className="text-primary mt-4 dark:font-normal font-medium">
                   {`Duration: ${formatDuration(project.duration_length, project.duration_type)}`}
                 </p>
               </div>
@@ -279,7 +279,7 @@ const ProjectView = () => {
                     )
                   }
                   type="button"
-                  className="bg-primary text-sm px-2 py-1 mt-2 rounded-full shadow shadow-gray-800 hover:bg-primarydark hover:text-gray-300"
+                  className="text-gray-200 bg-primary text-xs px-2 py-1 mt-2 rounded-full dark:shadow dark:shadow-gray-800 hover:bg-primarydark hover:text-gray-300"
                 >
                   {project.status.toLowerCase() === "just created"
                     ? "Start project"
@@ -292,7 +292,7 @@ const ProjectView = () => {
             <div className="sm:ml-4 max-sm:mt-4 sm:col-span-2 lg:col-span-4 ">
               <div
                 id="scrollableDiv"
-                className="h-[600px] p-4 rounded border bg-gray-900 bg-opacity-50 border-gray-400 flex flex-col items-start justify-start overflow-y-auto"
+                className="h-[600px] p-4 rounded dark:border bg-gray-300 dark:bg-gray-900  dark:border-gray-400 flex flex-col items-start justify-start overflow-y-auto"
               >
                 {showLoadMoreMessages && (
                   <button
@@ -310,7 +310,7 @@ const ProjectView = () => {
                     return (
                       <div
                         key={i}
-                        className={`px-3 py-2 rounded-lg bg-gray-700 bg-opacity-50 mb-4 text-sm ${
+                        className={`px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700  mb-4 text-sm ${
                           message.user_id === session.data.session.user.id ? "self-end text-right" : ""
                         }`}
                       >
@@ -340,9 +340,12 @@ const ProjectView = () => {
                   })}
                   type="text"
                   placeholder="Send a message..."
-                  className="w-full text-sm p-2 rounded border bg-gray-900 bg-opacity-50 focus:bg-gray-800 border-gray-400"
+                  className="w-full focus:ring-0 focus:outline-none min-w-0 text-sm p-2 rounded border bg-gray-300 dark:bg-gray-900 focus:bg-gray-300 dark:focus:bg-gray-800 dark:border-gray-400"
                 />
-                <button type="submit" className="rounded-full px-3 py-2 bg-primary text-sm hover:bg-primarydark">
+                <button
+                  type="submit"
+                  className="text-gray-200 rounded-lg px-3 py-2 bg-primary text-sm hover:bg-primarydark"
+                >
                   Send
                 </button>
               </form>

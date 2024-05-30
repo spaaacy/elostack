@@ -18,6 +18,7 @@ const Projects = () => {
   const [filteredProjects, setFilteredProjects] = useState();
   const [searchInput, setSearchInput] = useState("");
   const [statusInput, setStatusInput] = useState("");
+  const [openInput, setOpenInput] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [modalProject, setModalProject] = useState();
   const [projects, setProjects] = useState([]);
@@ -41,6 +42,7 @@ const Projects = () => {
     const filteredProjects = projects.filter(
       (project) =>
         (statusInput === "" ? true : project.status.toLowerCase() === statusInput) &&
+        (openInput ? project.is_open : !project.is_open) &&
         (searchInput === ""
           ? true
           : project.title.toLowerCase().includes(searchInput) ||
@@ -49,7 +51,7 @@ const Projects = () => {
     );
 
     setFilteredProjects(filteredProjects);
-  }, [searchInput, statusInput, showModal, session]);
+  }, [searchInput, statusInput, showModal, session, openInput]);
 
   const handleJoin = async () => {
     if (!session.data.session) return;
@@ -134,13 +136,17 @@ const Projects = () => {
           <h1 className="text-2xl font-semibold">Find Projects</h1>
 
           <hr className="border-0 h-[1px] bg-gray-400 my-4" />
-          <div className="flex items-center justify-between gap-2 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap">
             <input
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder={"Search..."}
               type="text"
               className="focus:ring-0 focus:outline-none min-w-0 w-96 text-sm p-2 rounded border bg-gray-200 dark:bg-gray-900 focus:bg-gray-300 dark:focus:bg-gray-800 border-gray-400"
             />
+            <div className="bg-gray-200 dark:bg-gray-900 p-2 text-sm rounded ml-auto flex items-center gap-2 border-gray-400 border">
+              <label>Open</label>
+              <input checked={openInput} onChange={() => setOpenInput(!openInput)} type="checkbox" />
+            </div>
             <select
               name="selectedStatus"
               onChange={(e) => setStatusInput(e.target.value)}
@@ -162,25 +168,28 @@ const Projects = () => {
                   >
                     <div className="flex flex-col justify-start items-start">
                       <h3 className="text-base font-medium">{p.title}</h3>
-                      <div className="flex items-center gap-2 text-gray-200">
-                        <p className=" text-right flex-shrink-0 bg-primary mt-1 px-2 py-1 rounded-full dark:shadow shadow-gray-800">
+                      <div className="flex items-baseline gap-2 text-gray-200 flex-wrap w-full">
+                        <p className=" flex-shrink-0 text-right  bg-primary mt-1 px-2 py-1 rounded-full dark:shadow shadow-gray-800">
                           {p.status}
                         </p>
                         <p
                           className={`${
                             p.is_open ? "bg-green-600" : "bg-red-700"
-                          } text-right flex-shrink-0 mt-1 px-2 py-1 rounded-full dark:shadow shadow-gray-800`}
+                          }  mt-1 px-2 py-1 rounded-full dark:shadow shadow-gray-800  flex-shrink-0`}
                         >
                           {p.is_open ? "Open" : "Closed"}
                         </p>
+                        <p className="ml-auto dark:font-normal font-medium text-primary flex-shrink-0">{`Leader: ${p.user.username}`}</p>
                       </div>
                     </div>
                     <p className="text-sm mt-2 line-clamp-4 ">{p.description}</p>
                     <div className="mt-auto flex justify-between items-center pt-1">
-                      <p className="text-primary">{formatDuration(p.duration_length, p.duration_type)}</p>
+                      <p className="dark:font-normal font-medium text-primary">
+                        {formatDuration(p.duration_length, p.duration_type)}
+                      </p>
                       <div className="relative group">
                         <FaCircleInfo className="text-sm text-primary" />
-                        <p className="text-gray-200 right-0 dark:shadow shadow-gray-800 transition-opacity opacity-0 group-hover:opacity-100 absolute bottom-6 bg-primary w-80 rounded-full px-2 py-1">
+                        <p className="text-gray-200 right-0 dark:shadow shadow-gray-800 transition-opacity opacity-0 group-hover:opacity-100 absolute bottom-6 bg-primary w-80 rounded-xl px-2 py-1  drop-shadow">
                           {p.technologies}
                         </p>
                       </div>
