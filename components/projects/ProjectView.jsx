@@ -25,7 +25,7 @@ const ProjectView = () => {
   const [chat, setChat] = useState();
   const [nextMessagePage, setNextMessagePage] = useState(1);
   const [loadMoreMessages, setLoadMoreMessages] = useState(false);
-  const [showLoadMoreMessages, setShowLoadMoreMessages] = useState(true);
+  const [showLoadMoreMessages, setShowLoadMoreMessages] = useState(false);
 
   const [dataLoaded, setDataLoaded] = useState(false);
   const router = useRouter();
@@ -53,7 +53,7 @@ const ProjectView = () => {
     // Scrolls the chat to the bottom
     if (chat && !loadMoreMessages) {
       var chatDiv = document.getElementById("scrollableDiv");
-      chatDiv.scrollTop = chatDiv.scrollHeight;
+      if (chatDiv) chatDiv.scrollTop = chatDiv.scrollHeight;
     }
   }, [session, chat]);
 
@@ -82,11 +82,8 @@ const ProjectView = () => {
       if (response.status === 200) {
         const { members } = await response.json();
         setMembers(members);
-        let access = false;
         const userId = session.data.session?.user.id;
-        for (const member of members) {
-          if (member.user_id === userId) access = true;
-        }
+        const access = members.some((m) => m.user_id === userId && !m.removed);
         if (!access) {
           router.push("/projects");
         } else setLoading(false);
@@ -112,6 +109,7 @@ const ProjectView = () => {
         setNextMessagePage(nextMessagePage + 1);
         const { chat } = await response.json();
         const chatReversed = chat.reverse();
+        if (chatReversed.length < 15) setShowLoadMoreMessages(false);
 
         if (nextMessagePage > 1) {
           console.log(chatReversed.length);
@@ -119,14 +117,41 @@ const ProjectView = () => {
             setShowLoadMoreMessages(false);
           } else {
             setChat((prevChat) => [...chatReversed, ...prevChat]);
-            if (chatReversed.length < 15) setShowLoadMoreMessages(false);
           }
         } else {
-          setChat(chat.reverse());
+          setChat(chatReversed);
         }
       }
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const changeStatus = async (status) => {
+    if (!session.data.session) return;
+    try {
+      setLoading(true);
+      const response = await fetch("/api/project/change-status", {
+        method: "PATCH",
+        headers: {
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+        },
+        body: JSON.stringify({
+          status,
+          projectId: id,
+        }),
+      });
+      if (response.status === 200) {
+        toast.success("Status changed");
+        setTimeout(() => window.location.reload(), 1000);
+      } else {
+        const { error } = await response.json();
+        throw error;
+      }
+    } catch (error) {
+      toast.error("Oops, something went wrong...");
+      console.error(error);
+      setLoading(false);
     }
   };
 
@@ -238,10 +263,31 @@ const ProjectView = () => {
                 </ul>
                 <p className="mt-4 font-semibold">Technologies</p>
                 <p>{project.technologies}</p>
-                <p className="text-orangeaccent mt-4">
+                <p className="text-primary mt-4">
                   {`Duration: ${formatDuration(project.duration_length, project.duration_type)}`}
                 </p>
               </div>
+              {isLeader && (
+                <button
+                  onClick={() =>
+                    changeStatus(
+                      project.status.toLowerCase() === "just created"
+                        ? "In progress"
+                        : project.status.toLowerCase() === "in progress"
+                        ? "Complete"
+                        : "In progress"
+                    )
+                  }
+                  type="button"
+                  className="bg-primary text-sm px-2 py-1 mt-2 rounded-full shadow shadow-gray-800 hover:bg-primarydark hover:text-gray-300"
+                >
+                  {project.status.toLowerCase() === "just created"
+                    ? "Start project"
+                    : project.status.toLowerCase() === "in progress"
+                    ? "Mark completed"
+                    : "Resume project"}
+                </button>
+              )}
             </div>
             <div className="sm:ml-4 max-sm:mt-4 sm:col-span-2 lg:col-span-4 ">
               <div
@@ -296,7 +342,7 @@ const ProjectView = () => {
                   placeholder="Send a message..."
                   className="w-full text-sm p-2 rounded border bg-gray-900 bg-opacity-50 focus:bg-gray-800 border-gray-400"
                 />
-                <button type="submit" className="rounded-full px-3 py-2 bg-orangeaccent text-sm hover:bg-orangedark">
+                <button type="submit" className="rounded-full px-3 py-2 bg-primary text-sm hover:bg-primarydark">
                   Send
                 </button>
               </form>

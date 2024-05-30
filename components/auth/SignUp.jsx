@@ -113,7 +113,7 @@ const SignUp = () => {
           <h1 className="text-lg mx-auto">Sign Up</h1>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="mt-4 px-8 py-6 rounded-lg bg-gray-900 bg-opacity-50 flex flex-col gap-2 border-gray-400 border-[1px]"
+            className="mt-4 px-8 py-6 rounded-lg bg-white dark:bg-gray-900 flex flex-col gap-2 dark:border-gray-400 dark:border-[1px]"
           >
             <label htmlFor="username" className="text-sm">
               Username
@@ -122,7 +122,7 @@ const SignUp = () => {
               id="username"
               {...register("username", { required: "Username is required" })}
               type="text"
-              className="rounded-md bg-gray-900 p-2 text-sm border-[1px] border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
+              className="rounded-md bg-gray-200 dark:bg-gray-900 p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
             />
             {errors.username && (
               <p role="alert" className="text-xs text-red-500">
@@ -136,7 +136,7 @@ const SignUp = () => {
               id="email"
               {...register("email", { required: "Email is required" })}
               type="text"
-              className="rounded-md bg-gray-900 p-2 text-sm border-[1px] border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
+              className="rounded-md bg-gray-200 dark:bg-gray-900 p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
             />
             {errors.email && (
               <p role="alert" className="text-xs text-red-500">
@@ -150,7 +150,7 @@ const SignUp = () => {
               id="password"
               {...register("password", { required: "Password is required", min: 6 })}
               type="password"
-              className="rounded-md bg-gray-900 p-2 text-sm border-[1px] border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
+              className="rounded-md bg-gray-200 dark:bg-gray-900 p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
             />
             {errors.password && (
               <p role="alert" className="text-xs text-red-500">
@@ -168,7 +168,7 @@ const SignUp = () => {
                 validate: (value, formValues) => value === formValues.password,
               })}
               type="password"
-              className="rounded-md bg-gray-900 p-2 text-sm border-[1px] border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
+              className="rounded-md bg-gray-200 dark:bg-gray-900 p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
             />
             {errors.confirmPassword && (
               <p role="alert" className="text-xs text-red-500">
@@ -179,7 +179,7 @@ const SignUp = () => {
             )}
             <button
               type="submit"
-              className="text-sm rounded-full bg-orangeaccent hover:bg-orangedark py-2 mt-2  hover:text-gray-300"
+              className="text-gray-200 text-sm rounded-full bg-primary hover:bg-primarydark py-2 mt-2 hover:text-gray-300"
             >
               Sign Up
             </button>
@@ -187,7 +187,7 @@ const SignUp = () => {
             <button
               onClick={signInWithGoogle}
               type="button"
-              className="text-sm gap-4 flex items-center justify-center bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 rounded-full"
+              className="text-sm gap-4 flex items-center justify-center bg-gray-200 hover:bg-gray-300 dark:hover:bg-gray-300 text-gray-700 font-bold py-2 rounded-full"
             >
               <Image src="/google.svg" alt="google_logo" width={20} height={20} />
               <span>Continue with Google</span>
@@ -195,7 +195,10 @@ const SignUp = () => {
           </form>
           <p className="ml-auto mt-4 text-sm">
             Already have an account?
-            <Link href={"/signin"} className="ml-1 text-blue-400 hover:text-blue-500">
+            <Link
+              href={"/signin"}
+              className="ml-1 dark:text-blue-400 dark:hover:text-blue-500 text-blue-600 hover:text-blue-700 hover:underline"
+            >
               Sign in
             </Link>
           </p>

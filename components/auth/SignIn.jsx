@@ -70,7 +70,7 @@ const Page = () => {
           <h1 className="text-lg mx-auto">Sign In</h1>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="mt-4 px-8 py-6 rounded-lg bg-gray-900 bg-opacity-50 flex flex-col gap-2 border-gray-400 border-[1px]"
+            className="mt-4 px-8 py-6 rounded-lg bg-white dark:bg-gray-900 flex flex-col gap-2 dark:border-gray-400 dark:border-[1px]"
           >
             <label htmlFor="email" className="text-sm">
               Email
@@ -79,7 +79,7 @@ const Page = () => {
               id="email"
               {...register("email", { required: "Email is required" })}
               type="text"
-              className="rounded-md bg-gray-900 p-2 text-sm border-[1px] border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
+              className="rounded-md bg-gray-200 dark:bg-gray-900 p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
               aria-invalid={errors.email ? "true" : "false"}
             />
             {errors.email && (
@@ -94,7 +94,7 @@ const Page = () => {
               id="password"
               {...register("password", { required: "Password is required" })}
               type="password"
-              className="rounded-md bg-gray-900 p-2 text-sm border-[1px] border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
+              className="rounded-md bg-gray-200 dark:bg-gray-900 p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
               aria-invalid={errors.password ? "true" : "false"}
             />
             {errors.password && (
@@ -104,7 +104,7 @@ const Page = () => {
             )}
             <button
               type="submit"
-              className="text-sm rounded-full bg-orangeaccent hover:bg-orangedark py-2 mt-2 hover:text-gray-300"
+              className="text-gray-200 text-sm rounded-full bg-primary hover:bg-primarydark py-2 mt-2 hover:text-gray-300"
             >
               Sign in
             </button>
@@ -112,7 +112,7 @@ const Page = () => {
             <button
               onClick={signInWithGoogle}
               type="button"
-              className="text-sm gap-4 flex items-center justify-center bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 rounded-full"
+              className="text-sm gap-4 flex items-center justify-center bg-gray-200 hover:bg-gray-300 dark:hover:bg-gray-300 text-gray-700 font-bold py-2 rounded-full"
             >
               <Image src="/google.svg" alt="google_logo" width={20} height={20} />
               <span>Continue with Google</span>
@@ -120,7 +120,10 @@ const Page = () => {
           </form>
           <p className="ml-auto mt-4 text-sm">
             Don't have an account?
-            <Link href={"/signup"} className="ml-1 text-blue-400 hover:text-blue-500">
+            <Link
+              href={"/signup"}
+              className="ml-1 dark:text-blue-400 dark:hover:text-blue-500 text-blue-600 hover:text-blue-700 hover:underline"
+            >
               Sign up
             </Link>
           </p>

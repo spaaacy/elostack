@@ -5,7 +5,7 @@ const Loader = () => {
   return (
     <div className="flex flex-1 ">
       <div className="m-auto">
-        <BounceLoader color={"#FF4500"} />
+        <BounceLoader color={"var(--primary)"} />
       </div>
     </div>
   );

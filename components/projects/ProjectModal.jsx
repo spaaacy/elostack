@@ -2,7 +2,7 @@ import { formatDuration } from "@/utils/formatDuration";
 import Link from "next/link";
 import { IoMdClose } from "react-icons/io";
 
-const ProjectModal = ({ setShowModal, project, handleJoin, joined, session }) => {
+const ProjectModal = ({ setShowModal, project, handleJoin, session, removed }) => {
   const handleModalClose = (e) => {
     if (e.target === e.currentTarget) {
       setShowModal(false);
@@ -22,42 +22,29 @@ const ProjectModal = ({ setShowModal, project, handleJoin, joined, session }) =>
           </button>
         </div>
 
-        <p className="font-extralight text-xs text-orangeaccent">{project.status}</p>
+        <p className="font-extralight text-xs text-primary">{project.status}</p>
         <div className="flex justify-between items-baseline w-full flex-1">
           <p className=" font-light text-sm mt-4 line-clamp-14">
             <span className="font-medium">Description</span>
             <br />
             {project.description}
           </p>
-          <p className="font-extralight text-xs text-orangeaccent flex-shrink-0">
+          <p className="font-extralight text-xs text-primary flex-shrink-0">
             {formatDuration(project.duration_length, project.duration_type)}
           </p>
         </div>
-        <div className="w-full flex justify-between items-end">
+        <div className="w-full flex justify-between items-end gap-2">
           <div className="flex flex-col justify-center items-start">
-            <p className=" text-xs text-orangeaccent">Technologies</p>
+            <p className=" text-xs text-primary">Technologies</p>
             <p className=" text-xs">{project.technologies}</p>
           </div>
 
           {session?.data.session ? (
-            joined ? (
-              <Link
-                href={`/projects/${project.id}`}
-                className={
-                  "bg-orangeaccent hover:bg-orangedark hover:text-gray-300 mt-auto self-end px-3 py-1  rounded-full text-sm  shadow shadow-black flex-shrink-0"
-                }
-              >
-                Open Project
-              </Link>
-            ) : (
+            project.is_open &&
+            !removed && (
               <button
                 onClick={handleJoin}
-                disabled={project.status.toLowerCase() !== "looking for members"}
-                className={`${
-                  project.status.toLowerCase() !== "looking for members"
-                    ? "bg-gray-600 text-gray-400"
-                    : "bg-orangeaccent hover:bg-orangedark hover:text-gray-300"
-                } mt-auto self-end px-3 py-1  rounded-full text-sm  shadow shadow-black`}
+                className="bg-primary hover:bg-primarydark hover:text-gray-300 mt-auto self-end px-3 py-1  rounded-full text-sm  shadow shadow-gray-800"
               >
                 Join
               </button>
@@ -66,11 +53,16 @@ const ProjectModal = ({ setShowModal, project, handleJoin, joined, session }) =>
             <Link
               href={"/signin"}
               className={
-                "bg-orangeaccent hover:bg-orangedark hover:text-gray-300 mt-auto self-end px-3 py-1  rounded-full text-sm  shadow shadow-black"
+                "bg-primary hover:bg-primarydark hover:text-gray-300 mt-auto self-end px-3 py-1  rounded-full text-sm  shadow shadow-gray-800"
               }
             >
               Join
             </Link>
+          )}
+          {removed && (
+            <p className="bg-red-700 mt-auto self-end px-3 py-1  rounded-full text-sm  shadow shadow-gray-800 flex-shrink-0">
+              You were removed
+            </p>
           )}
         </div>
       </div>

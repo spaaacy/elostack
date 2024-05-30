@@ -57,7 +57,8 @@ const CreateProject = () => {
           duration_length: data.durationLength,
           duration_type: data.durationType,
           team_size: data.teamSize,
-          status: "Looking for members",
+          status: "Just created",
+          is_open: true,
         }),
       });
       if (response.status === 201) {
@@ -142,7 +143,7 @@ const CreateProject = () => {
             <h1 className="text-2xl font-semibold">Create Project</h1>
             <button
               onClick={() => setShowIdeaPrompt(!showIdeaPrompt)}
-              className="px-2 py-1 bg-orangeaccent hover:bg-orangedark rounded-full text-sm hover:text-gray-300 shadow shadow-black flex items-center"
+              className="px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-sm hover:text-gray-300 shadow shadow-gray-800 flex items-center"
             >
               <BsStars className="inline mr-2" />
               Generate Idea
@@ -159,7 +160,7 @@ const CreateProject = () => {
                 <button
                   type="button"
                   onClick={generateIdea}
-                  className="text-xs p-1 bg-orangeaccent hover:bg-orangedark hover:text-gray-300  rounded ml-2"
+                  className="text-xs p-1 bg-primary hover:bg-primarydark hover:text-gray-300  rounded ml-2"
                 >
                   Go
                 </button>
@@ -252,7 +253,7 @@ const CreateProject = () => {
                 onKeyDown={technologyKeyDown}
               />
               <button type="button" onClick={addTechnology}>
-                <IoAddCircleSharp className="text-orangeaccent text-2xl" />
+                <IoAddCircleSharp className="text-primary text-2xl" />
               </button>
             </div>
             {errors.technology?.type === "validate" && (
@@ -267,7 +268,7 @@ const CreateProject = () => {
                     <li
                       onClick={() => removeTechnology(t)}
                       key={i}
-                      className="hover:cursor-pointer flex-shrink-0 text-xs bg-orangeaccent px-2 py-1 rounded-full"
+                      className="hover:cursor-pointer flex-shrink-0 text-xs bg-primary px-2 py-1 rounded-full"
                     >
                       {t}
                     </li>
@@ -279,7 +280,7 @@ const CreateProject = () => {
               {showClear && (
                 <button
                   onClick={clearValues}
-                  className="mt-4 px-2 py-1 bg-orangeaccent hover:bg-orangedark rounded-full text-sm hover:text-gray-300 shadow shadow-black"
+                  className="mt-4 px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-sm hover:text-gray-300 shadow shadow-gray-800"
                   type="button"
                 >
                   Clear
@@ -287,7 +288,7 @@ const CreateProject = () => {
               )}
               {session?.data.session ? (
                 <button
-                  className="mt-4 ml-auto px-2 py-1 bg-orangeaccent hover:bg-orangedark rounded-full text-sm hover:text-gray-300 shadow shadow-black"
+                  className="mt-4 ml-auto px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-sm hover:text-gray-300 shadow shadow-gray-800"
                   type="submit"
                 >
                   Create
@@ -295,7 +296,7 @@ const CreateProject = () => {
               ) : (
                 <Link
                   href={"/signin"}
-                  className="mt-4 ml-auto px-2 py-1 bg-orangeaccent hover:bg-orangedark rounded-full text-sm hover:text-gray-300 shadow shadow-black"
+                  className="mt-4 ml-auto px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-sm hover:text-gray-300 shadow shadow-gray-800"
                 >
                   Create
                 </Link>

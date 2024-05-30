@@ -4,14 +4,21 @@
 
 @layer base {
   :root {
-    color-scheme: dark;
-    --foreground-rgb: 235, 235, 235;
-    --background-rgb: 41, 30, 42;
+    --foreground: #291e2a;
+    --background: #ebebeb;
+    --primary: #e63d00;
+    --primarydark: #cc3600;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --foreground: #ebebeb;
+      --background: #291e2a;
+    }
   }
 
   body {
-    color: rgb(var(--foreground-rgb));
-    background: rgb(var(--background-rgb));
+    @apply dark:bg-backgrounddark dark:text-white bg-backgroundlight text-black;
   }
 
   main {

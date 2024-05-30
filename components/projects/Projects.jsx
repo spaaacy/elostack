@@ -116,8 +116,12 @@ const Projects = () => {
   };
 
   const handleClick = (project) => {
-    setShowModal(true);
-    setModalProject(project);
+    if (session.data.session && memberList.some((m) => m.project_id === project.id && !m.removed)) {
+      router.push(`/projects/${project.id}`);
+    } else {
+      setShowModal(true);
+      setModalProject(project);
+    }
   };
 
   return (
@@ -135,15 +139,15 @@ const Projects = () => {
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder={"Search..."}
               type="text"
-              className="min-w-0 w-96 text-sm p-2 rounded border bg-gray-900 bg-opacity-50 focus:bg-gray-800 border-gray-400"
+              className="focus:ring-0 focus:outline-none min-w-0 w-96 text-sm p-2 rounded border bg-gray-200 dark:bg-gray-900 focus:bg-gray-300 dark:focus:bg-gray-800 border-gray-400"
             />
             <select
               name="selectedStatus"
               onChange={(e) => setStatusInput(e.target.value)}
-              className="min-w-0  text-sm p-2 rounded border bg-gray-900 bg-opacity-50 hover:bg-gray-800 border-gray-400"
+              className="min-w-0  text-sm p-2 rounded border bg-gray-200 hover:bg-gray-300 dark:bg-gray-900  dark:hover:bg-gray-800 border-gray-400"
             >
               <option value={""}>Show All</option>
-              <option value={"looking for members"}>Looking for members</option>
+              <option value={"just created"}>Just created</option>
               <option value={"in progress"}>In Progress</option>
               <option value={"complete"}>Complete</option>
             </select>
@@ -154,20 +158,29 @@ const Projects = () => {
                 <li key={i}>
                   <div
                     onClick={() => handleClick(p)}
-                    className="hover:cursor-pointer h-48 p-2 flex flex-col border bg-gray-900 bg-opacity-50 rounded hover:bg-gray-800 border-gray-400 text-xs font-light"
+                    className="bg-gray-200 hover:bg-gray-300 hover:cursor-pointer h-48 p-2 flex flex-col dark:border dark:bg-gray-900  rounded dark:hover:bg-gray-800 border-gray-400 text-xs font-light"
                   >
                     <div className="flex flex-col justify-start items-start">
                       <h3 className="text-base font-medium">{p.title}</h3>
-                      <p className="text-right flex-shrink-0 bg-orangeaccent mt-1 px-2 py-1 rounded-full shadow shadow-black">
-                        {p.status}
-                      </p>
+                      <div className="flex items-center gap-2 text-gray-200">
+                        <p className=" text-right flex-shrink-0 bg-primary mt-1 px-2 py-1 rounded-full dark:shadow shadow-gray-800">
+                          {p.status}
+                        </p>
+                        <p
+                          className={`${
+                            p.is_open ? "bg-green-600" : "bg-red-700"
+                          } text-right flex-shrink-0 mt-1 px-2 py-1 rounded-full dark:shadow shadow-gray-800`}
+                        >
+                          {p.is_open ? "Open" : "Closed"}
+                        </p>
+                      </div>
                     </div>
                     <p className="text-sm mt-2 line-clamp-4 ">{p.description}</p>
                     <div className="mt-auto flex justify-between items-center pt-1">
-                      <p className="text-orangeaccent">{formatDuration(p.duration_length, p.duration_type)}</p>
+                      <p className="text-primary">{formatDuration(p.duration_length, p.duration_type)}</p>
                       <div className="relative group">
-                        <FaCircleInfo className="text-sm text-orangeaccent" />
-                        <p className="right-0 shadow shadow-black transition-opacity opacity-0 group-hover:opacity-100 absolute bottom-6 bg-orangeaccent rounded-full truncate px-2 py-1">
+                        <FaCircleInfo className="text-sm text-primary" />
+                        <p className="text-gray-200 right-0 dark:shadow shadow-gray-800 transition-opacity opacity-0 group-hover:opacity-100 absolute bottom-6 bg-primary w-80 rounded-full px-2 py-1">
                           {p.technologies}
                         </p>
                       </div>
@@ -182,7 +195,7 @@ const Projects = () => {
       <Footer />
       {showModal && (
         <ProjectModal
-          joined={session?.data.session ? memberList.some((m) => m.project_id === modalProject.id) : false}
+          removed={memberList ? memberList.some((m) => m.removed && modalProject.id === m.project_id) : false}
           project={modalProject}
           setShowModal={setShowModal}
           handleJoin={handleJoin}
