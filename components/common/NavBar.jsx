@@ -17,10 +17,12 @@ const NavBar = () => {
   const router = useRouter();
   const [user, setUser] = useState();
   const [showMobileDropdown, setShowMobileDropdown] = useState(false);
-  const { systemTheme, theme, setTheme } = useTheme();
-  const currentTheme = theme === "system" ? systemTheme : theme;
+  const { systemTheme, theme } = useTheme();
+  const [currentTheme, setCurrentTheme] = useState();
 
   useEffect(() => {
+    setCurrentTheme(theme === "system" ? systemTheme : theme);
+
     const fetchUser = async () => {
       const userId = session.data.session?.user.id;
       if (userId) {
@@ -48,8 +50,8 @@ const NavBar = () => {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      location.reload(); // Refresh the page to update the session state
-      router.push("/"); // Refresh the page to update the session state
+      location.reload();
+      router.push("/");
     } catch (error) {
       console.error(error);
     }
