@@ -18,7 +18,7 @@ const Projects = () => {
   const [filteredProjects, setFilteredProjects] = useState();
   const [searchInput, setSearchInput] = useState("");
   const [statusInput, setStatusInput] = useState("");
-  const [openInput, setOpenInput] = useState(false);
+  const [openInput, setOpenInput] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [modalProject, setModalProject] = useState();
   const [projects, setProjects] = useState([]);
@@ -42,7 +42,7 @@ const Projects = () => {
     const filteredProjects = projects.filter(
       (project) =>
         (statusInput === "" ? true : project.status.toLowerCase() === statusInput) &&
-        (openInput ? project.is_open : !project.is_open) &&
+        (openInput ? project.is_open : true) &&
         (searchInput === ""
           ? true
           : project.title.toLowerCase().includes(searchInput) ||
@@ -51,7 +51,7 @@ const Projects = () => {
     );
 
     setFilteredProjects(filteredProjects);
-  }, [searchInput, statusInput, showModal, session, openInput]);
+  }, [searchInput, statusInput, showModal, session, openInput, projects]);
 
   const handleJoin = async () => {
     if (!session.data.session) return;
