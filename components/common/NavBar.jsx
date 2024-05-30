@@ -17,11 +17,12 @@ const NavBar = () => {
   const router = useRouter();
   const [user, setUser] = useState();
   const [showMobileDropdown, setShowMobileDropdown] = useState(false);
-  const { systemTheme, theme } = useTheme();
+  const { systemTheme, theme, setTheme } = useTheme();
   const [currentTheme, setCurrentTheme] = useState();
 
   useEffect(() => {
     setCurrentTheme(theme === "system" ? systemTheme : theme);
+    console.log(currentTheme);
 
     const fetchUser = async () => {
       const userId = session.data.session?.user.id;
@@ -46,6 +47,11 @@ const NavBar = () => {
     }
   }, [session]);
 
+  const toggleTheme = (theme) => {
+    setCurrentTheme(theme);
+    setTheme(theme);
+  };
+
   const signOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
@@ -64,14 +70,29 @@ const NavBar = () => {
     <nav>
       <div className="px-8 md:px-16 py-2 flex items-center justify-start">
         <Link href={"/"} className={`${kanit.className} flex justify-center items-center text-2xl flex-shrink-0`}>
-          <Image src={currentTheme === "dark" ? "/logo.png" : "/logo_black.png"} alt={"logo"} width={50} height={50} />
+          {currentTheme && (
+            <Image
+              src={currentTheme === "dark" ? "/logo.png" : "/logo_black.png"}
+              alt={"logo"}
+              width={50}
+              height={50}
+            />
+          )}
           <span className="max-sm:hidden">EloStack</span>
         </Link>
-        <DesktopNav showSignIn={showSignIn} signOut={signOut} session={session} user={user} />
+        <DesktopNav
+          showSignIn={showSignIn}
+          signOut={signOut}
+          session={session}
+          user={user}
+          currentTheme={currentTheme}
+          toggleTheme={toggleTheme}
+        />
         <MobileNav
           currentTheme={currentTheme}
           setShowMobileDropdown={setShowMobileDropdown}
           showMobileDropdown={showMobileDropdown}
+          toggleTheme={toggleTheme}
         />
       </div>
       {showMobileDropdown && <MobileDropdown showSignIn={showSignIn} signOut={signOut} session={session} />}
@@ -81,18 +102,7 @@ const NavBar = () => {
 
 export default NavBar;
 
-const DesktopNav = ({ showSignIn, signOut, session, user }) => {
-  const { systemTheme, theme, setTheme } = useTheme();
-  const [currentTheme, setCurrentTheme] = useState();
-
-  useEffect(() => {
-    setCurrentTheme(theme === "system" ? systemTheme : theme);
-  }, []);
-
-  const toggleTheme = (theme) => {
-    setCurrentTheme(theme);
-    setTheme(theme);
-  };
+const DesktopNav = ({ showSignIn, signOut, session, user, currentTheme, toggleTheme }) => {
   return (
     <div className="ml-12 flex justify-start items-center gap-4 max-sm:hidden w-full">
       <Link
@@ -108,13 +118,15 @@ const DesktopNav = ({ showSignIn, signOut, session, user }) => {
         Create Project
       </Link>
       <div className="flex justify-center items-baseline ml-auto">
-        <button
-          type="button"
-          onClick={() => (theme == "dark" ? toggleTheme("light") : toggleTheme("dark"))}
-          className="mr-4 self-center text-xl"
-        >
-          {currentTheme && currentTheme === "light" ? <MdDarkMode /> : <MdLightMode />}
-        </button>
+        {currentTheme && (
+          <button
+            type="button"
+            onClick={() => (currentTheme == "dark" ? toggleTheme("light") : toggleTheme("dark"))}
+            className="mr-4 self-center text-xl"
+          >
+            {currentTheme === "light" ? <MdDarkMode /> : <MdLightMode />}
+          </button>
+        )}
         {user && <p className="italic text-sm text-gray-600 dark:text-gray-300">{`${user.username}`}</p>}
         {showSignIn && (
           <div
@@ -129,28 +141,18 @@ const DesktopNav = ({ showSignIn, signOut, session, user }) => {
   );
 };
 
-const MobileNav = ({ setShowMobileDropdown, showMobileDropdown }) => {
-  const { systemTheme, theme, setTheme } = useTheme();
-  const [currentTheme, setCurrentTheme] = useState();
-
-  useEffect(() => {
-    setCurrentTheme(theme === "system" ? systemTheme : theme);
-  }, []);
-
-  const toggleTheme = (theme) => {
-    setCurrentTheme(theme);
-    setTheme(theme);
-  };
-
+const MobileNav = ({ setShowMobileDropdown, showMobileDropdown, currentTheme, toggleTheme }) => {
   return (
     <div className="flex items-center gap-2 ml-auto sm:hidden">
-      <button
-        type="button"
-        onClick={() => (theme == "dark" ? toggleTheme("light") : toggleTheme("dark"))}
-        className="mr-4 self-center text-xl"
-      >
-        {currentTheme && currentTheme === "light" ? <MdDarkMode /> : <MdLightMode />}
-      </button>
+      {currentTheme && (
+        <button
+          type="button"
+          onClick={() => (currentTheme == "dark" ? toggleTheme("light") : toggleTheme("dark"))}
+          className="mr-4 self-center text-xl"
+        >
+          {currentTheme === "light" ? <MdDarkMode /> : <MdLightMode />}
+        </button>
+      )}
       <button type="button" onClick={() => setShowMobileDropdown(!showMobileDropdown)}>
         <IoMenu className="text-2xl" />
       </button>
