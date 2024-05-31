@@ -22,7 +22,6 @@ const NavBar = () => {
 
   useEffect(() => {
     setCurrentTheme(theme === "system" ? systemTheme : theme);
-    console.log(currentTheme);
 
     const fetchUser = async () => {
       const userId = session.data.session?.user.id;

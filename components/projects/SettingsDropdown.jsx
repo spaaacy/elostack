@@ -10,15 +10,15 @@ const githubUrlPattern = /^https?:\/\/(?:www\.)?github\.com\/[\w-]+\/[\w-]+\/?$/
 const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) => {
   const dropdownRef = useRef();
   const githubRef = useRef();
-  const removeMemberRef = useRef();
+  const banMemberRef = useRef();
   const changeLeaderRef = useRef();
   const deleteProjectRef = useRef();
   const leaveProjectRef = useRef();
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [showGithubDropdown, setShowGithubDropdown] = useState(false);
-  const [showRemoveMember, setShowRemoveMember] = useState(false);
-  const [confirmRemoveMember, setConfirmRemoveMember] = useState();
+  const [showBanMember, setShowBanMember] = useState(false);
+  const [confirmBanMember, setConfirmBanMember] = useState();
   const [showChangeLeader, setShowChangeLeader] = useState(false);
   const [confirmChangeLeader, setConfirmChangeLeader] = useState();
   const [showDeleteProject, setShowDeleteProject] = useState();
@@ -155,12 +155,12 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
     }
   };
 
-  const removeMember = async (userId) => {
+  const banMember = async (userId) => {
     if (!session.data.session) return;
     try {
-      setShowRemoveMember(false);
+      setShowBanMember(false);
       setLoading(true);
-      const response = await fetch("/api/member/remove-member", {
+      const response = await fetch("/api/member/ban-member", {
         method: "PATCH",
         headers: {
           "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
@@ -171,7 +171,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
         }),
       });
       if (response.status === 200) {
-        toast.success("Member removed");
+        toast.success("Member has been banned");
         setTimeout(() => window.location.reload(), 1000);
       } else {
         const { error } = await response.json();
@@ -219,8 +219,8 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
     if (githubRef.current && !githubRef.current.contains(event.target)) {
       setShowGithubDropdown(false);
     }
-    if (removeMemberRef.current && !removeMemberRef.current.contains(event.target)) {
-      setShowRemoveMember(false);
+    if (banMemberRef.current && !banMemberRef.current.contains(event.target)) {
+      setShowBanMember(false);
     }
     if (changeLeaderRef.current && !changeLeaderRef.current.contains(event.target)) {
       setShowChangeLeader(false);
@@ -237,7 +237,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
     <div className="ml-auto">
       <button
         type="button"
-        disabled={showDropdown || showGithubDropdown || showRemoveMember}
+        disabled={showDropdown || showGithubDropdown || showBanMember}
         onClick={() => setShowDropdown(true)}
       >
         <BsThreeDotsVertical className="text-xl" />
@@ -256,7 +256,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
               {project.is_open ? "Close project to new members" : "Open project to new members"}
             </button>
           )}
-          {isLeader && members.some((m) => !m.removed && m.user_id !== project.leader) && (
+          {isLeader && members.some((m) => !m.banned && m.user_id !== project.leader) && (
             <button
               type="button"
               onClick={() => {
@@ -281,16 +281,16 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
             </button>
           )}
           {isLeader && <hr className="border-0 h-[1px] bg-gray-600 w-full my-1 rounded-full" />}
-          {isLeader && members.some((m) => !m.removed && m.user_id !== project.leader) && (
+          {isLeader && members.some((m) => !m.banned && m.user_id !== project.leader) && (
             <button
               type="button"
               onClick={() => {
-                setShowRemoveMember(true);
+                setShowBanMember(true);
                 setShowDropdown(false);
               }}
               className="hover:bg-gray-200 dark:hover:bg-gray-800 font-medium text-red-600 dark:font-normal dark:text-red-500  hover:text-red-600 p-1 w-full text-right"
             >
-              Remove member
+              Ban member
             </button>
           )}
           <button
@@ -312,7 +312,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
           </button>
           {isLeader && (
             <button
-              disabled={members.some((m) => !m.removed && m.user_id !== project.leader)}
+              disabled={members.some((m) => !m.banned && m.user_id !== project.leader)}
               data-tooltip-id="delete-tooltip"
               data-tooltip-content="Members are in this project"
               type="button"
@@ -321,7 +321,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
                 setShowDropdown(false);
               }}
               className={`${
-                members.some((m) => !m.removed && m.user_id !== project.leader)
+                members.some((m) => !m.banned && m.user_id !== project.leader)
                   ? "text-gray-500 hover:cursor-not-allowed"
                   : "hover:bg-gray-200 dark:hover:bg-gray-800 font-medium text-red-600 dark:font-normal dark:text-red-500  hover:text-red-600"
               }  p-1 w-full text-right`}
@@ -330,7 +330,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
             </button>
           )}
           {isLeader && <Tooltip id="leader-tooltip" place="bottom" type="dark" effect="float" />}
-          {members.some((m) => !m.removed && m.user_id !== project.leader) && (
+          {members.some((m) => !m.banned && m.user_id !== project.leader) && (
             <Tooltip id="delete-tooltip" place="bottom" type="dark" effect="float" />
           )}
         </div>
@@ -363,7 +363,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
           ) : (
             <>
               {members
-                .filter((m) => m.user_id !== project.leader && !m.removed)
+                .filter((m) => m.user_id !== project.leader && !m.banned)
                 .map((m) => {
                   return (
                     <button
@@ -428,25 +428,25 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
           </button>
         </div>
       )}
-      {showRemoveMember && (
+      {showBanMember && (
         <div
-          ref={removeMemberRef}
+          ref={banMemberRef}
           className="absolute top-10 bg-gray-100 border-gray-400 border right-0 dark:bg-gray-900 rounded p-2 text-sm flex flex-col text-black dark:text-gray-300 justify-center items-end"
         >
-          {confirmRemoveMember ? (
+          {confirmBanMember ? (
             <>
               <p className="font-medium text-red-600 dark:font-normal dark:text-red-500">Are you sure?</p>
               <div className="flex justify-center mx-auto gap-4 mt-2">
                 <button
                   type="button"
-                  onClick={() => removeMember(confirmRemoveMember)}
+                  onClick={() => banMember(confirmBanMember)}
                   className="hover:bg-gray-200 dark:hover:bg-gray-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
                 >
                   Yes
                 </button>
                 <button
                   type="button"
-                  onClick={() => setConfirmRemoveMember(false)}
+                  onClick={() => setConfirmBanMember(false)}
                   className="hover:bg-gray-200 dark:hover:bg-gray-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
                 >
                   No
@@ -456,13 +456,13 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
           ) : (
             <>
               {members
-                .filter((m) => m.user_id !== project.leader && !m.removed)
+                .filter((m) => m.user_id !== project.leader && !m.banned)
                 .map((m) => {
                   return (
                     <button
                       key={m.user.user_id}
                       type="button"
-                      onClick={() => setConfirmRemoveMember(m.user_id)}
+                      onClick={() => setConfirmBanMember(m.user_id)}
                       className="w-full hover:bg-gray-200 dark:hover:bg-gray-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
                     >
                       {m.user.username}
@@ -473,7 +473,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
               <button
                 type="button"
                 onClick={() => {
-                  setShowRemoveMember(false);
+                  setShowBanMember(false);
                   setShowDropdown(true);
                 }}
                 className="w-full hover:bg-gray-200 dark:hover:bg-gray-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"

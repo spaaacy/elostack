@@ -10,14 +10,13 @@ export async function PATCH(req, res) {
     const auth = await supabase.auth.setSession({ access_token, refresh_token });
     if (auth.error) throw auth.error;
 
-    const { userId, projectId } = await req.json();
-    const { error } = await supabase
-      .from("member")
-      .update({ removed: true })
-      .match({ project_id: projectId, user_id: userId });
-    if (error) throw error;
+    const { userId, projectId, requestId } = await req.json();
+    let results = await supabase.from("request").update({ accepted: true }).eq("id", requestId);
+    if (results.error) throw results.error;
+    results = await supabase.from("member").insert({ user_id: userId, project_id: projectId });
+    if (results.error) throw results.error;
 
-    return NextResponse.json({ message: "Member removed successfully!" }, { status: 200 });
+    return NextResponse.json({ message: "Request changed successfully!" }, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error }, { status: 500 });

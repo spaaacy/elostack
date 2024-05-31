@@ -271,7 +271,7 @@ const CreateProject = () => {
                     <li
                       onClick={() => removeTechnology(t)}
                       key={i}
-                      className="hover:cursor-pointer flex-shrink-0 text-xs bg-primary px-2 py-1 rounded-full"
+                      className="hover:cursor-pointer flex-shrink-0 text-xs bg-primary px-2 py-1 rounded-full text-gray-200"
                     >
                       {t}
                     </li>

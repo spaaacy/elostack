@@ -24,12 +24,14 @@ const Projects = () => {
   const router = useRouter();
   const [dataLoaded, setDataLoaded] = useState(false);
   const [memberList, setMemberList] = useState();
+  const [requests, setRequests] = useState();
 
   useEffect(() => {
     if (session && !dataLoaded) {
+      setDataLoaded(true);
       fetchProjects();
       fetchUserMemberList();
-      setDataLoaded(true);
+      fetchUserRequests();
     }
 
     if (showModal) {
@@ -52,12 +54,12 @@ const Projects = () => {
     setFilteredProjects(filteredProjects);
   }, [searchInput, statusInput, showModal, session, openInput, projects]);
 
-  const handleJoin = async () => {
+  const createRequest = async (message) => {
     if (!session.data.session) return;
     try {
       setShowModal(false);
       setLoading(true);
-      const response = await fetch("/api/member/create", {
+      const response = await fetch("/api/request/create", {
         method: "POST",
         headers: {
           "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
@@ -65,18 +67,31 @@ const Projects = () => {
         body: JSON.stringify({
           userId: session.data.session.user.id,
           projectId: modalProject.id,
+          message,
         }),
       });
       if (response.status === 201) {
-        router.push(`/projects/${modalProject.id}`);
+        toast.success("Request has been made!");
+        setRequests((prevRequests) => [
+          ...prevRequests,
+          {
+            user_id: session.data.session.user.id,
+            project_id: modalProject.id,
+            message,
+            accepted: false,
+            rejected: false,
+          },
+        ]);
+        setShowModal(false);
       } else {
         const { error } = await response.json();
         throw error;
       }
     } catch (error) {
-      setLoading(false);
       toast.error("Oops, something went wrong...");
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -93,6 +108,26 @@ const Projects = () => {
       if (response.status === 200) {
         const { data } = await response.json();
         setMemberList(data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchUserRequests = async () => {
+    const userId = session.data.session?.user.id;
+    if (!userId) return;
+    try {
+      const response = await fetch("/api/request/user", {
+        method: "POST",
+        headers: {
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+        },
+        body: JSON.stringify({ userId }),
+      });
+      if (response.status === 200) {
+        const { requests } = await response.json();
+        setRequests(requests);
       }
     } catch (error) {
       console.error(error);
@@ -116,7 +151,7 @@ const Projects = () => {
   };
 
   const handleClick = (project) => {
-    if (session.data.session && memberList.some((m) => m.project_id === project.id && !m.removed)) {
+    if (session.data.session && memberList.some((m) => m.project_id === project.id && !m.banned)) {
       router.push(`/projects/${project.id}`);
     } else {
       setShowModal(true);
@@ -203,10 +238,11 @@ const Projects = () => {
       <Footer />
       {showModal && (
         <ProjectModal
-          removed={memberList ? memberList.some((m) => m.removed && modalProject.id === m.project_id) : false}
+          banned={memberList ? memberList.some((m) => m.banned && modalProject.id === m.project_id) : false}
+          request={requests ? requests.find((r) => r.project_id === modalProject.id) : null}
           project={modalProject}
           setShowModal={setShowModal}
-          handleJoin={handleJoin}
+          createRequest={createRequest}
           session={session}
         />
       )}
