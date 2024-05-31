@@ -68,7 +68,7 @@ const NavBar = () => {
 
   return (
     <nav className={"min-h-16"}>
-      <div className="px-8 md:px-16 py-2 flex items-center justify-start">
+      <div className="px-8 lg:px-16 py-2 flex items-center justify-start">
         <Link href={"/"} className={`${kanit.className} flex justify-center items-center text-2xl flex-shrink-0`}>
           {currentTheme && (
             <Image
@@ -78,7 +78,7 @@ const NavBar = () => {
               height={50}
             />
           )}
-          <span className="max-sm:hidden">EloStack</span>
+          <span className="max-lg:hidden">EloStack</span>
         </Link>
         <DesktopNav
           showSignIn={showSignIn}
@@ -106,7 +106,7 @@ export default NavBar;
 
 const DesktopNav = ({ showSignIn, signOut, session, user, currentTheme, toggleTheme, isHomePage }) => {
   return (
-    <div className="ml-12 flex justify-start items-center gap-4 max-sm:hidden w-full">
+    <div className="ml-12 flex justify-start items-center gap-4 max-lg:hidden w-full">
       <Link
         href={"/projects"}
         className="p-2 border-b-2 border-transparent hover:text-gray-500 hover:border-b-gray-500 dark:hover:border-b-gray-300 dark:hover:text-gray-300"
@@ -153,7 +153,7 @@ const DesktopNav = ({ showSignIn, signOut, session, user, currentTheme, toggleTh
 
 const MobileNav = ({ setShowMobileDropdown, showMobileDropdown, currentTheme, toggleTheme, isHomePage }) => {
   return (
-    <div className="flex items-center gap-2 ml-auto sm:hidden">
+    <div className="flex items-center gap-2 ml-auto lg:hidden">
       {!isHomePage && currentTheme && (
         <button
           type="button"
@@ -172,7 +172,7 @@ const MobileNav = ({ setShowMobileDropdown, showMobileDropdown, currentTheme, to
 
 const MobileDropdown = ({ showSignIn, signOut, session }) => {
   return (
-    <div className="flex flex-col justify-center items-center sm:hidden">
+    <div className="flex flex-col justify-center items-center lg:hidden">
       <Link href={"/projects"} className="p-2 hover:bg-gray-300 dark:hover:bg-gray-600 w-full text-center">
         Projects
       </Link>

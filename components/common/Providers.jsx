@@ -6,5 +6,9 @@ export const Providers = (props) => {
   const pathname = usePathname();
   const forcedThemeFromPathname = pathname === "/" ? "dark" : undefined;
 
-  return <ThemeProvider forcedTheme={forcedThemeFromPathname}>{props.children}</ThemeProvider>;
+  return (
+    <ThemeProvider attribute="class" forcedTheme={forcedThemeFromPathname}>
+      {props.children}
+    </ThemeProvider>
+  );
 };
