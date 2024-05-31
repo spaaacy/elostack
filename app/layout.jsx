@@ -3,8 +3,7 @@ import "@/styles/globals.css";
 import "react-tooltip/dist/react-tooltip.css";
 import { UserProvider } from "@/context/UserContext";
 import GoogleAnalytics from "@/components/common/GoogleAnalytics";
-import { ThemeProvider } from "next-themes";
-
+import { Providers } from "@/components/common/Providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -19,9 +18,9 @@ export default function RootLayout({ children }) {
         <GoogleAnalytics ga_id={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS} />
       </head>
       <body className={inter.className}>
-        <ThemeProvider attribute="class">
-          <UserProvider>{children}</UserProvider>
-        </ThemeProvider>
+        <UserProvider>
+          <Providers>{children}</Providers>
+        </UserProvider>
       </body>
     </html>
   );

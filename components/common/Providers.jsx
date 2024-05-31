@@ -1,0 +1,10 @@
+"use client";
+import { usePathname } from "next/navigation";
+import { ThemeProvider } from "next-themes";
+
+export const Providers = (props) => {
+  const pathname = usePathname();
+  const forcedThemeFromPathname = pathname === "/" ? "dark" : undefined;
+
+  return <ThemeProvider forcedTheme={forcedThemeFromPathname}>{props.children}</ThemeProvider>;
+};

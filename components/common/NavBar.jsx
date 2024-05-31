@@ -64,14 +64,15 @@ const NavBar = () => {
 
   const pathname = usePathname();
   const showSignIn = pathname !== "/signin" && pathname !== "/signup";
+  const isHomePage = pathname === "/";
 
   return (
-    <nav className="min-h-16">
+    <nav className={"min-h-16"}>
       <div className="px-8 md:px-16 py-2 flex items-center justify-start">
         <Link href={"/"} className={`${kanit.className} flex justify-center items-center text-2xl flex-shrink-0`}>
           {currentTheme && (
             <Image
-              src={currentTheme === "dark" ? "/logo.png" : "/logo_black.png"}
+              src={currentTheme === "light" && !isHomePage ? "/logo_black.png" : "/logo.png"}
               alt={"logo"}
               width={50}
               height={50}
@@ -86,8 +87,10 @@ const NavBar = () => {
           user={user}
           currentTheme={currentTheme}
           toggleTheme={toggleTheme}
+          isHomePage={isHomePage}
         />
         <MobileNav
+          isHomePage={isHomePage}
           currentTheme={currentTheme}
           setShowMobileDropdown={setShowMobileDropdown}
           showMobileDropdown={showMobileDropdown}
@@ -101,7 +104,7 @@ const NavBar = () => {
 
 export default NavBar;
 
-const DesktopNav = ({ showSignIn, signOut, session, user, currentTheme, toggleTheme }) => {
+const DesktopNav = ({ showSignIn, signOut, session, user, currentTheme, toggleTheme, isHomePage }) => {
   return (
     <div className="ml-12 flex justify-start items-center gap-4 max-sm:hidden w-full">
       <Link
@@ -125,7 +128,7 @@ const DesktopNav = ({ showSignIn, signOut, session, user, currentTheme, toggleTh
         </Link>
       )}
       <div className="flex justify-center items-baseline ml-auto">
-        {currentTheme && (
+        {!isHomePage && currentTheme && (
           <button
             type="button"
             onClick={() => (currentTheme == "dark" ? toggleTheme("light") : toggleTheme("dark"))}
@@ -134,7 +137,7 @@ const DesktopNav = ({ showSignIn, signOut, session, user, currentTheme, toggleTh
             {currentTheme === "light" ? <MdDarkMode /> : <MdLightMode />}
           </button>
         )}
-        {user && <p className="italic text-sm text-gray-600 dark:text-gray-300">{`${user.username}`}</p>}
+        {!isHomePage && user && <p className="italic text-sm text-gray-600 dark:text-gray-300">{`${user.username}`}</p>}
         {showSignIn && (
           <div
             className="ml-4 hover:bg-gray-300 dark:hover:bg-gray-600 px-3 py-1 rounded-full 
@@ -148,10 +151,10 @@ const DesktopNav = ({ showSignIn, signOut, session, user, currentTheme, toggleTh
   );
 };
 
-const MobileNav = ({ setShowMobileDropdown, showMobileDropdown, currentTheme, toggleTheme }) => {
+const MobileNav = ({ setShowMobileDropdown, showMobileDropdown, currentTheme, toggleTheme, isHomePage }) => {
   return (
     <div className="flex items-center gap-2 ml-auto sm:hidden">
-      {currentTheme && (
+      {!isHomePage && currentTheme && (
         <button
           type="button"
           onClick={() => (currentTheme == "dark" ? toggleTheme("light") : toggleTheme("dark"))}
