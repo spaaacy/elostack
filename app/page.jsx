@@ -13,14 +13,14 @@ const Page = () => {
         <NavBar />
         <Image className="-z-50 object-cover" src={"/astronaut.jpg"} alt="hero_bg" fill={true} />
         <div
-          className={`max-2xl:px-8 absolute 2xl:right-72 max-2xl:right-0 max-2xl:bottom-[10%] 2xl:top-1/2 2xl:-translate-y-1/2 transform text-right flex flex-col items-end justify-center  ${jetbrainsMono.className}`}
+          className={`max-2xl:px-8 absolute 2xl:right-72 max-2xl:right-0 max-sm:bottom-[10%] sm:top-1/2 2xl:-translate-y-1/2 transform text-right flex flex-col items-end justify-center  ${jetbrainsMono.className}`}
         >
-          <h1 className="text-4xl md:text-5xl ">
+          <h1 className="max-sm:text-3xl sm:text-4xl md:text-5xl ">
             Don't go alone...
             <br />
             Collaborate.
           </h1>
-          <h2 className="text-2xl md:text-3xl mt-20">
+          <h2 className="max-sm:text-xl sm:text-2xl md:text-3xl mt-8 md:mt-20 sm:mt-12">
             Find software projects, <br /> build real experience.
           </h2>
           <Link

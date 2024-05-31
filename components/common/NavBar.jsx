@@ -68,7 +68,7 @@ const NavBar = () => {
 
   return (
     <nav className={"min-h-16"}>
-      <div className="px-8 lg:px-16 py-2 flex items-center justify-start">
+      <div className={`px-8 lg:px-16 py-2 flex items-center justify-start ${isHomePage ? "max-lg:bg-black" : ""}`}>
         <Link href={"/"} className={`${kanit.className} flex justify-center items-center text-2xl flex-shrink-0`}>
           {currentTheme && (
             <Image
@@ -97,7 +97,9 @@ const NavBar = () => {
           toggleTheme={toggleTheme}
         />
       </div>
-      {showMobileDropdown && <MobileDropdown showSignIn={showSignIn} signOut={signOut} session={session} />}
+      {showMobileDropdown && (
+        <MobileDropdown isHomePage={isHomePage} showSignIn={showSignIn} signOut={signOut} session={session} />
+      )}
     </nav>
   );
 };
@@ -170,9 +172,9 @@ const MobileNav = ({ setShowMobileDropdown, showMobileDropdown, currentTheme, to
   );
 };
 
-const MobileDropdown = ({ showSignIn, signOut, session }) => {
+const MobileDropdown = ({ showSignIn, signOut, session, isHomePage }) => {
   return (
-    <div className="flex flex-col justify-center items-center lg:hidden">
+    <div className={`${isHomePage ? "bg-black" : ""} flex flex-col justify-center items-center lg:hidden`}>
       <Link href={"/projects"} className="p-2 hover:bg-gray-300 dark:hover:bg-gray-600 w-full text-center">
         Projects
       </Link>
