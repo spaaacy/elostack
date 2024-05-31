@@ -7,7 +7,7 @@ const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], weight: "500" });
 
 const Page = () => {
   return (
-    <div className="flex flex-col dark text-white bg-black">
+    <div className="flex flex-col dark text-white bg-black min-h-screen">
       <section className="h-screen z-10 mb-auto">
         <div className="absolute bg-black h-screen w-full opacity-50 -z-10 md:hidden"></div>
         <NavBar />
