@@ -177,16 +177,16 @@ const MobileDropdown = ({ showSignIn, signOut, session }) => {
       <Link href={"/create-project"} className="p-2 hover:bg-gray-300 dark:hover:bg-gray-600 w-full text-center">
         Create Project
       </Link>
+      {session?.data.session && (
+        <Link href={"/my-projects"} className="p-2 hover:bg-gray-300 dark:hover:bg-gray-600 w-full text-center">
+          My Projects
+        </Link>
+      )}
       <hr className="border-0 h-[1px] bg-gray-400 my-2 w-full" />
       {showSignIn && (
         <div className="p-2 hover:bg-gray-300 dark:hover:bg-gray-600 w-full text-center">
           {session?.data.session ? <button onClick={signOut}>Log out</button> : <Link href={"/signin"}>Sign In</Link>}
         </div>
-      )}
-      {session?.data.session && (
-        <Link href={"/my-projects"} className="p-2 hover:bg-gray-300 dark:hover:bg-gray-600 w-full text-center">
-          My Projects
-        </Link>
       )}
     </div>
   );
