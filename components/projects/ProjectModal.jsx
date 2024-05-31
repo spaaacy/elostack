@@ -24,7 +24,7 @@ const ProjectModal = ({ setShowModal, project, handleJoin, session, removed }) =
 
         <div className="flex items-center justify-between text-xs w-full mt-2 text-primary dark:font-normal font-medium">
           <p>{project.status}</p>
-          <p className="ml-auto ">{`Leader: ${project.user.username}`}</p>
+          <p className="ml-auto ">{`Leader: ${project.leader_username}`}</p>
         </div>
         <div className="flex justify-between items-baseline w-full flex-1">
           <p className=" font-light text-sm mt-4 line-clamp-14">

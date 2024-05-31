@@ -102,7 +102,7 @@ const Projects = () => {
   const fetchProjects = async () => {
     try {
       const response = await fetch("/api/project", {
-        method: "GET",
+        method: "POST",
       });
       if (response.status === 200) {
         const { projects } = await response.json();
@@ -162,7 +162,7 @@ const Projects = () => {
                 <li key={i}>
                   <div
                     onClick={() => handleClick(p)}
-                    className="bg-gray-200 hover:bg-gray-300 hover:cursor-pointer h-48 p-2 flex flex-col dark:border dark:bg-gray-900  rounded dark:hover:bg-gray-800 border-gray-400 text-xs font-light"
+                    className="bg-gray-200 hover:bg-gray-300 hover:cursor-pointer h-56 p-2 flex flex-col dark:border dark:bg-gray-900  rounded dark:hover:bg-gray-800 border-gray-400 text-xs font-light"
                   >
                     <div className="flex flex-col justify-start items-start">
                       <h3 className="text-base font-medium">{p.title}</h3>
@@ -177,11 +177,12 @@ const Projects = () => {
                         >
                           {p.is_open ? "Open" : "Closed"}
                         </p>
-                        <p className="ml-auto dark:font-normal font-medium text-primary flex-shrink-0">{`Leader: ${p.user.username}`}</p>
+                        <p className="ml-auto dark:font-normal font-medium text-primary flex-shrink-0">{`Leader: ${p.leader_username}`}</p>
                       </div>
                     </div>
                     <p className="text-sm mt-2 line-clamp-4 ">{p.description}</p>
-                    <div className="mt-auto flex justify-between items-center pt-1">
+                    <p className="dark:font-normal font-medium text-primary mt-auto">{`Team ${p.total_members}/${p.team_size}`}</p>
+                    <div className="flex justify-between items-center pt-1">
                       <p className="dark:font-normal font-medium text-primary">
                         {formatDuration(p.duration_length, p.duration_type)}
                       </p>

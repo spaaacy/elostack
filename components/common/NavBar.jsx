@@ -67,7 +67,7 @@ const NavBar = () => {
   const showSignIn = pathname !== "/signin" && pathname !== "/signup";
 
   return (
-    <nav>
+    <nav className="min-h-16">
       <div className="px-8 md:px-16 py-2 flex items-center justify-start">
         <Link href={"/"} className={`${kanit.className} flex justify-center items-center text-2xl flex-shrink-0`}>
           {currentTheme && (
