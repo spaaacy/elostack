@@ -117,6 +117,14 @@ const DesktopNav = ({ showSignIn, signOut, session, user, currentTheme, toggleTh
       >
         Create Project
       </Link>
+      {session?.data.session && (
+        <Link
+          href={"/my-projects"}
+          className="p-2 border-b-2 border-transparent hover:text-gray-500 hover:border-b-gray-500 dark:hover:border-b-gray-300 dark:hover:text-gray-300"
+        >
+          My Projects
+        </Link>
+      )}
       <div className="flex justify-center items-baseline ml-auto">
         {currentTheme && (
           <button
@@ -174,6 +182,11 @@ const MobileDropdown = ({ showSignIn, signOut, session }) => {
         <div className="p-2 hover:bg-gray-300 dark:hover:bg-gray-600 w-full text-center">
           {session?.data.session ? <button onClick={signOut}>Log out</button> : <Link href={"/signin"}>Sign In</Link>}
         </div>
+      )}
+      {session?.data.session && (
+        <Link href={"/my-projects"} className="p-2 hover:bg-gray-300 dark:hover:bg-gray-600 w-full text-center">
+          My Projects
+        </Link>
       )}
     </div>
   );

@@ -5,37 +5,26 @@ import NavBar from "../common/NavBar";
 import { formatDuration } from "@/utils/formatDuration";
 import { FaCircleInfo } from "react-icons/fa6";
 import { useContext, useEffect, useState } from "react";
-import ProjectModal from "./ProjectModal";
 import Loader from "../common/Loader";
 import { UserContext } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 
-const Projects = () => {
+const MyProjects = () => {
   const { session } = useContext(UserContext);
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [filteredProjects, setFilteredProjects] = useState();
+  const [dataLoaded, setDataLoaded] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [statusInput, setStatusInput] = useState("");
   const [openInput, setOpenInput] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [modalProject, setModalProject] = useState();
   const [projects, setProjects] = useState([]);
-  const router = useRouter();
-  const [dataLoaded, setDataLoaded] = useState(false);
-  const [memberList, setMemberList] = useState();
+  const [filteredProjects, setFilteredProjects] = useState();
 
   useEffect(() => {
     if (session && !dataLoaded) {
-      fetchProjects();
-      fetchUserMemberList();
       setDataLoaded(true);
-    }
-
-    if (showModal) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
+      fetchProjects();
     }
 
     const filteredProjects = projects.filter(
@@ -50,59 +39,17 @@ const Projects = () => {
     );
 
     setFilteredProjects(filteredProjects);
-  }, [searchInput, statusInput, showModal, session, openInput, projects]);
-
-  const handleJoin = async () => {
-    if (!session.data.session) return;
-    try {
-      setShowModal(false);
-      setLoading(true);
-      const response = await fetch("/api/member/create", {
-        method: "POST",
-        headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
-        },
-        body: JSON.stringify({
-          userId: session.data.session.user.id,
-          projectId: modalProject.id,
-        }),
-      });
-      if (response.status === 201) {
-        router.push(`/projects/${modalProject.id}`);
-      } else {
-        const { error } = await response.json();
-        throw error;
-      }
-    } catch (error) {
-      setLoading(false);
-      toast.error("Oops, something went wrong...");
-      console.error(error);
-    }
-  };
-
-  const fetchUserMemberList = async () => {
-    const userId = session.data.session?.user.id;
-    if (!userId) return;
-    try {
-      const response = await fetch(`/api/member/${userId}`, {
-        method: "GET",
-        headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
-        },
-      });
-      if (response.status === 200) {
-        const { data } = await response.json();
-        setMemberList(data);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  }, [searchInput, statusInput, session, openInput, projects]);
 
   const fetchProjects = async () => {
+    const userId = session.data.session.user.id;
+    if (!userId) return;
     try {
-      const response = await fetch("/api/project", {
-        method: "GET",
+      const response = await fetch("/api/project/my-projects", {
+        method: "POST",
+        body: JSON.stringify({
+          userId,
+        }),
       });
       if (response.status === 200) {
         const { projects } = await response.json();
@@ -115,15 +62,6 @@ const Projects = () => {
     }
   };
 
-  const handleClick = (project) => {
-    if (session.data.session && memberList.some((m) => m.project_id === project.id && !m.removed)) {
-      router.push(`/projects/${project.id}`);
-    } else {
-      setShowModal(true);
-      setModalProject(project);
-    }
-  };
-
   return (
     <div className="flex flex-col h-screen">
       <NavBar />
@@ -131,7 +69,7 @@ const Projects = () => {
         <Loader />
       ) : (
         <main>
-          <h1 className="text-2xl font-semibold">Find Projects</h1>
+          <h1 className="text-2xl font-semibold">My Projects</h1>
 
           <hr className="border-0 h-[1px] bg-gray-400 my-4" />
           <div className="flex items-center gap-2 flex-wrap">
@@ -161,7 +99,7 @@ const Projects = () => {
               return (
                 <li key={i}>
                   <div
-                    onClick={() => handleClick(p)}
+                    onClick={() => router.push(`/projects/${p.id}`)}
                     className="bg-gray-200 hover:bg-gray-300 hover:cursor-pointer h-48 p-2 flex flex-col dark:border dark:bg-gray-900  rounded dark:hover:bg-gray-800 border-gray-400 text-xs font-light"
                   >
                     <div className="flex flex-col justify-start items-start">
@@ -200,18 +138,9 @@ const Projects = () => {
         </main>
       )}
       <Footer />
-      {showModal && (
-        <ProjectModal
-          removed={memberList ? memberList.some((m) => m.removed && modalProject.id === m.project_id) : false}
-          project={modalProject}
-          setShowModal={setShowModal}
-          handleJoin={handleJoin}
-          session={session}
-        />
-      )}
       <Toaster />
     </div>
   );
 };
 
-export default Projects;
+export default MyProjects;
