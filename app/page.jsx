@@ -57,9 +57,9 @@ const Page = () => {
   }, [isCursorInside]);
 
   return (
-    <div className="flex flex-col dark text-white bg-black min-h-screen">
-      <section className="h-screen z-10">
-        <div className="absolute bg-black h-screen w-full opacity-30 -z-40 md:hidden"></div>
+    <div className="flex flex-col dark text-white bg-black min-h-[calc(100dvh)]">
+      <section className="h-[calc(100dvh)] z-10">
+        <div className="absolute bg-black h-full w-full opacity-30 -z-40 md:hidden"></div>
         <NavBar />
         <Image className="-z-50 object-cover" src={"/astronaut.jpg"} alt="hero_bg" fill={true} />
         {/* <div className="absolute bottom-0 left-0 h-1/3 w-full -z-40 bg-gradient-to-b from-transparent to-black"></div> */}
