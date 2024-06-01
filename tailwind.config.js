@@ -17,6 +17,9 @@ module.exports = {
         primary: "#E63D00",
         primarydark: "#CC3600",
       },
+      dropShadow: {
+        "3xl": "0 50px 50px rgba(0, 0, 0, 0.75)",
+      },
     },
   },
   plugins: [],

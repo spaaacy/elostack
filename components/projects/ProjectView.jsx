@@ -435,7 +435,7 @@ const ProjectView = () => {
                               message.user_id === session.data.session.user.id ? "self-end text-right" : ""
                             }`}
                           >
-                            <p key={i}>
+                            <p>
                               <span className="font-semibold">
                                 {members.find((m) => m.user_id === message.user_id).user.username}
                               </span>
