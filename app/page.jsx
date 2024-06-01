@@ -57,7 +57,7 @@ const Page = () => {
   }, [isCursorInside]);
 
   return (
-    <div className="flex flex-col dark text-white bg-black min-h-[calc(100dvh)]">
+    <div className="flex flex-col dark text-white bg-black">
       <section className="h-[calc(100dvh)] z-10">
         <div className="absolute bg-black h-full w-full opacity-30 -z-40 md:hidden"></div>
         <NavBar />
