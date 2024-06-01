@@ -58,10 +58,10 @@ const Page = () => {
 
   return (
     <div className="flex flex-col dark text-white bg-black">
-      <section className="h-[calc(100dvh)] z-10">
+      <section className="h-[calc(100dvh)] z-10 relative">
         <div className="absolute bg-black h-full w-full opacity-30 -z-40 md:hidden"></div>
         <NavBar />
-        <Image className="-z-50 object-cover" src={"/astronaut.jpg"} alt="hero_bg" fill={true} />
+        <Image className="-z-50 object-cover h-full" src={"/astronaut.jpg"} alt="hero_bg" fill={true} />
         {/* <div className="absolute bottom-0 left-0 h-1/3 w-full -z-40 bg-gradient-to-b from-transparent to-black"></div> */}
         <div
           className={`max-2xl:px-8 absolute 2xl:right-72 max-2xl:right-0 max-sm:bottom-[10%] sm:top-1/2 2xl:-translate-y-1/2 transform text-right flex flex-col items-end justify-center  ${jetbrainsMono.className}`}
