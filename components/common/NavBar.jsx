@@ -129,6 +129,14 @@ const DesktopNav = ({ showSignIn, signOut, session, user, currentTheme, toggleTh
           My Projects
         </Link>
       )}
+      <Link
+        target="_blank"
+        href={"https://discord.gg/PPbGuu3u43"}
+        className="p-2 border-b-2 border-transparent hover:text-gray-500 hover:border-b-gray-500 dark:hover:border-b-gray-300 dark:hover:text-gray-300"
+      >
+        Community
+      </Link>
+
       <div className="flex justify-center items-baseline ml-auto">
         {!isHomePage && currentTheme && (
           <button
@@ -186,6 +194,13 @@ const MobileDropdown = ({ showSignIn, signOut, session, isHomePage }) => {
           My Projects
         </Link>
       )}
+      <Link
+        target="_blank"
+        href={"https://discord.gg/PPbGuu3u43"}
+        className="p-2 hover:bg-gray-300 dark:hover:bg-gray-600 w-full text-center"
+      >
+        Community
+      </Link>
       <hr className="border-0 h-[1px] bg-gray-400 my-2 w-full" />
       {showSignIn && (
         <div className="p-2 hover:bg-gray-300 dark:hover:bg-gray-600 w-full text-center">
