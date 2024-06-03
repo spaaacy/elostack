@@ -1,8 +1,7 @@
 import { supabase } from "@/utils/supabase";
 import { NextRequest, NextResponse } from "next/server";
-import { v4 as uuidv4 } from "uuid";
 
-export async function POST(req, res) {
+export async function DELETE(req, res) {
   try {
     // Authentication
     const access_token = req.headers.get("x-supabase-auth").split(" ")[0];
@@ -11,16 +10,13 @@ export async function POST(req, res) {
     const auth = await supabase.auth.setSession({ access_token, refresh_token });
     if (auth.error) throw auth.error;
 
-    const project = await req.json();
-    const projectId = uuidv4();
-
-    let results = await supabase.from("project").insert({ ...project, id: projectId });
+    const { userId, projectId } = await req.json();
+    let results = await supabase.from("member").delete().match({ project_id: projectId, user_id: userId });
+    if (results.error) throw results.error;
+    results = await supabase.from("request").delete().match({ project_id: projectId, user_id: userId });
     if (results.error) throw results.error;
 
-    results = await supabase.from("member").insert({ user_id: project.leader, project_id: projectId });
-    if (results.error) throw results.error;
-
-    return NextResponse.json({ message: "Project created successfully!" }, { status: 201 });
+    return NextResponse.json({ message: "Member has been removed!" }, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error }, { status: 500 });

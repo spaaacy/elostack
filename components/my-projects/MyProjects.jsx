@@ -54,7 +54,7 @@ const MyProjects = () => {
     const userId = session.data.session.user.id;
     if (!userId) return;
     try {
-      const response = await fetch("/api/project", {
+      const response = await fetch("/api/project/my-projects", {
         method: "POST",
         body: JSON.stringify({
           userId,
@@ -86,7 +86,7 @@ const MyProjects = () => {
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder={"Search..."}
               type="text"
-              className="focus:ring-0 focus:outline-none min-w-0 w-96 text-sm p-2 rounded border bg-gray-200 dark:bg-gray-900 focus:bg-gray-300 dark:focus:bg-gray-800 border-gray-400"
+              className="focus:ring-0 focus:outline-none min-w-0 w-96 text-sm px-3 py-2 rounded-full border bg-gray-200 dark:bg-gray-900 hover:bg-gray-300 dark:hover:bg-gray-800 focus:bg-gray-300 dark:focus:bg-gray-800 border-gray-400"
             />
             <div className="bg-gray-200 dark:bg-gray-900 p-2 text-sm rounded ml-auto flex items-center gap-2 border-gray-400 border">
               <label>Open</label>

@@ -8,11 +8,13 @@ import { useContext, useEffect, useState } from "react";
 import ProjectModal from "./ProjectModal";
 import Loader from "../common/Loader";
 import { UserContext } from "@/context/UserContext";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 
 const Projects = () => {
   const { session } = useContext(UserContext);
+  const searchParams = useSearchParams();
+
   const [loading, setLoading] = useState(true);
   const [filteredProjects, setFilteredProjects] = useState();
   const [searchInput, setSearchInput] = useState("");
@@ -137,11 +139,24 @@ const Projects = () => {
   const fetchProjects = async () => {
     try {
       const response = await fetch("/api/project", {
-        method: "POST",
+        method: "GET",
       });
       if (response.status === 200) {
         const { projects } = await response.json();
         setProjects(projects);
+
+        if (searchParams.has("id")) {
+          const id = searchParams.get("id");
+          const project = projects.find((p) => p.id === id);
+          if (project) {
+            if (session.data.session?.user.id === project.leader) {
+              router.push(`/projects/${project.id}`);
+            } else {
+              setShowModal(true);
+              setModalProject(project);
+            }
+          }
+        }
       }
     } catch (error) {
       console.error(error);
@@ -174,7 +189,7 @@ const Projects = () => {
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder={"Search..."}
               type="text"
-              className="focus:ring-0 focus:outline-none min-w-0 w-96 text-sm p-2 rounded border bg-gray-200 dark:bg-gray-900 focus:bg-gray-300 dark:focus:bg-gray-800 border-gray-400"
+              className="focus:ring-0 focus:outline-none min-w-0 w-96 text-sm px-3 py-2 rounded-full border bg-gray-200 dark:bg-gray-900 hover:bg-gray-300 dark:hover:bg-gray-800 focus:bg-gray-300 dark:focus:bg-gray-800 border-gray-400"
             />
             <div className="bg-gray-200 dark:bg-gray-900 p-2 text-sm rounded ml-auto flex items-center gap-2 border-gray-400 border">
               <label>Open</label>

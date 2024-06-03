@@ -19,7 +19,6 @@ const CreateProject = () => {
   const [ideaPrompt, setIdeaPrompt] = useState();
   const [showIdeaPrompt, setShowIdeaPrompt] = useState(false);
   const [showClear, setShowClear] = useState(false);
-  const ideaPromptRef = useRef(null);
   const router = useRouter();
 
   const {
@@ -138,37 +137,24 @@ const CreateProject = () => {
       {loading ? (
         <Loader />
       ) : (
-        <main className="md:w-[720px]">
-          <div className="flex justify-between items-center relative flex-wrap gap-1">
+        <main className="md:w-[860px]">
+          <div className="flex items-center relative flex-wrap gap-2">
             <h1 className="text-2xl font-semibold">Create Project</h1>
+            <input
+              onKeyDown={generateIdeaKeyDown}
+              onChange={(e) => setIdeaPrompt(e.target.value)}
+              className="border-gray-400  border rounded-full bg-gray-200 focus:bg-gray-300 dark:bg-gray-900 dark:focus:bg-gray-800 focus:ring-0 focus:outline-none text-xs px-3 py-2 ml-auto min-w-0 w-96"
+              type="text"
+              placeholder="Prompt (e.g., Full-Stack React)"
+            />
             <button
-              onClick={() => setShowIdeaPrompt(!showIdeaPrompt)}
+              type="button"
+              onClick={generateIdea}
               className="text-gray-200 px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-sm hover:text-gray-300 dark:shadow dark:shadow-gray-800 flex items-center"
             >
               <BsStars className="inline mr-2" />
               Generate Idea
             </button>
-            {showIdeaPrompt && (
-              <div
-                ref={ideaPromptRef}
-                className="absolute top-10 right-0 bg-white border-gray-400 border dark:bg-gray-900 rounded p-1 w-60 flex"
-              >
-                <input
-                  onKeyDown={generateIdeaKeyDown}
-                  onChange={(e) => setIdeaPrompt(e.target.value)}
-                  className="dark:border-gray-400 dark:border rounded bg-gray-200 focus:bg-gray-300 dark:bg-gray-900 dark:focus:bg-gray-800 focus:ring-0 focus:outline-none text-xs flex-1 p-1"
-                  type="text"
-                  placeholder="Prompt (e.g., Full-Stack React)"
-                />
-                <button
-                  type="button"
-                  onClick={generateIdea}
-                  className="text-xs p-1 text-gray-100 bg-primary hover:bg-primarydark hover:text-gray-200 rounded ml-1"
-                >
-                  Go
-                </button>
-              </div>
-            )}
           </div>
           <hr className="border-0 h-[1px] bg-gray-400 my-4" />
           <form

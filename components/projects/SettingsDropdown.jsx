@@ -11,6 +11,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
   const dropdownRef = useRef();
   const githubRef = useRef();
   const banMemberRef = useRef();
+  const removeMemberRef = useRef();
   const changeLeaderRef = useRef();
   const deleteProjectRef = useRef();
   const leaveProjectRef = useRef();
@@ -18,11 +19,14 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
   const [showDropdown, setShowDropdown] = useState(false);
   const [showGithubDropdown, setShowGithubDropdown] = useState(false);
   const [showBanMember, setShowBanMember] = useState(false);
-  const [confirmBanMember, setConfirmBanMember] = useState();
-  const [showChangeLeader, setShowChangeLeader] = useState(false);
-  const [confirmChangeLeader, setConfirmChangeLeader] = useState();
+  const [showRemoveMember, setShowRemoveMember] = useState(false);
   const [showDeleteProject, setShowDeleteProject] = useState();
   const [showLeaveProject, setShowLeaveProject] = useState();
+
+  const [confirmBanMember, setConfirmBanMember] = useState();
+  const [confirmRemoveMember, setConfirmRemoveMember] = useState();
+  const [showChangeLeader, setShowChangeLeader] = useState(false);
+  const [confirmChangeLeader, setConfirmChangeLeader] = useState();
 
   const router = useRouter();
   const {
@@ -185,6 +189,36 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
     }
   };
 
+  const removeMember = async (userId) => {
+    if (!session.data.session) return;
+    try {
+      setShowRemoveMember(false);
+      setLoading(true);
+      const response = await fetch("/api/member/remove-member", {
+        method: "DELETE",
+        headers: {
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+        },
+        body: JSON.stringify({
+          userId,
+          projectId: project.id,
+        }),
+      });
+      if (response.status === 200) {
+        toast.success("Member has been removed");
+        setTimeout(() => window.location.reload(), 1000);
+      } else {
+        const { error } = await response.json();
+        throw error;
+      }
+    } catch (error) {
+      toast.error("Oops, something went wrong...");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const deleteProject = async () => {
     if (!session.data.session) return;
     try {
@@ -229,6 +263,9 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
       setShowDeleteProject(false);
     }
     if (leaveProjectRef.current && !leaveProjectRef.current.contains(event.target)) {
+      setShowLeaveProject(false);
+    }
+    if (removeMemberRef.current && !removeMemberRef.current.contains(event.target)) {
       setShowLeaveProject(false);
     }
   };
@@ -285,6 +322,18 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
             <button
               type="button"
               onClick={() => {
+                setShowRemoveMember(true);
+                setShowDropdown(false);
+              }}
+              className="hover:bg-gray-200 dark:hover:bg-gray-800 font-medium text-red-600 dark:font-normal dark:text-red-500  hover:text-red-600 p-1 w-full text-right"
+            >
+              Remove member
+            </button>
+          )}
+          {isLeader && members.some((m) => !m.banned && m.user_id !== project.leader) && (
+            <button
+              type="button"
+              onClick={() => {
                 setShowBanMember(true);
                 setShowDropdown(false);
               }}
@@ -295,7 +344,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
           )}
           <button
             type="button"
-            // disabled={isLeader}
+            disabled={isLeader}
             onClick={() => {
               setShowLeaveProject(true);
               setShowDropdown(false);
@@ -474,6 +523,62 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
                 type="button"
                 onClick={() => {
                   setShowBanMember(false);
+                  setShowDropdown(true);
+                }}
+                className="w-full hover:bg-gray-200 dark:hover:bg-gray-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
+              >
+                Back
+              </button>
+            </>
+          )}
+        </div>
+      )}
+      {showRemoveMember && (
+        <div
+          ref={removeMemberRef}
+          className="absolute top-10 bg-gray-100 border-gray-400 border right-0 dark:bg-gray-900 rounded p-2 text-sm flex flex-col text-black dark:text-gray-300 justify-center items-end"
+        >
+          {confirmRemoveMember ? (
+            <>
+              <p className="font-medium text-red-600 dark:font-normal dark:text-red-500">Are you sure?</p>
+              <div className="flex justify-center mx-auto gap-4 mt-2">
+                <button
+                  type="button"
+                  onClick={() => removeMember(confirmRemoveMember)}
+                  className="hover:bg-gray-200 dark:hover:bg-gray-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
+                >
+                  Yes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmRemoveMember(false)}
+                  className="hover:bg-gray-200 dark:hover:bg-gray-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
+                >
+                  No
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              {members
+                .filter((m) => m.user_id !== project.leader && !m.banned)
+                .map((m) => {
+                  return (
+                    <button
+                      key={m.user.user_id}
+                      type="button"
+                      onClick={() => setConfirmRemoveMember(m.user_id)}
+                      className="w-full hover:bg-gray-200 dark:hover:bg-gray-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
+                    >
+                      {m.user.username}
+                    </button>
+                  );
+                })}
+              <hr className="border-0 h-[1px] bg-gray-600 w-full my-1 rounded-full" />
+              <button
+                type="button"
+                onClick={() => {
+                  setShowRemoveMember(false);
                   setShowDropdown(true);
                 }}
                 className="w-full hover:bg-gray-200 dark:hover:bg-gray-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"

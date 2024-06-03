@@ -284,12 +284,12 @@ const ProjectView = () => {
         <main className="">
           <div className="flex justify-start items-end relative">
             <Link href={"/projects"}>
-              <IoMdArrowBack className="text-3xl hover:text-gray-300" />
+              <IoMdArrowBack className="text-3xl dark:hover:text-gray-300 hover:text-gray-500" />
             </Link>
             <h1 className="ml-4 font-bold text-2xl">{project.title}</h1>
             {project.github && (
               <Link href={project.github} target="_blank">
-                <FaGithub className="ml-4 text-3xl hover:text-gray-300" />
+                <FaGithub className="ml-4 text-3xl dark:hover:text-gray-300 hover:text-gray-500" />
               </Link>
             )}
             <SettingsDropdown

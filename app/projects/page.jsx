@@ -1,12 +1,17 @@
-// export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic";
 import Projects from "@/components/projects/Projects";
+import { Suspense } from "react";
 
 export const metadata = {
   title: "Find Projects | EloStack",
 };
 
 const Page = () => {
-  return <Projects />;
+  return (
+    <Suspense>
+      <Projects />;
+    </Suspense>
+  );
 };
 
 export default Page;

@@ -104,19 +104,20 @@ const ProjectModal = ({ setShowModal, project, createRequest, session, banned, r
                 Request to Join
               </Link>
             )}
-            {banned && (
+            {banned ? (
               <p className="bg-red-700 mt-auto self-end px-3 py-1  rounded-full text-sm  dark:shadow dark:shadow-gray-800 flex-shrink-0 text-gray-200">
                 You were banned
               </p>
-            )}
-            {request && (
-              <p
-                className={`${
-                  request.rejected ? "bg-red-700" : "bg-green-600"
-                }  mt-auto self-end px-3 py-1  rounded-full text-sm  dark:shadow dark:shadow-gray-800 flex-shrink-0 text-gray-200`}
-              >
-                {request.rejected ? "Your were rejected" : "Request made"}
-              </p>
+            ) : (
+              request && (
+                <p
+                  className={`${
+                    request.rejected ? "bg-red-700" : "bg-green-600"
+                  }  mt-auto self-end px-3 py-1  rounded-full text-sm  dark:shadow dark:shadow-gray-800 flex-shrink-0 text-gray-200`}
+                >
+                  {request.rejected ? "Your were rejected" : "Request made"}
+                </p>
+              )
             )}
           </div>
         </div>
