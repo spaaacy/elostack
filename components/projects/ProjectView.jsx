@@ -163,8 +163,8 @@ const ProjectView = () => {
           },
           body: JSON.stringify({
             requestId: request.id,
-            userId: request.user_id,
-            projectId: project.id,
+            member: { user_id: request.user_id, project_id: project.id },
+            userId: session.data.session.user.id,
           }),
         });
       } else if (status === "reject") {
@@ -175,6 +175,8 @@ const ProjectView = () => {
           },
           body: JSON.stringify({
             requestId: request.id,
+            userId: request.user_id,
+            projectId: project.id,
           }),
         });
       }

@@ -4,13 +4,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { Kanit } from "next/font/google";
 import { usePathname, useRouter } from "next/navigation";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { UserContext } from "@/context/UserContext";
 import { supabase } from "@/utils/supabase";
 import { IoMenu } from "react-icons/io5";
 import { MdLightMode, MdDarkMode } from "react-icons/md";
 import { useTheme } from "next-themes";
+import { FaBell } from "react-icons/fa";
 const kanit = Kanit({ subsets: ["latin"], weight: "600" });
+import { FaXmark } from "react-icons/fa6";
 
 const NavBar = () => {
   const { session } = useContext(UserContext);
@@ -19,32 +21,96 @@ const NavBar = () => {
   const [showMobileDropdown, setShowMobileDropdown] = useState(false);
   const { systemTheme, theme, setTheme } = useTheme();
   const [currentTheme, setCurrentTheme] = useState();
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState();
+  const [dataLoaded, setDataLoaded] = useState(false);
+  const notificationsRef = useRef();
 
   useEffect(() => {
     setCurrentTheme(theme === "system" ? systemTheme : theme);
 
-    const fetchUser = async () => {
-      const userId = session.data.session?.user.id;
-      if (userId) {
-        const response = await fetch(`/api/user/${userId}`, {
-          headers: {
-            "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
-          },
-          method: "GET",
-        });
-        if (response.status === 200) {
-          const { user } = await response.json();
-          setUser(user);
-        } else {
-          router.push("/signup?google_oauth=true");
+    if (session && window.location.pathname !== "/signup" && window.location.pathname !== "/signin") {
+      if (session.data.session) {
+        if (!dataLoaded) {
+          setDataLoaded(true);
+          fetchUser();
+          fetchNotifications();
         }
       }
-    };
-
-    if (session && window.location.pathname !== "/signup") {
-      fetchUser();
     }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, [session]);
+
+  const handleClickOutside = (event) => {
+    if (notificationsRef.current && !notificationsRef.current.contains(event.target)) {
+      setShowNotifications(false);
+    }
+  };
+
+  const fetchUser = async () => {
+    const userId = session.data.session?.user.id;
+    if (userId) {
+      const response = await fetch(`/api/user/${userId}`, {
+        headers: {
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+        },
+        method: "GET",
+      });
+      if (response.status === 200) {
+        const { user } = await response.json();
+        setUser(user);
+      } else {
+        router.push("/signup?google_oauth=true");
+      }
+    }
+  };
+
+  const fetchNotifications = async () => {
+    const userId = session.data.session.user.id;
+    if (!userId) return;
+    try {
+      const response = await fetch(`/api/notification/${userId}`, {
+        method: "GET",
+        headers: {
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+        },
+      });
+      if (response.status === 200) {
+        const { notifications } = await response.json();
+        const reversed = notifications.reverse();
+        setNotifications(reversed);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleNotificationClick = async (notification, redirect) => {
+    if (!session?.data.session) return;
+    try {
+      setNotifications((prev) => prev.filter((n) => n.id !== notification.id));
+      const response = await fetch("/api/notification/delete", {
+        method: "DELETE",
+        headers: {
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+        },
+        body: JSON.stringify({ notificationId: notification.id }),
+      });
+      if (response.status !== 200) {
+        const { error } = await response.json();
+        throw error;
+      } else if (redirect === true) {
+        if (notification.payload.type !== "request" && notification.payload.accepted !== false)
+          router.push(`/projects/${notification.project_id}`);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const toggleTheme = (theme) => {
     setCurrentTheme(theme);
@@ -72,7 +138,8 @@ const NavBar = () => {
         <Link href={"/"} className={`${kanit.className} flex justify-center items-center text-2xl flex-shrink-0`}>
           {currentTheme && (
             <Image
-              src={currentTheme === "light" && !isHomePage ? "/logo_black.png" : "/logo.png"}
+              // src={currentTheme === "light" && !isHomePage ? "/logo_black.png" : "/logo.png"}
+              src={"/logo_black.png"}
               alt={"logo"}
               width={50}
               height={50}
@@ -81,6 +148,9 @@ const NavBar = () => {
           <span className="max-lg:hidden">EloStack</span>
         </Link>
         <DesktopNav
+          notifications={notifications}
+          showNotifications={showNotifications}
+          setShowNotifications={setShowNotifications}
           showSignIn={showSignIn}
           signOut={signOut}
           session={session}
@@ -88,6 +158,9 @@ const NavBar = () => {
           currentTheme={currentTheme}
           toggleTheme={toggleTheme}
           isHomePage={isHomePage}
+          notificationsRef={notificationsRef}
+          handleNotificationClick={handleNotificationClick}
+          router={router}
         />
         <MobileNav
           isHomePage={isHomePage}
@@ -106,7 +179,21 @@ const NavBar = () => {
 
 export default NavBar;
 
-const DesktopNav = ({ showSignIn, signOut, session, user, currentTheme, toggleTheme, isHomePage }) => {
+const DesktopNav = ({
+  showSignIn,
+  signOut,
+  session,
+  user,
+  currentTheme,
+  toggleTheme,
+  isHomePage,
+  showNotifications,
+  setShowNotifications,
+  notifications,
+  notificationsRef,
+  handleNotificationClick,
+  router,
+}) => {
   return (
     <div className="ml-12 flex justify-start items-center gap-4 max-lg:hidden w-full">
       <Link
@@ -138,7 +225,51 @@ const DesktopNav = ({ showSignIn, signOut, session, user, currentTheme, toggleTh
       </Link>
 
       <div className="flex justify-center items-baseline ml-auto">
-        {!isHomePage && currentTheme && (
+        <div className="self-center relative mr-8">
+          <button type="button" className="flex items-center " onClick={() => setShowNotifications(!showNotifications)}>
+            <FaBell />
+            {notifications?.length > 0 && (
+              <div className="w-[6px] h-[6px] bg-red-500 absolute top-0 right-0 rounded-full" />
+            )}
+          </button>
+          {showNotifications && (
+            <div
+              ref={notificationsRef}
+              className="absolute top-8 right-0 bg-gray-300 rounded border border-gray-400 py-2 text-xs z-50 w-56 text-gray-700 dark:bg-gray-900 dark:text-gray-300"
+            >
+              {notifications?.length > 0 ? (
+                notifications.map((n) => (
+                  <div
+                    key={n.id}
+                    className="flex justify-between items-center hover:bg-gray-200 dark:hover:bg-gray-800 w-full py-2 px-2 relative"
+                  >
+                    <button type="button" className={"text-left"} onClick={() => handleNotificationClick(n, true)}>
+                      {n.payload.type === "chat"
+                        ? `New messages in ${n.project.title}`
+                        : n.payload.type === "request" && n.payload.accepted === true
+                        ? `${
+                            n.payload.userId === session.data.session.user.id
+                              ? `You request was accepted into ${n.project.title}`
+                              : `A new member has joined ${n.project.title}`
+                          }`
+                        : n.payload.type === "request" &&
+                          n.payload.accepted === false &&
+                          n.payload.userId === session.data.session.user.id
+                        ? `Your request into ${n.project.title} was rejected`
+                        : ""}
+                    </button>
+                    <button type="button" onClick={() => handleNotificationClick(n, false)}>
+                      <FaXmark className="text-base" />
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <p className="text-center">You have no new notifications</p>
+              )}
+            </div>
+          )}
+        </div>
+        {/* {!isHomePage && currentTheme && (
           <button
             type="button"
             onClick={() => (currentTheme == "dark" ? toggleTheme("light") : toggleTheme("dark"))}
@@ -146,7 +277,7 @@ const DesktopNav = ({ showSignIn, signOut, session, user, currentTheme, toggleTh
           >
             {currentTheme === "light" ? <MdDarkMode /> : <MdLightMode />}
           </button>
-        )}
+        )} */}
         {!isHomePage && user && <p className="italic text-sm text-gray-600 dark:text-gray-300">{`${user.username}`}</p>}
         {showSignIn && (
           <div
@@ -164,7 +295,7 @@ const DesktopNav = ({ showSignIn, signOut, session, user, currentTheme, toggleTh
 const MobileNav = ({ setShowMobileDropdown, showMobileDropdown, currentTheme, toggleTheme, isHomePage }) => {
   return (
     <div className="flex items-center gap-2 ml-auto lg:hidden">
-      {!isHomePage && currentTheme && (
+      {/* {!isHomePage && currentTheme && (
         <button
           type="button"
           onClick={() => (currentTheme == "dark" ? toggleTheme("light") : toggleTheme("dark"))}
@@ -172,7 +303,7 @@ const MobileNav = ({ setShowMobileDropdown, showMobileDropdown, currentTheme, to
         >
           {currentTheme === "light" ? <MdDarkMode /> : <MdLightMode />}
         </button>
-      )}
+      )} */}
       <button type="button" onClick={() => setShowMobileDropdown(!showMobileDropdown)}>
         <IoMenu className="text-2xl" />
       </button>

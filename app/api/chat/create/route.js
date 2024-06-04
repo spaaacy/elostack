@@ -11,8 +11,14 @@ export async function POST(req, res) {
     if (auth.error) throw auth.error;
 
     const chat = await req.json();
-    const { error } = await supabase.from("chat").insert(chat);
-    if (error) throw error;
+    let results = await supabase.from("chat").insert(chat);
+    if (results.error) throw results.error;
+    results = await supabase.rpc("create_notifications", {
+      p_user_id: chat.user_id,
+      p_project_id: chat.project_id,
+      p_payload: { type: "chat" },
+    });
+    if (results.error) throw results.error;
 
     return NextResponse.json({ message: "Message created successfully!" }, { status: 201 });
   } catch (error) {

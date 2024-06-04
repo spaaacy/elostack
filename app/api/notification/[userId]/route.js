@@ -1,7 +1,7 @@
 import { supabase } from "@/utils/supabase";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function PATCH(req, res) {
+export async function GET(req, res) {
   try {
     // Authentication
     const access_token = req.headers.get("x-supabase-auth").split(" ")[0];
@@ -10,17 +10,12 @@ export async function PATCH(req, res) {
     const auth = await supabase.auth.setSession({ access_token, refresh_token });
     if (auth.error) throw auth.error;
 
-    const { requestId, userId, projectId } = await req.json();
-    let results = await supabase.from("request").update({ rejected: true }).eq("id", requestId);
-    if (results.error) throw results.error;
-    results = await supabase.from("notification").insert({
-      user_id: userId,
-      project_id: projectId,
-      payload: { type: "request", userId, accepted: false },
-    });
-    if (results.error) throw results.error;
+    const { userId } = res.params;
+    // console.log(userId);
+    const { data, error } = await supabase.from("notification").select("*, project(*)").eq("user_id", userId);
 
-    return NextResponse.json({ message: "Request changed successfully!" }, { status: 200 });
+    if (error) throw error;
+    return NextResponse.json({ notifications: data }, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error }, { status: 500 });
