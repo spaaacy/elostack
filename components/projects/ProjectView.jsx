@@ -388,7 +388,7 @@ const ProjectView = () => {
               )}
               <div
                 id="scrollableDiv"
-                className="min-h-[550px] p-4 rounded dark:border bg-gray-300 dark:bg-gray-900  dark:border-gray-400 flex flex-col items-start justify-start overflow-y-auto"
+                className="h-[550px] p-4 rounded dark:border bg-gray-300 dark:bg-gray-900  dark:border-gray-400 flex flex-col items-start justify-start overflow-y-auto"
               >
                 {showRequests ? (
                   <>
