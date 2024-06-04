@@ -29,6 +29,7 @@ const ProjectView = () => {
   const [loadMoreMessages, setLoadMoreMessages] = useState(false);
   const [showLoadMoreMessages, setShowLoadMoreMessages] = useState(false);
   const [showRequests, setShowRequests] = useState(false);
+  const [showMoreDescription, setShowMoreDescription] = useState(false)
 
   const [dataLoaded, setDataLoaded] = useState(false);
   const router = useRouter();
@@ -283,7 +284,7 @@ const ProjectView = () => {
       {loading ? (
         <Loader />
       ) : (
-        <main className="">
+        <main>
           <div className="flex justify-start items-end relative">
             <Link href={"/projects"}>
               <IoMdArrowBack className="text-3xl dark:hover:text-gray-300 hover:text-gray-500" />
@@ -307,10 +308,11 @@ const ProjectView = () => {
           <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 ">
             <div>
               <div className="p-2 rounded dark:border bg-gray-300 dark:bg-gray-900  dark:border-gray-400 flex flex-col font-light text-sm ">
-                <p>
-                  <span className="font-semibold ">Description</span>
+                <p className="relative">
+                  <span className="font-semibold">Description</span>
                   <br />
-                  {project.description}
+                  {showMoreDescription ? project.description : `${project.description.substring(0, 250)}...`}
+                  <button type="button" className="bg-gray-300 pl-2 dark:bg-gray-900 absolute bottom-0 right-0 dark:text-blue-400 dark:hover:text-blue-500 text-blue-600 hover:text-blue-700 hover:underline" onClick={() => setShowMoreDescription(!showMoreDescription)}>{showMoreDescription ? "Show Less" : "Show More"}</button>
                 </p>
                 <p className="mt-4 font-semibold">Members</p>
                 <ul>
@@ -386,7 +388,7 @@ const ProjectView = () => {
               )}
               <div
                 id="scrollableDiv"
-                className="h-[550px] p-4 rounded dark:border bg-gray-300 dark:bg-gray-900  dark:border-gray-400 flex flex-col items-start justify-start overflow-y-auto"
+                className="min-h-[550px] p-4 rounded dark:border bg-gray-300 dark:bg-gray-900  dark:border-gray-400 flex flex-col items-start justify-start overflow-y-auto"
               >
                 {showRequests ? (
                   <>
