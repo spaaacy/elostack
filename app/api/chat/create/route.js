@@ -10,13 +10,13 @@ export async function POST(req, res) {
     const auth = await supabase.auth.setSession({ access_token, refresh_token });
     if (auth.error) throw auth.error;
 
-    const chat = await req.json();
+    const { chat, projectTitle } = await req.json();
     let results = await supabase.from("chat").insert(chat);
     if (results.error) throw results.error;
     results = await supabase.rpc("create_notifications", {
       p_user_id: chat.user_id,
       p_project_id: chat.project_id,
-      p_payload: { type: "chat" },
+      p_payload: { type: "chat", projectTitle },
     });
     if (results.error) throw results.error;
 

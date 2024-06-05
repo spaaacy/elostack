@@ -29,7 +29,7 @@ const ProjectView = () => {
   const [loadMoreMessages, setLoadMoreMessages] = useState(false);
   const [showLoadMoreMessages, setShowLoadMoreMessages] = useState(false);
   const [showRequests, setShowRequests] = useState(false);
-  const [showMoreDescription, setShowMoreDescription] = useState(false)
+  const [showMoreDescription, setShowMoreDescription] = useState(false);
 
   const [dataLoaded, setDataLoaded] = useState(false);
   const router = useRouter();
@@ -119,7 +119,6 @@ const ProjectView = () => {
         if (chatReversed.length < 15) setShowLoadMoreMessages(false);
 
         if (nextMessagePage > 1) {
-          console.log(chatReversed.length);
           if (chatReversed.length === 0) {
             setShowLoadMoreMessages(false);
           } else {
@@ -166,6 +165,7 @@ const ProjectView = () => {
             requestId: request.id,
             member: { user_id: request.user_id, project_id: project.id },
             userId: session.data.session.user.id,
+            projectTitle: project.title,
           }),
         });
       } else if (status === "reject") {
@@ -178,6 +178,7 @@ const ProjectView = () => {
             requestId: request.id,
             userId: request.user_id,
             projectId: project.id,
+            projectTitle: project.title,
           }),
         });
       }
@@ -237,7 +238,7 @@ const ProjectView = () => {
         headers: {
           "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
         },
-        body: JSON.stringify(newMessage),
+        body: JSON.stringify({ chat: newMessage, projectTitle: project.title }),
       });
       if (response.status === 201) {
         setLoadMoreMessages(false);
@@ -254,28 +255,34 @@ const ProjectView = () => {
 
   const listenToMessages = async () => {
     if (!session.data.session) return;
-    const auth = await supabase.auth.setSession({
-      access_token: session.data.session.access_token,
-      refresh_token: session.data.session.refresh_token,
-    });
-    if (auth.error) throw auth.error;
+    try {
+      const auth = await supabase.auth.setSession({
+        access_token: session.data.session.access_token,
+        refresh_token: session.data.session.refresh_token,
+      });
+      if (auth.error) throw auth.error;
 
-    supabase
-      .channel("messages")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "chat",
-          filter: `user_id=neq.${session.data.session.user.id}`,
-        },
-        (payload) => {
-          setLoadMoreMessages(false);
-          setChat((prevChat) => [...prevChat, payload.new]);
-        }
-      )
-      .subscribe();
+      supabase
+        .channel("messages")
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "chat",
+            filter: `project_id=eq.${id}`,
+          },
+          (payload) => {
+            if (payload.new.user_id !== session.data.session.user.id) {
+              setLoadMoreMessages(false);
+              setChat((prevChat) => [...prevChat, payload.new]);
+            }
+          }
+        )
+        .subscribe();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -312,7 +319,13 @@ const ProjectView = () => {
                   <span className="font-semibold">Description</span>
                   <br />
                   {showMoreDescription ? project.description : `${project.description.substring(0, 250)}...`}
-                  <button type="button" className="bg-gray-300 pl-2 dark:bg-gray-900 absolute bottom-0 right-0 dark:text-blue-400 dark:hover:text-blue-500 text-blue-600 hover:text-blue-700 hover:underline" onClick={() => setShowMoreDescription(!showMoreDescription)}>{showMoreDescription ? "Show Less" : "Show More"}</button>
+                  <button
+                    type="button"
+                    className="bg-gray-300 pl-2 dark:bg-gray-900 absolute bottom-0 right-0 dark:text-blue-400 dark:hover:text-blue-500 text-blue-600 hover:text-blue-700 hover:underline"
+                    onClick={() => setShowMoreDescription(!showMoreDescription)}
+                  >
+                    {showMoreDescription ? "Show Less" : "Show More"}
+                  </button>
                 </p>
                 <p className="mt-4 font-semibold">Members</p>
                 <ul>

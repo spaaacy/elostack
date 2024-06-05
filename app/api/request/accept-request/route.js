@@ -10,7 +10,7 @@ export async function PATCH(req, res) {
     const auth = await supabase.auth.setSession({ access_token, refresh_token });
     if (auth.error) throw auth.error;
 
-    const { userId, member, requestId } = await req.json();
+    const { userId, member, requestId, projectTitle } = await req.json();
     let results = await supabase.from("request").update({ accepted: true }).eq("id", requestId);
     if (results.error) throw results.error;
     results = await supabase.from("member").insert(member);
@@ -18,7 +18,7 @@ export async function PATCH(req, res) {
     results = await supabase.rpc("create_notifications", {
       p_user_id: userId,
       p_project_id: member.project_id,
-      p_payload: { type: "request", userId: member.user_id, accepted: true },
+      p_payload: { type: "request", userId: member.user_id, accepted: true, projectTitle },
     });
     if (results.error) throw results.error;
 

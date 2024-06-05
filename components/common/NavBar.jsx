@@ -29,13 +29,16 @@ const NavBar = () => {
   useEffect(() => {
     setCurrentTheme(theme === "system" ? systemTheme : theme);
 
+    const loadData = async () => {
+      setDataLoaded(true);
+      fetchUser();
+      await fetchNotifications();
+      listenToNotifications();
+    };
+
     if (session && window.location.pathname !== "/signup" && window.location.pathname !== "/signin") {
       if (session.data.session) {
-        if (!dataLoaded) {
-          setDataLoaded(true);
-          fetchUser();
-          fetchNotifications();
-        }
+        if (!dataLoaded) loadData();
       }
     }
 
@@ -48,6 +51,35 @@ const NavBar = () => {
   const handleClickOutside = (event) => {
     if (notificationsRef.current && !notificationsRef.current.contains(event.target)) {
       setShowNotifications(false);
+    }
+  };
+
+  const listenToNotifications = async () => {
+    if (!session.data.session) return;
+    try {
+      const auth = await supabase.auth.setSession({
+        access_token: session.data.session.access_token,
+        refresh_token: session.data.session.refresh_token,
+      });
+      if (auth.error) throw auth.error;
+
+      supabase
+        .channel("notifications")
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "notification",
+            filter: `user_id=eq.${session.data.session.user.id}`,
+          },
+          (payload) => {
+            setNotifications((prevNotification) => [...prevNotification, payload.new]);
+          }
+        )
+        .subscribe();
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -108,7 +140,7 @@ const NavBar = () => {
           router.push(`/projects/${notification.project_id}`);
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -137,13 +169,7 @@ const NavBar = () => {
       <div className={`px-8 lg:px-16 py-2 flex items-center justify-start ${isHomePage ? "max-lg:bg-black" : ""}`}>
         <Link href={"/"} className={`${kanit.className} flex justify-center items-center text-2xl flex-shrink-0`}>
           {currentTheme && (
-            <Image
-              // src={currentTheme === "light" && !isHomePage ? "/logo_black.png" : "/logo.png"}
-              src={"/logo_black.png"}
-              alt={"logo"}
-              width={50}
-              height={50}
-            />
+            <Image src={isHomePage ? "/logo.png" : "/logo_black.png"} alt={"logo"} width={50} height={50} />
           )}
           <span className="max-lg:hidden">EloStack</span>
         </Link>
@@ -151,6 +177,8 @@ const NavBar = () => {
           notifications={notifications}
           showNotifications={showNotifications}
           setShowNotifications={setShowNotifications}
+          notificationsRef={notificationsRef}
+          handleNotificationClick={handleNotificationClick}
           showSignIn={showSignIn}
           signOut={signOut}
           session={session}
@@ -158,8 +186,6 @@ const NavBar = () => {
           currentTheme={currentTheme}
           toggleTheme={toggleTheme}
           isHomePage={isHomePage}
-          notificationsRef={notificationsRef}
-          handleNotificationClick={handleNotificationClick}
           router={router}
         />
         <MobileNav
@@ -168,6 +194,12 @@ const NavBar = () => {
           setShowMobileDropdown={setShowMobileDropdown}
           showMobileDropdown={showMobileDropdown}
           toggleTheme={toggleTheme}
+          notifications={notifications}
+          showNotifications={showNotifications}
+          setShowNotifications={setShowNotifications}
+          notificationsRef={notificationsRef}
+          handleNotificationClick={handleNotificationClick}
+          session={session}
         />
       </div>
       {showMobileDropdown && (
@@ -186,13 +218,13 @@ const DesktopNav = ({
   user,
   currentTheme,
   toggleTheme,
+  router,
   isHomePage,
   showNotifications,
   setShowNotifications,
   notifications,
   notificationsRef,
   handleNotificationClick,
-  router,
 }) => {
   return (
     <div className="ml-12 flex justify-start items-center gap-4 max-lg:hidden w-full">
@@ -225,50 +257,14 @@ const DesktopNav = ({
       </Link>
 
       <div className="flex justify-center items-baseline ml-auto">
-        <div className="self-center relative mr-8">
-          <button type="button" className="flex items-center " onClick={() => setShowNotifications(!showNotifications)}>
-            <FaBell />
-            {notifications?.length > 0 && (
-              <div className="w-[6px] h-[6px] bg-red-500 absolute top-0 right-0 rounded-full" />
-            )}
-          </button>
-          {showNotifications && (
-            <div
-              ref={notificationsRef}
-              className="absolute top-8 right-0 bg-gray-300 rounded border border-gray-400 py-2 text-xs z-50 w-56 text-gray-700 dark:bg-gray-900 dark:text-gray-300"
-            >
-              {notifications?.length > 0 ? (
-                notifications.map((n) => (
-                  <div
-                    key={n.id}
-                    className="flex justify-between items-center hover:bg-gray-200 dark:hover:bg-gray-800 w-full py-2 px-2 relative"
-                  >
-                    <button type="button" className={"text-left"} onClick={() => handleNotificationClick(n, true)}>
-                      {n.payload.type === "chat"
-                        ? `New messages in ${n.project.title}`
-                        : n.payload.type === "request" && n.payload.accepted === true
-                        ? `${
-                            n.payload.userId === session.data.session.user.id
-                              ? `You request was accepted into ${n.project.title}`
-                              : `A new member has joined ${n.project.title}`
-                          }`
-                        : n.payload.type === "request" &&
-                          n.payload.accepted === false &&
-                          n.payload.userId === session.data.session.user.id
-                        ? `Your request into ${n.project.title} was rejected`
-                        : ""}
-                    </button>
-                    <button type="button" onClick={() => handleNotificationClick(n, false)}>
-                      <FaXmark className="text-base" />
-                    </button>
-                  </div>
-                ))
-              ) : (
-                <p className="text-center">You have no new notifications</p>
-              )}
-            </div>
-          )}
-        </div>
+        <NotificationBell
+          session={session}
+          showNotifications={showNotifications}
+          setShowNotifications={setShowNotifications}
+          notificationsRef={notificationsRef}
+          notifications={notifications}
+          handleNotificationClick={handleNotificationClick}
+        />
         {/* {!isHomePage && currentTheme && (
           <button
             type="button"
@@ -292,7 +288,19 @@ const DesktopNav = ({
   );
 };
 
-const MobileNav = ({ setShowMobileDropdown, showMobileDropdown, currentTheme, toggleTheme, isHomePage }) => {
+const MobileNav = ({
+  setShowMobileDropdown,
+  showMobileDropdown,
+  currentTheme,
+  toggleTheme,
+  isHomePage,
+  showNotifications,
+  setShowNotifications,
+  notifications,
+  notificationsRef,
+  handleNotificationClick,
+  session,
+}) => {
   return (
     <div className="flex items-center gap-2 ml-auto lg:hidden">
       {/* {!isHomePage && currentTheme && (
@@ -304,6 +312,15 @@ const MobileNav = ({ setShowMobileDropdown, showMobileDropdown, currentTheme, to
           {currentTheme === "light" ? <MdDarkMode /> : <MdLightMode />}
         </button>
       )} */}
+
+      <NotificationBell
+        session={session}
+        showNotifications={showNotifications}
+        setShowNotifications={setShowNotifications}
+        notificationsRef={notificationsRef}
+        notifications={notifications}
+        handleNotificationClick={handleNotificationClick}
+      />
       <button type="button" onClick={() => setShowMobileDropdown(!showMobileDropdown)}>
         <IoMenu className="text-2xl" />
       </button>
@@ -336,6 +353,62 @@ const MobileDropdown = ({ showSignIn, signOut, session, isHomePage }) => {
       {showSignIn && (
         <div className="p-2 hover:bg-gray-300 dark:hover:bg-gray-600 w-full text-center">
           {session?.data.session ? <button onClick={signOut}>Log out</button> : <Link href={"/signin"}>Sign In</Link>}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const NotificationBell = ({
+  showNotifications,
+  setShowNotifications,
+  notificationsRef,
+  notifications,
+  handleNotificationClick,
+  session,
+}) => {
+  return (
+    <div className="self-center relative mr-8">
+      <button type="button" className="flex items-center " onClick={() => setShowNotifications(!showNotifications)}>
+        <FaBell />
+        {notifications?.length > 0 && (
+          <div className="w-[6px] h-[6px] bg-red-500 absolute top-0 right-0 rounded-full" />
+        )}
+      </button>
+      {showNotifications && (
+        <div
+          ref={notificationsRef}
+          className="absolute top-8 right-0 bg-gray-300 rounded border border-gray-400 py-2 text-xs z-50 w-56 text-gray-700 dark:bg-gray-900 dark:text-gray-300"
+        >
+          {notifications?.length > 0 ? (
+            notifications.map((n) => (
+              <div
+                key={n.id}
+                className="flex justify-between items-center hover:bg-gray-200 dark:hover:bg-gray-800 w-full py-2 px-2 relative"
+              >
+                <button type="button" className={"text-left"} onClick={() => handleNotificationClick(n, true)}>
+                  {n.payload.type === "chat"
+                    ? `New messages in ${n.payload.projectTitle}`
+                    : n.payload.type === "request" && n.payload.accepted === true
+                    ? `${
+                        n.payload.userId === session.data.session.user.id
+                          ? `You request was accepted into ${n.payload.projectTitle}`
+                          : `A new member has joined ${n.payload.projectTitle}`
+                      }`
+                    : n.payload.type === "request" &&
+                      n.payload.accepted === false &&
+                      n.payload.userId === session.data.session.user.id
+                    ? `Your request into ${n.payload.projectTitle} was rejected`
+                    : ""}
+                </button>
+                <button type="button" onClick={() => handleNotificationClick(n, false)}>
+                  <FaXmark className="text-base" />
+                </button>
+              </div>
+            ))
+          ) : (
+            <p className="text-center">You have no new notifications</p>
+          )}
         </div>
       )}
     </div>

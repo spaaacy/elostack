@@ -10,13 +10,13 @@ export async function PATCH(req, res) {
     const auth = await supabase.auth.setSession({ access_token, refresh_token });
     if (auth.error) throw auth.error;
 
-    const { requestId, userId, projectId } = await req.json();
+    const { requestId, userId, projectId, projectTitle } = await req.json();
     let results = await supabase.from("request").update({ rejected: true }).eq("id", requestId);
     if (results.error) throw results.error;
     results = await supabase.from("notification").insert({
       user_id: userId,
       project_id: projectId,
-      payload: { type: "request", userId, accepted: false },
+      payload: { type: "request", userId, accepted: false, projectTitle },
     });
     if (results.error) throw results.error;
 
