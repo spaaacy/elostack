@@ -122,6 +122,7 @@ const NavBar = () => {
   };
 
   const handleNotificationClick = async (notification, redirect) => {
+    console.log("ASD");
     if (!session?.data.session) return;
     try {
       setNotifications((prev) => prev.filter((n) => n.id !== notification.id));
