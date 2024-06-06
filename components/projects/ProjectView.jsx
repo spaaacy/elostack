@@ -2,9 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import NavBar from "../common/NavBar";
-import Footer from "../common/Footer";
 import Link from "next/link";
-import { IoMdArrowBack } from "react-icons/io";
 import { FaGithub } from "react-icons/fa";
 import { formatDuration } from "@/utils/formatDuration";
 import { useContext, useEffect, useState } from "react";
@@ -13,6 +11,7 @@ import Loader from "../common/Loader";
 import toast, { Toaster } from "react-hot-toast";
 import SettingsDropdown from "./SettingsDropdown";
 import ChatBox from "./ChatBox";
+import Feed from "./Feed";
 
 const ProjectView = () => {
   const { id } = useParams();
@@ -115,10 +114,7 @@ const ProjectView = () => {
       ) : (
         <main>
           <div className="flex justify-start items-end relative">
-            <Link href={"/projects"}>
-              <IoMdArrowBack className="text-3xl dark:hover:text-gray-300 hover:text-gray-500" />
-            </Link>
-            <h1 className="ml-4 font-bold text-2xl">{project.title}</h1>
+            <h1 className="font-bold text-2xl">{project.title}</h1>
             {project.github && (
               <Link href={project.github} target="_blank">
                 <FaGithub className="ml-4 text-3xl dark:hover:text-gray-300 hover:text-gray-500" />
@@ -132,7 +128,7 @@ const ProjectView = () => {
               setLoading={setLoading}
             />
           </div>
-          <p className="ml-12 font-light ">{project.status}</p>
+          <p className="font-light ">{project.status}</p>
           <hr className="border-0 h-[1px] bg-gray-400 my-4" />
           <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 ">
             <div>
@@ -192,6 +188,7 @@ const ProjectView = () => {
                 </button>
               )}
             </div>
+            <Feed />
             <ChatBox session={session} isLeader={isLeader} project={project} id={id} members={members} />
           </div>
         </main>

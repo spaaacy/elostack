@@ -196,19 +196,19 @@ const ChatBox = ({ session, isLeader, project, id, members }) => {
 
   return (
     <div
-      className={`fixed max-sm:left-1/2 max-sm:-translate-x-1/2 bottom-0 right-4 text-xs drop-shadow-xl  bg-white rounded max-sm:w-[80%] w-72 ${
+      className={`fixed max-sm:left-1/2 max-sm:-translate-x-1/2 bottom-0 right-4 text-xs drop-shadow-xl  dark:bg-gray-900 bg-white rounded max-sm:w-[80%] w-72 ${
         showChatBox ? "max-sm:h-[85%] h-[480px] pb-2" : ""
       } flex flex-col`}
     >
       <div
-        className="text-sm font-semibold text-black text-center hover:cursor-pointer rounded-t py-2"
+        className="text-sm font-semibold dark:text-white text-black text-center hover:cursor-pointer rounded-t py-2"
         onClick={() => setShowChatBox(!showChatBox)}
       >
         Messages
       </div>
       {showChatBox && (
         <>
-          <hr className="h-[1px] bg-neutral-500 " />
+          <hr className="h-[1px] bg-neutral-500 dark:bg-neutral-600 dark:border-0" />
           {isLeader && (
             <div className="flex items-center w-full gap-2 mb-2 p-2">
               <button
@@ -237,10 +237,7 @@ const ChatBox = ({ session, isLeader, project, id, members }) => {
               </button>
             </div>
           )}
-          <div
-            id="scrollableDiv"
-            className=" p-2 rounded dark:border  dark:border-gray-400 flex flex-col items-start justify-start overflow-y-auto"
-          >
+          <div id="scrollableDiv" className=" p-2 rounded flex flex-col items-start justify-start overflow-y-auto">
             {showRequests ? (
               <>
                 {requests &&
