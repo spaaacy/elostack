@@ -74,7 +74,7 @@ const NavBar = () => {
             filter: `user_id=eq.${session.data.session.user.id}`,
           },
           (payload) => {
-            setNotifications((prevNotification) => [...prevNotification, payload.new]);
+            setNotifications((prevNotification) => [payload.new, ...prevNotification]);
           }
         )
         .subscribe();
@@ -136,8 +136,7 @@ const NavBar = () => {
         const { error } = await response.json();
         throw error;
       } else if (redirect === true) {
-        if (notification.payload.type !== "request" && notification.payload.accepted !== false)
-          router.push(`/projects/${notification.project_id}`);
+        if (notification.payload.accepted !== false) router.push(`/projects/${notification.project_id}`);
       }
     } catch (error) {
       console.error(error);
@@ -380,6 +379,7 @@ const NotificationBell = ({
           ref={notificationsRef}
           className="absolute top-8 right-0 bg-gray-300 rounded border border-gray-400 py-2 text-xs z-50 w-56 text-gray-700 dark:bg-gray-900 dark:text-gray-300"
         >
+          {console.log(notifications)}
           {notifications?.length > 0 ? (
             notifications.map((n) => (
               <div
@@ -389,16 +389,22 @@ const NotificationBell = ({
                 <button type="button" className={"text-left"} onClick={() => handleNotificationClick(n, true)}>
                   {n.payload.type === "chat"
                     ? `New messages in ${n.payload.projectTitle}`
-                    : n.payload.type === "request" && n.payload.accepted === true
+                    : n.payload.type === "request-response" && n.payload.accepted === true
                     ? `${
                         n.payload.userId === session.data.session.user.id
                           ? `You request was accepted into ${n.payload.projectTitle}`
                           : `A new member has joined ${n.payload.projectTitle}`
                       }`
-                    : n.payload.type === "request" &&
+                    : n.payload.type === "request-response" &&
                       n.payload.accepted === false &&
                       n.payload.userId === session.data.session.user.id
                     ? `Your request into ${n.payload.projectTitle} was rejected`
+                    : n.payload.type === "request-created"
+                    ? `You have a new request to join ${n.payload.projectTitle}`
+                    : n.payload.type === "member-remove"
+                    ? `You were removed from ${n.payload.projectTitle}`
+                    : n.payload.type === "member-ban"
+                    ? `You were banned from ${n.payload.projectTitle}`
                     : ""}
                 </button>
                 <button type="button" onClick={() => handleNotificationClick(n, false)}>

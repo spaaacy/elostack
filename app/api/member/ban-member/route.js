@@ -10,12 +10,18 @@ export async function PATCH(req, res) {
     const auth = await supabase.auth.setSession({ access_token, refresh_token });
     if (auth.error) throw auth.error;
 
-    const { userId, projectId } = await req.json();
-    const { error } = await supabase
+    const { userId, projectId, projectTitle } = await req.json();
+    let results = await supabase
       .from("member")
       .update({ banned: true })
       .match({ project_id: projectId, user_id: userId });
-    if (error) throw error;
+    if (results.error) throw results.error;
+    results = await supabase.from("notification").insert({
+      user_id: userId,
+      project_id: projectId,
+      payload: { type: "member-ban", projectTitle },
+    });
+    if (results.error) throw results.error;
 
     return NextResponse.json({ message: "Member banned successfully!" }, { status: 200 });
   } catch (error) {

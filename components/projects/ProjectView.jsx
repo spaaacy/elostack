@@ -448,7 +448,7 @@ const ProjectView = () => {
                         return (
                           <div
                             key={i}
-                            className={`px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700  mb-4 text-sm ${
+                            className={`break-all max-w-[70%] px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700  mb-4 text-sm ${
                               message.user_id === session.data.session.user.id ? "self-end text-right" : ""
                             }`}
                           >

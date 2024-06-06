@@ -10,9 +10,15 @@ export async function POST(req, res) {
     const auth = await supabase.auth.setSession({ access_token, refresh_token });
     if (auth.error) throw auth.error;
 
-    const { userId, projectId, message } = await req.json();
-    const { error } = await supabase.from("request").insert({ user_id: userId, project_id: projectId, message });
-    if (error) throw error;
+    const { userId, projectId, message, projectLeader, projectTitle } = await req.json();
+    let results = await supabase.from("request").insert({ user_id: userId, project_id: projectId, message });
+    if (results.error) throw results.error;
+    results = await supabase.from("notification").insert({
+      user_id: projectLeader,
+      project_id: projectId,
+      payload: { type: "request-created", projectTitle, userId },
+    });
+    if (results.error) throw results.error;
 
     return NextResponse.json({ message: "Request created successfully!" }, { status: 201 });
   } catch (error) {

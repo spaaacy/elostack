@@ -70,6 +70,8 @@ const Projects = () => {
           userId: session.data.session.user.id,
           projectId: modalProject.id,
           message,
+          projectLeader: modalProject.leader,
+          projectTitle: modalProject.title,
         }),
       });
       if (response.status === 201) {

@@ -172,6 +172,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
         body: JSON.stringify({
           userId,
           projectId: project.id,
+          projectTitle: project.title,
         }),
       });
       if (response.status === 200) {
@@ -202,6 +203,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
         body: JSON.stringify({
           userId,
           projectId: project.id,
+          projectTitle: project.title,
         }),
       });
       if (response.status === 200) {
