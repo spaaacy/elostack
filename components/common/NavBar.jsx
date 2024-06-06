@@ -379,7 +379,6 @@ const NotificationBell = ({
           ref={notificationsRef}
           className="absolute top-8 right-0 bg-gray-300 rounded border border-gray-400 py-2 text-xs z-50 w-56 text-gray-700 dark:bg-gray-900 dark:text-gray-300"
         >
-          {console.log(notifications)}
           {notifications?.length > 0 ? (
             notifications.map((n) => (
               <div

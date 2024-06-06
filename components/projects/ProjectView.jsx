@@ -2,19 +2,16 @@
 
 import { useParams, useRouter } from "next/navigation";
 import NavBar from "../common/NavBar";
-import Footer from "../common/Footer";
 import Link from "next/link";
-import { IoMdArrowBack } from "react-icons/io";
 import { FaGithub } from "react-icons/fa";
 import { formatDuration } from "@/utils/formatDuration";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { UserContext } from "@/context/UserContext";
 import Loader from "../common/Loader";
 import toast, { Toaster } from "react-hot-toast";
 import SettingsDropdown from "./SettingsDropdown";
-import { useForm } from "react-hook-form";
-import { formatTime } from "@/utils/formatTime";
-import { supabase } from "@/utils/supabase";
+import ChatBox from "./ChatBox";
+import Feed from "./Feed";
 
 const ProjectView = () => {
   const { id } = useParams();
@@ -22,28 +19,16 @@ const ProjectView = () => {
   const [loading, setLoading] = useState(true);
   const [project, setProject] = useState();
   const [members, setMembers] = useState();
-  const [chat, setChat] = useState();
-  const [requests, setReqests] = useState();
-
-  const [nextMessagePage, setNextMessagePage] = useState(1);
-  const [loadMoreMessages, setLoadMoreMessages] = useState(false);
-  const [showLoadMoreMessages, setShowLoadMoreMessages] = useState(false);
-  const [showRequests, setShowRequests] = useState(false);
   const [showMoreDescription, setShowMoreDescription] = useState(false);
-
   const [dataLoaded, setDataLoaded] = useState(false);
   const router = useRouter();
   const [isLeader, setIsLeader] = useState(false);
-
-  const { register, handleSubmit, setValue } = useForm();
 
   useEffect(() => {
     const loadData = async () => {
       setDataLoaded(true);
       await fetchProject();
       await fetchMembers();
-      await fetchChat();
-      await listenToMessages();
     };
 
     if (session) {
@@ -53,13 +38,7 @@ const ProjectView = () => {
         router.push("/signin");
       }
     }
-
-    // Scrolls the chat to the bottom
-    if (chat && !loadMoreMessages) {
-      var chatDiv = document.getElementById("scrollableDiv");
-      if (chatDiv) chatDiv.scrollTop = chatDiv.scrollHeight;
-    }
-  }, [session, chat]);
+  }, [session]);
 
   const fetchProject = async () => {
     try {
@@ -71,7 +50,6 @@ const ProjectView = () => {
         setProject(project);
         if (project.leader === session.data.session.user.id) {
           setIsLeader(true);
-          fetchRequests();
         }
       } else {
         router.push("/projects");
@@ -96,101 +74,6 @@ const ProjectView = () => {
         } else setLoading(false);
       }
     } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const fetchChat = async () => {
-    try {
-      const response = await fetch(`/api/chat/`, {
-        method: "POST",
-        headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
-        },
-        body: JSON.stringify({
-          projectId: id,
-          pageNumber: nextMessagePage,
-        }),
-      });
-      if (response.status === 200) {
-        setNextMessagePage(nextMessagePage + 1);
-        const { chat } = await response.json();
-        const chatReversed = chat.reverse();
-        if (chatReversed.length < 15) setShowLoadMoreMessages(false);
-
-        if (nextMessagePage > 1) {
-          if (chatReversed.length === 0) {
-            setShowLoadMoreMessages(false);
-          } else {
-            setChat((prevChat) => [...chatReversed, ...prevChat]);
-          }
-        } else {
-          setChat(chatReversed);
-        }
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const fetchRequests = async () => {
-    try {
-      const response = await fetch(`/api/request/${id}`, {
-        method: "GET",
-        headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
-        },
-      });
-
-      if (response.status === 200) {
-        const { requests } = await response.json();
-        setReqests(requests);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const respondToRequest = async (status, request) => {
-    if (!session.data.session) return;
-    try {
-      let response;
-      if (status === "accept") {
-        response = await fetch("/api/request/accept-request", {
-          method: "PATCH",
-          headers: {
-            "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
-          },
-          body: JSON.stringify({
-            requestId: request.id,
-            member: { user_id: request.user_id, project_id: project.id },
-            userId: session.data.session.user.id,
-            projectTitle: project.title,
-          }),
-        });
-      } else if (status === "reject") {
-        response = await fetch("/api/request/reject-request", {
-          method: "PATCH",
-          headers: {
-            "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
-          },
-          body: JSON.stringify({
-            requestId: request.id,
-            userId: request.user_id,
-            projectId: project.id,
-            projectTitle: project.title,
-          }),
-        });
-      }
-      if (response.status === 200) {
-        setReqests(requests.filter((r) => r.id !== request.id));
-        if (status === "accept") window.location.reload();
-      } else {
-        const { error } = await response.json();
-        throw error;
-      }
-    } catch (error) {
-      toast.error("Oops, something went wrong...");
       console.error(error);
     }
   };
@@ -223,68 +106,6 @@ const ProjectView = () => {
     }
   };
 
-  const sendMessage = async (data, e) => {
-    e.preventDefault();
-    setValue("message", "");
-    if (!session.data.session) return;
-    try {
-      const newMessage = {
-        message: data.message.trim(),
-        user_id: session.data.session.user.id,
-        project_id: project.id,
-      };
-      const response = await fetch("/api/chat/create", {
-        method: "POST",
-        headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
-        },
-        body: JSON.stringify({ chat: newMessage, projectTitle: project.title }),
-      });
-      if (response.status === 201) {
-        setLoadMoreMessages(false);
-        setChat([...chat, { ...newMessage, created_at: new Date().toISOString() }]);
-      } else {
-        const { error } = await response.json();
-        throw error;
-      }
-    } catch (error) {
-      toast.error("Oops, something went wrong...");
-      console.error(error);
-    }
-  };
-
-  const listenToMessages = async () => {
-    if (!session.data.session) return;
-    try {
-      const auth = await supabase.auth.setSession({
-        access_token: session.data.session.access_token,
-        refresh_token: session.data.session.refresh_token,
-      });
-      if (auth.error) throw auth.error;
-
-      supabase
-        .channel("messages")
-        .on(
-          "postgres_changes",
-          {
-            event: "INSERT",
-            schema: "public",
-            table: "chat",
-            filter: `project_id=eq.${id}`,
-          },
-          (payload) => {
-            if (payload.new.user_id !== session.data.session.user.id) {
-              setLoadMoreMessages(false);
-              setChat((prevChat) => [...prevChat, payload.new]);
-            }
-          }
-        )
-        .subscribe();
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   return (
     <div className="flex flex-col min-h-screen overflow-y-auto">
       <NavBar />
@@ -293,10 +114,7 @@ const ProjectView = () => {
       ) : (
         <main>
           <div className="flex justify-start items-end relative">
-            <Link href={"/projects"}>
-              <IoMdArrowBack className="text-3xl dark:hover:text-gray-300 hover:text-gray-500" />
-            </Link>
-            <h1 className="ml-4 font-bold text-2xl">{project.title}</h1>
+            <h1 className="font-bold text-2xl">{project.title}</h1>
             {project.github && (
               <Link href={project.github} target="_blank">
                 <FaGithub className="ml-4 text-3xl dark:hover:text-gray-300 hover:text-gray-500" />
@@ -310,7 +128,7 @@ const ProjectView = () => {
               setLoading={setLoading}
             />
           </div>
-          <p className="ml-12 font-light ">{project.status}</p>
+          <p className="font-light ">{project.status}</p>
           <hr className="border-0 h-[1px] bg-gray-400 my-4" />
           <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 ">
             <div>
@@ -318,7 +136,7 @@ const ProjectView = () => {
                 <p className="relative">
                   <span className="font-semibold">Description</span>
                   <br />
-                  {showMoreDescription ? project.description : `${project.description.substring(0, 250)}...`}
+                  {showMoreDescription ? project.description : `${project.description.substring(0, 265)}...`}
                   <button
                     type="button"
                     className="bg-gray-300 pl-2 dark:bg-gray-900 absolute bottom-0 right-0 dark:text-blue-400 dark:hover:text-blue-500 text-blue-600 hover:text-blue-700 hover:underline"
@@ -370,132 +188,11 @@ const ProjectView = () => {
                 </button>
               )}
             </div>
-            <div className="sm:ml-4 max-sm:mt-4 sm:col-span-2 lg:col-span-4 ">
-              {isLeader && (
-                <div className="flex items-center w-full text-sm gap-2 mb-2">
-                  <button
-                    disabled={!showRequests}
-                    type="button"
-                    onClick={() => setShowRequests(false)}
-                    className={`${
-                      showRequests
-                        ? "bg-gray-300 dark:bg-gray-900 hover:bg-gray-400 dark:hover:bg-gray-800"
-                        : "bg-primary hover:bg-primarydark text-gray-200"
-                    }  flex-1 rounded  p-1`}
-                  >
-                    Chat
-                  </button>
-                  <button
-                    type="button"
-                    disabled={showRequests}
-                    onClick={() => setShowRequests(true)}
-                    className={`${
-                      showRequests
-                        ? "bg-primary text-gray-200 hover:bg-primarydark "
-                        : "bg-gray-300 dark:bg-gray-900  hover:bg-gray-400 dark:hover:bg-gray-800"
-                    }  flex-1 rounded p-1`}
-                  >
-                    Requests
-                  </button>
-                </div>
-              )}
-              <div
-                id="scrollableDiv"
-                className="h-[550px] p-4 rounded dark:border bg-gray-300 dark:bg-gray-900  dark:border-gray-400 flex flex-col items-start justify-start overflow-y-auto"
-              >
-                {showRequests ? (
-                  <>
-                    {requests &&
-                      requests
-                        .filter((r) => !r.accepted && !r.rejected)
-                        .map((r, i) => {
-                          return (
-                            <div key={i} className={"px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700  mb-4 text-sm"}>
-                              <p key={i}>
-                                <span className="font-semibold">{r.user.username}</span>
-                                <br />
-                                {r.message}
-                                <br />
-                                <span className="text-xs font-extralight">{formatTime(r.created_at)}</span>
-                              </p>
-                              <div className="text-xs flex items-center justify-start gap-2 mt-1">
-                                <button className="hover:underline" onClick={() => respondToRequest("accept", r)}>
-                                  Accept Request
-                                </button>
-                                <button className="hover:underline" onClick={() => respondToRequest("reject", r)}>
-                                  Reject Request
-                                </button>
-                              </div>
-                            </div>
-                          );
-                        })}
-                  </>
-                ) : (
-                  <>
-                    {showLoadMoreMessages && (
-                      <button
-                        onClick={() => {
-                          setLoadMoreMessages(true);
-                          fetchChat();
-                        }}
-                        className="text-sm mx-auto mb-8 text-gray-400 hover:underline"
-                      >
-                        Load more messages...
-                      </button>
-                    )}
-                    {chat &&
-                      chat.map((message, i) => {
-                        return (
-                          <div
-                            key={i}
-                            className={`break-all max-w-[70%] px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700  mb-4 text-sm ${
-                              message.user_id === session.data.session.user.id ? "self-end text-right" : ""
-                            }`}
-                          >
-                            <p>
-                              <span className="font-semibold">
-                                {members.find((m) => m.user_id === message.user_id).user.username}
-                              </span>
-                              <br />
-                              {message.message}
-                              <br />
-                              <span className="text-xs font-extralight">{formatTime(message.created_at)}</span>
-                            </p>
-                          </div>
-                        );
-                      })}
-                  </>
-                )}
-              </div>
-              {!showRequests && (
-                <form onSubmit={handleSubmit(sendMessage)} className="flex items-center gap-2 justify-center mt-2">
-                  <input
-                    {...register("message", {
-                      required: "Message cannot be empty",
-                      validate: (value, formValues) => {
-                        const trimmed = value.trim();
-                        const valid = trimmed.length > 0;
-                        if (!valid) setValue("message", "");
-                        return valid;
-                      },
-                    })}
-                    type="text"
-                    placeholder="Send a message..."
-                    className="w-full focus:ring-0 focus:outline-none min-w-0 text-sm p-2 rounded border bg-gray-300 dark:bg-gray-900 focus:bg-gray-300 dark:focus:bg-gray-800 dark:border-gray-400"
-                  />
-                  <button
-                    type="submit"
-                    className="text-gray-200 rounded-lg px-3 py-2 bg-primary text-sm hover:bg-primarydark"
-                  >
-                    Send
-                  </button>
-                </form>
-              )}
-            </div>
+            <Feed id={id} session={session} members={members} />
+            <ChatBox session={session} isLeader={isLeader} project={project} id={id} members={members} />
           </div>
         </main>
       )}
-      <Footer />
       <Toaster />
     </div>
   );
