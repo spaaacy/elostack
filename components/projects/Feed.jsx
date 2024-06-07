@@ -5,7 +5,7 @@ import { BiSolidLike } from "react-icons/bi";
 import toast from "react-hot-toast";
 import { v4 as uuidv4 } from "uuid";
 
-const Feed = ({ id, session, members }) => {
+const Feed = ({ id, session, members, project }) => {
   const [posts, setPosts] = useState([]);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [likes, setLikes] = useState([]);
@@ -23,7 +23,7 @@ const Feed = ({ id, session, members }) => {
   }, [session]);
 
   const {
-    setValue, 
+    setValue,
     register,
     handleSubmit,
     formState: { errors },
@@ -38,10 +38,7 @@ const Feed = ({ id, session, members }) => {
       const response = await fetch("/api/post/create", {
         method: "POST",
         headers: {
-          "X-Supabase-Auth":
-            session.data.session.access_token +
-            " " +
-            session.data.session.refresh_token,
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
         },
         body: JSON.stringify({
           content: data.content,
@@ -58,7 +55,7 @@ const Feed = ({ id, session, members }) => {
             user_id: userId,
             project_id: id,
             id: postId,
-            likes: 0
+            like: [],
           },
           ...prevPosts,
         ]);
@@ -77,10 +74,7 @@ const Feed = ({ id, session, members }) => {
       const response = await fetch(`/api/post/${id}`, {
         method: "GET",
         headers: {
-          "X-Supabase-Auth":
-            session.data.session.access_token +
-            " " +
-            session.data.session.refresh_token,
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
         },
       });
       if (response.status === 200) {
@@ -99,10 +93,7 @@ const Feed = ({ id, session, members }) => {
       const response = await fetch(`/api/like/${userId}`, {
         method: "GET",
         headers: {
-          "X-Supabase-Auth":
-            session.data.session.access_token +
-            " " +
-            session.data.session.refresh_token,
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
         },
       });
       if (response.status === 200) {
@@ -114,35 +105,68 @@ const Feed = ({ id, session, members }) => {
     }
   };
 
-  const likePost = async (postId) => {
+  const likePost = async (post) => {
     const userId = session?.data.session.user.id;
     if (!userId) return;
     try {
       const response = await fetch("/api/like/create", {
         method: "POST",
         headers: {
-          "X-Supabase-Auth":
-            session.data.session.access_token +
-            " " +
-            session.data.session.refresh_token,
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+        },
+        body: JSON.stringify({
+          userId,
+          postId: post.id,
+          postUserId: post.user_id,
+          projectId: project.id,
+          projectTitle: project.title,
+        }),
+      });
+
+      if (response.status === 201) {
+        setPosts((prevPosts) =>
+          prevPosts.map((prev) =>
+            prev.id === post.id
+              ? {
+                  ...prev,
+                  like: [...prev.like, { user_id: userId, post_id: post.id }],
+                }
+              : prev
+          )
+        );
+      } else {
+        const { error } = await response.json();
+        throw error;
+      }
+    } catch (error) {
+      toast.error("Oops, something went wrong...");
+      console.error(error);
+    }
+  };
+
+  const unlikePost = async (postId) => {
+    const userId = session?.data.session.user.id;
+    if (!userId) return;
+    try {
+      const response = await fetch("/api/like/delete", {
+        method: "DELETE",
+        headers: {
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
         },
         body: JSON.stringify({
           userId,
           postId,
         }),
       });
-      if (response.status === 201) {
-        setLikes((prevLikes) => [
-          {
-            user_id: userId,
-            post_id: postId,
-          },
-          ...prevLikes,
-        ]);
-        console.log(posts)
+      if (response.status === 200) {
         setPosts((prevPosts) =>
           prevPosts.map((post) =>
-            post.id === postId ? { ...post, likes: post.likes + 1 } : post
+            post.id === postId
+              ? {
+                  ...post,
+                  like: post.like.filter((like) => like.user_id !== userId),
+                }
+              : post
           )
         );
       } else {
@@ -185,23 +209,16 @@ const Feed = ({ id, session, members }) => {
       {members && (
         <ul className="flex flex-col gap-2 mt-4">
           {posts.map((p, i) => {
-            const liked = likes.find((l) => l.post_id === p.id);
+            const liked = p.like.find((l) => l.post_id === p.id);
             return (
-              <div
-                className="rounded-xl bg-neutral-50 px-3 py-2 dark:bg-gray-900 flex flex-col gap-2"
-                key={i}
-              >
-                <p className="font-bold">
-                  {members.find((m) => m.user_id === p.user_id).user.username}
-                </p>
+              <div className=" text-sm rounded-xl bg-neutral-50 px-3 py-2 dark:bg-gray-900 flex flex-col gap-2" key={i}>
+                <p className="font-bold">{members.find((m) => m.user_id === p.user_id).user.username}</p>
                 {p.content}
                 <hr className="border-0 h-[1px] bg-neutral-300 my-2" />
                 <div className="text-neutral-600 flex items-center justify-between text-sm">
                   <button
                     type="button"
-                    onClick={
-                      liked ? () => likePost(p.id) : () => likePost(p.id)
-                    }
+                    onClick={liked ? () => unlikePost(p.id) : () => likePost(p)}
                     className="items-end flex"
                   >
                     {liked ? "Liked " : "Like "}
@@ -211,7 +228,7 @@ const Feed = ({ id, session, members }) => {
                       <BiLike className="ml-2 text-xl inline" />
                     )}
                   </button>
-                  <p className="font-light">{`${p.likes} Likes`}</p>
+                  <p className="font-light">{`${p.like.length} Likes`}</p>
                 </div>
               </div>
             );

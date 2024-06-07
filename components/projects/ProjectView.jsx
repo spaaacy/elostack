@@ -188,7 +188,7 @@ const ProjectView = () => {
                 </button>
               )}
             </div>
-            <Feed id={id} session={session} members={members} />
+            <Feed id={id} session={session} members={members} project={project} />
             <ChatBox session={session} isLeader={isLeader} project={project} id={id} members={members} />
           </div>
         </main>

@@ -276,7 +276,15 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
     <div className="ml-auto">
       <button
         type="button"
-        disabled={showDropdown || showGithubDropdown || showBanMember}
+        disabled={
+          showDropdown ||
+          showGithubDropdown ||
+          showBanMember ||
+          showChangeLeader ||
+          showRemoveMember ||
+          showLeaveProject ||
+          showDeleteProject
+        }
         onClick={() => setShowDropdown(true)}
       >
         <BsThreeDotsVertical className="text-xl" />
