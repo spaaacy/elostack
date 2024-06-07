@@ -97,7 +97,7 @@ const Post = ({ post, session, setPosts, project, members }) => {
   const liked = post.like.find((l) => l.post_id === post.id);
 
   return (
-    <div className=" text-sm rounded-xl bg-neutral-50 px-3 py-2 dark:bg-gray-900 flex flex-col gap-2">
+    <div className=" text-sm rounded-xl bg-neutral-50 px-3 py-2 dark:bg-backgrounddark dark:border dark:border-gray-400 flex flex-col gap-2">
       <div className="flex items-center">
         <p className="font-bold">{members.find((m) => m.user_id === post.user_id).user.username}</p>
         <p className="ml-auto font-light text-xs">
@@ -119,7 +119,7 @@ const Post = ({ post, session, setPosts, project, members }) => {
       </div>
       {post.content}
       <hr className="border-0 h-[1px] bg-neutral-300 my-2" />
-      <div className="text-neutral-600 flex items-center gap-4 text-sm">
+      <div className="text-neutral-600 dark:text-neutral-200 flex items-center gap-4 text-sm">
         <button
           type="button"
           onClick={liked ? () => unlikePost(post.id) : () => likePost(p)}
@@ -140,7 +140,7 @@ const Post = ({ post, session, setPosts, project, members }) => {
             {...register("comment", { required: "Comment cannot be empty" })}
             id="scrollableDiv"
             placeholder="Share your thoughts..."
-            className="p-2 text-sm w-full bg-gray-200 rounded-xl resize-none focus:bg-gray-300 dark:bg-gray-900 dark:focus:bg-gray-800 dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
+            className="p-2 text-sm w-full bg-gray-200 rounded-xl resize-none focus:bg-gray-300 dark:bg-backgrounddark dark:focus:bg-neutral-800 dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
             rows={1}
           />
           {errors.comment && (
@@ -149,7 +149,7 @@ const Post = ({ post, session, setPosts, project, members }) => {
             </p>
           )}
           <button
-            className="ml-auto px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-gray-200 hover:text-gray-300 dark:shadow dark:shadow-gray-800 text-xs"
+            className="ml-auto px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-gray-200 hover:text-gray-300 dark:shadow dark:shadow-neutral-800 text-xs"
             type="submit"
           >
             Comment

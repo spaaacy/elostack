@@ -196,7 +196,7 @@ const ChatBox = ({ session, isLeader, project, id, members }) => {
 
   return (
     <div
-      className={`fixed max-sm:left-1/2 max-sm:-translate-x-1/2 bottom-0 right-4 text-xs drop-shadow-xl  dark:bg-gray-900 bg-white rounded max-sm:w-[80%] w-72 ${
+      className={`fixed max-sm:left-1/2 max-sm:-translate-x-1/2 bottom-0 right-4 text-xs drop-shadow-xl  dark:bg-backgrounddark dark:border-t dark:border-x dark:border-gray-400 bg-white rounded max-sm:w-[80%] w-72 ${
         showChatBox ? "max-sm:h-[85%] h-[480px] pb-2" : ""
       } flex flex-col`}
     >
@@ -217,7 +217,7 @@ const ChatBox = ({ session, isLeader, project, id, members }) => {
                 onClick={() => setShowRequests(false)}
                 className={`${
                   showRequests
-                    ? "bg-gray-300 dark:bg-gray-900 hover:bg-gray-400 dark:hover:bg-gray-800"
+                    ? "bg-gray-300 dark:bg-backgrounddark hover:bg-gray-400 dark:hover:bg-neutral-800"
                     : "bg-primary hover:bg-primarydark text-gray-200"
                 }  flex-1 rounded  p-1`}
               >
@@ -230,7 +230,7 @@ const ChatBox = ({ session, isLeader, project, id, members }) => {
                 className={`${
                   showRequests
                     ? "bg-primary text-gray-200 hover:bg-primarydark "
-                    : "bg-gray-300 dark:bg-gray-900  hover:bg-gray-400 dark:hover:bg-gray-800"
+                    : "bg-gray-300 dark:bg-backgrounddark  hover:bg-gray-400 dark:hover:bg-neutral-800"
                 }  flex-1 rounded p-1`}
               >
                 Requests
@@ -245,7 +245,7 @@ const ChatBox = ({ session, isLeader, project, id, members }) => {
                     .filter((r) => !r.accepted && !r.rejected)
                     .map((r, i) => {
                       return (
-                        <div key={i} className={"px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700  mb-4 "}>
+                        <div key={i} className={"px-3 py-2 rounded-lg bg-gray-100 dark:bg-backgrounddark   mb-4 "}>
                           <p key={i}>
                             <span className="font-semibold">{r.user.username}</span>
                             <br />
@@ -316,7 +316,7 @@ const ChatBox = ({ session, isLeader, project, id, members }) => {
                 })}
                 type="text"
                 placeholder="Send a message..."
-                className="w-full focus:ring-0 focus:outline-none min-w-0  p-2 rounded border bg-gray-300 dark:bg-gray-900 focus:bg-gray-300 dark:focus:bg-gray-800 dark:border-gray-400"
+                className="w-full focus:ring-0 focus:outline-none min-w-0  p-2 rounded border bg-gray-300 dark:bg-backgrounddark focus:bg-gray-300 dark:focus:bg-neutral-800 dark:border-gray-400"
               />
               <button type="submit" className="text-gray-200 rounded-lg px-3 py-2 bg-primary  hover:bg-primarydark">
                 Send

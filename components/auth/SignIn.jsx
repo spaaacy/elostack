@@ -70,7 +70,7 @@ const Page = () => {
           <h1 className="text-lg mx-auto">Sign In</h1>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="mt-4 px-8 py-6 rounded-lg bg-white dark:bg-gray-900 flex flex-col gap-2 dark:border-gray-400 dark:border-[1px]"
+            className="mt-4 px-8 py-6 rounded-lg bg-white dark:bg-backgrounddark flex flex-col gap-2 dark:border-gray-400 dark:border-[1px]"
           >
             <label htmlFor="email" className="text-sm">
               Email
@@ -79,7 +79,7 @@ const Page = () => {
               id="email"
               {...register("email", { required: "Email is required" })}
               type="text"
-              className="rounded-md bg-gray-200 dark:bg-gray-900 p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none  focus:bg-gray-300 dark:focus:bg-gray-800"
+              className="rounded-md bg-gray-200 dark:bg-backgrounddark p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none  focus:bg-gray-300 dark:focus:bg-neutral-800"
               aria-invalid={errors.email ? "true" : "false"}
             />
             {errors.email && (
@@ -94,7 +94,7 @@ const Page = () => {
               id="password"
               {...register("password", { required: "Password is required" })}
               type="password"
-              className="rounded-md bg-gray-200 dark:bg-gray-900 p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none focus:bg-gray-300 dark:focus:bg-gray-800"
+              className="rounded-md bg-gray-200 dark:bg-backgrounddark p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none focus:bg-gray-300 dark:focus:bg-neutral-800"
               aria-invalid={errors.password ? "true" : "false"}
             />
             {errors.password && (

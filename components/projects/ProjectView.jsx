@@ -132,14 +132,14 @@ const ProjectView = () => {
           <hr className="border-0 h-[1px] bg-gray-400 my-4" />
           <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 ">
             <div>
-              <div className="p-2 rounded dark:border bg-gray-300 dark:bg-gray-900  dark:border-gray-400 flex flex-col font-light text-sm ">
+              <div className="p-2 rounded dark:border bg-gray-300 dark:bg-backgrounddark  dark:border-gray-400 flex flex-col font-light text-sm ">
                 <p className="relative">
                   <span className="font-semibold">Description</span>
                   <br />
                   {showMoreDescription ? project.description : `${project.description.substring(0, 265)}...`}
                   <button
                     type="button"
-                    className="bg-gray-300 pl-2 dark:bg-gray-900 absolute bottom-0 right-0 dark:text-blue-400 dark:hover:text-blue-500 text-blue-600 hover:text-blue-700 hover:underline"
+                    className="bg-gray-300 pl-2 dark:bg-backgrounddark absolute bottom-0 right-0 dark:text-blue-400 dark:hover:text-blue-500 text-blue-600 hover:text-blue-700 hover:underline"
                     onClick={() => setShowMoreDescription(!showMoreDescription)}
                   >
                     {showMoreDescription ? "Show Less" : "Show More"}
@@ -178,7 +178,7 @@ const ProjectView = () => {
                     )
                   }
                   type="button"
-                  className="text-gray-200 bg-primary text-xs px-2 py-1 mt-2 rounded-full dark:shadow dark:shadow-gray-800 hover:bg-primarydark hover:text-gray-300"
+                  className="text-gray-200 bg-primary text-xs px-2 py-1 mt-2 rounded-full dark:shadow dark:shadow-neutral-800 hover:bg-primarydark hover:text-gray-300"
                 >
                   {project.status.toLowerCase() === "just created"
                     ? "Start project"

@@ -87,14 +87,14 @@ const Feed = ({ id, session, members, project }) => {
     <div className=" sm:ml-4 max-sm:mt-4 sm:col-span-2 lg:col-span-4">
       <form
         onSubmit={handleSubmit(createPost)}
-        className="rounded-xl bg-neutral-50 px-3 py-2 dark:bg-gray-900 flex flex-col gap-2"
+        className="rounded-xl bg-neutral-50 px-3 py-2 dark:bg-backgrounddark dark:border dark:border-gray-400 flex flex-col gap-2"
       >
         <p className="text-base font-semibold ">Post an update</p>
         <textarea
           {...register("content", { required: "Content cannot be empty" })}
           id="scrollableDiv"
           placeholder="Tell everyone what's new..."
-          className="p-2 text-sm w-full bg-gray-200 rounded-xl resize-none focus:bg-gray-300 dark:bg-gray-900 dark:focus:bg-gray-800 dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
+          className="p-2 text-sm w-full bg-gray-200 rounded-xl resize-none focus:bg-gray-300 dark:bg-backgrounddark dark:focus:bg-neutral-800 dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
           rows={3}
         />
         {errors.content && (
@@ -103,7 +103,7 @@ const Feed = ({ id, session, members, project }) => {
           </p>
         )}
         <button
-          className="ml-auto px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-sm text-gray-200 hover:text-gray-300 dark:shadow dark:shadow-gray-800"
+          className="ml-auto px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-xs text-gray-200 hover:text-gray-300 dark:shadow dark:shadow-neutral-800"
           type="submit"
         >
           Create
