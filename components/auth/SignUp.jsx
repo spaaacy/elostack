@@ -113,7 +113,7 @@ const SignUp = () => {
           <h1 className="text-lg mx-auto">Sign Up</h1>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="mt-4 px-8 py-6 rounded-lg bg-white dark:bg-gray-900 flex flex-col gap-2 dark:border-gray-400 dark:border-[1px]"
+            className="mt-4 px-8 py-6 rounded-lg bg-white dark:bg-backgrounddark flex flex-col gap-2 dark:border-gray-400 dark:border-[1px]"
           >
             <label htmlFor="username" className="text-sm">
               Username
@@ -122,7 +122,7 @@ const SignUp = () => {
               id="username"
               {...register("username", { required: "Username is required" })}
               type="text"
-              className="rounded-md bg-gray-200 dark:bg-gray-900 p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none focus:bg-gray-300 dark:focus:bg-gray-800"
+              className="rounded-md bg-gray-200 dark:bg-backgrounddark p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none focus:bg-gray-300 dark:focus:bg-neutral-800"
             />
             {errors.username && (
               <p role="alert" className="text-xs text-red-500">
@@ -136,7 +136,7 @@ const SignUp = () => {
               id="email"
               {...register("email", { required: "Email is required" })}
               type="text"
-              className="rounded-md bg-gray-200 dark:bg-gray-900 p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none focus:bg-gray-300 dark:focus:bg-gray-800"
+              className="rounded-md bg-gray-200 dark:bg-backgrounddark p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none focus:bg-gray-300 dark:focus:bg-neutral-800"
             />
             {errors.email && (
               <p role="alert" className="text-xs text-red-500">
@@ -150,7 +150,7 @@ const SignUp = () => {
               id="password"
               {...register("password", { required: "Password is required", min: 6 })}
               type="password"
-              className="rounded-md bg-gray-200 dark:bg-gray-900 p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none  focus:bg-gray-300 dark:focus:bg-gray-800"
+              className="rounded-md bg-gray-200 dark:bg-backgrounddark p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none  focus:bg-gray-300 dark:focus:bg-neutral-800"
             />
             {errors.password && (
               <p role="alert" className="text-xs text-red-500">
@@ -168,7 +168,7 @@ const SignUp = () => {
                 validate: (value, formValues) => value === formValues.password,
               })}
               type="password"
-              className="rounded-md bg-gray-200 dark:bg-gray-900 p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none  focus:bg-gray-300 dark:focus:bg-gray-800"
+              className="rounded-md bg-gray-200 dark:bg-backgrounddark p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none  focus:bg-gray-300 dark:focus:bg-neutral-800"
             />
             {errors.confirmPassword && (
               <p role="alert" className="text-xs text-red-500">

@@ -81,7 +81,7 @@ const NavBar = () => {
       <div className={`px-8 lg:px-16 py-2 flex items-center justify-start ${isHomePage ? "max-lg:bg-black" : ""}`}>
         <Link href={"/"} className={`${kanit.className} flex justify-center items-center text-2xl flex-shrink-0`}>
           {currentTheme && (
-            <Image src={isHomePage ? "/logo.png" : "/logo_black.png"} alt={"logo"} width={50} height={50} />
+            <Image src={isHomePage || currentTheme === "dark" ? "/logo.png" : "/logo_black.png"} alt={"logo"} width={50} height={50} />
           )}
           <span className="max-lg:hidden">EloStack</span>
         </Link>
@@ -145,20 +145,20 @@ const DesktopNav = ({ showSignIn, signOut, session, user, currentTheme, toggleTh
       </Link>
 
       <div className="flex justify-center items-baseline ml-auto">
-        <NotificationBell session={session} />
-        {/* {!isHomePage && currentTheme && (
+        {session?.data.session && <NotificationBell session={session} />}
+        {!isHomePage && currentTheme && (
           <button
             type="button"
             onClick={() => (currentTheme == "dark" ? toggleTheme("light") : toggleTheme("dark"))}
-            className="mr-4 self-center text-xl"
+            className="mr-8 self-center text-xl"
           >
             {currentTheme === "light" ? <MdDarkMode /> : <MdLightMode />}
           </button>
-        )} */}
-        {!isHomePage && user && <p className="italic text-sm text-gray-600 dark:text-gray-300">{`${user.username}`}</p>}
+        )}
+        {!isHomePage && user && <p className="italic text-sm text-neutral-600 dark:text-gray-300">{`${user.username}`}</p>}
         {showSignIn && (
           <div
-            className="ml-4 hover:bg-gray-300 dark:hover:bg-gray-600 px-3 py-1 rounded-full 
+            className="ml-4 hover:bg-gray-300 dark:hover:bg-neutral-600 px-3 py-1 rounded-full 
           text-sm"
           >
             {session?.data.session ? <button onClick={signOut}>Log out</button> : <Link href={"/signin"}>Sign In</Link>}
@@ -172,7 +172,7 @@ const DesktopNav = ({ showSignIn, signOut, session, user, currentTheme, toggleTh
 const MobileNav = ({ setShowMobileDropdown, showMobileDropdown, currentTheme, toggleTheme, isHomePage, session }) => {
   return (
     <div className="flex items-center gap-2 ml-auto lg:hidden">
-      {/* {!isHomePage && currentTheme && (
+      {!isHomePage && currentTheme && (
         <button
           type="button"
           onClick={() => (currentTheme == "dark" ? toggleTheme("light") : toggleTheme("dark"))}
@@ -180,9 +180,9 @@ const MobileNav = ({ setShowMobileDropdown, showMobileDropdown, currentTheme, to
         >
           {currentTheme === "light" ? <MdDarkMode /> : <MdLightMode />}
         </button>
-      )} */}
+      )}
 
-      <NotificationBell session={session} />
+      {session?.data.session && <NotificationBell session={session} />}
       <button type="button" onClick={() => setShowMobileDropdown(!showMobileDropdown)}>
         <IoMenu className="text-2xl" />
       </button>
@@ -193,27 +193,27 @@ const MobileNav = ({ setShowMobileDropdown, showMobileDropdown, currentTheme, to
 const MobileDropdown = ({ showSignIn, signOut, session, isHomePage }) => {
   return (
     <div className={`${isHomePage ? "bg-black" : ""} flex flex-col justify-center items-center lg:hidden`}>
-      <Link href={"/projects"} className="p-2 hover:bg-gray-300 dark:hover:bg-gray-600 w-full text-center">
+      <Link href={"/projects"} className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center">
         Projects
       </Link>
-      <Link href={"/create-project"} className="p-2 hover:bg-gray-300 dark:hover:bg-gray-600 w-full text-center">
+      <Link href={"/create-project"} className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center">
         Create Project
       </Link>
       {session?.data.session && (
-        <Link href={"/my-projects"} className="p-2 hover:bg-gray-300 dark:hover:bg-gray-600 w-full text-center">
+        <Link href={"/my-projects"} className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center">
           My Projects
         </Link>
       )}
       <Link
         target="_blank"
         href={"https://discord.gg/PPbGuu3u43"}
-        className="p-2 hover:bg-gray-300 dark:hover:bg-gray-600 w-full text-center"
+        className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center"
       >
         Community
       </Link>
       <hr className="border-0 h-[1px] bg-gray-400 my-2 w-full" />
       {showSignIn && (
-        <div className="p-2 hover:bg-gray-300 dark:hover:bg-gray-600 w-full text-center">
+        <div className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center">
           {session?.data.session ? <button onClick={signOut}>Log out</button> : <Link href={"/signin"}>Sign In</Link>}
         </div>
       )}
@@ -339,13 +339,13 @@ const NotificationBell = ({ session }) => {
       {showNotifications && (
         <div
           ref={notificationsRef}
-          className="absolute top-8 right-0 bg-gray-300 rounded border border-gray-400 py-2 text-xs z-50 w-56 text-gray-700 dark:bg-gray-900 dark:text-gray-300"
+          className="absolute top-8 right-0 bg-gray-300 rounded border border-gray-400 py-2 text-xs z-50 w-56  dark:bg-backgrounddark dark:text-gray-300"
         >
           {notifications?.length > 0 ? (
             notifications.map((n) => (
               <div
                 key={n.id}
-                className="flex justify-between items-center hover:bg-gray-200 dark:hover:bg-gray-800 w-full py-2 px-2 relative"
+                className="flex justify-between items-center hover:bg-gray-200 dark:hover:bg-neutral-800 w-full py-2 px-2 relative"
               >
                 <button type="button" className={"text-left"} onClick={() => handleNotificationClick(n, true)}>
                   {n.payload.type === "chat"

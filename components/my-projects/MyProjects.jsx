@@ -85,16 +85,16 @@ const MyProjects = () => {
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder={"Search..."}
               type="text"
-              className="focus:ring-0 focus:outline-none min-w-0 w-96 text-sm px-3 py-2 rounded-full border bg-gray-200 dark:bg-gray-900 hover:bg-gray-300 dark:hover:bg-gray-800 focus:bg-gray-300 dark:focus:bg-gray-800 border-gray-400"
+              className="focus:ring-0 focus:outline-none min-w-0 w-96 text-sm px-3 py-2 rounded-full border bg-gray-200 dark:bg-backgrounddark hover:bg-gray-300 dark:hover:bg-neutral-800 focus:bg-gray-300 dark:focus:bg-neutral-800 border-gray-400"
             />
-            {/* <div className="bg-gray-200 dark:bg-gray-900 p-2 text-sm rounded ml-auto flex items-center gap-2 border-gray-400 border">
+            {/* <div className="bg-gray-200 dark:bg-backgrounddark p-2 text-sm rounded ml-auto flex items-center gap-2 border-gray-400 border">
               <label>Open</label>
               <input checked={openInput} onChange={() => setOpenInput(!openInput)} type="checkbox" />
             </div>
             <select
               name="selectedStatus"
               onChange={(e) => setStatusInput(e.target.value)}
-              className="min-w-0  text-sm p-2 rounded border bg-gray-200 hover:bg-gray-300 dark:bg-gray-900  dark:hover:bg-gray-800 border-gray-400"
+              className="min-w-0  text-sm p-2 rounded border bg-gray-200 hover:bg-gray-300 dark:bg-backgrounddark  dark:hover:bg-neutral-800 border-gray-400"
             >
               <option value={""}>Show All</option>
               <option value={"just created"}>Just created</option>
@@ -108,18 +108,18 @@ const MyProjects = () => {
                 <li key={i}>
                   <div
                     onClick={() => router.push(`/projects/${p.id}`)}
-                    className="bg-gray-200 hover:bg-gray-300 hover:cursor-pointer h-56 p-2 flex flex-col dark:border dark:bg-gray-900  rounded dark:hover:bg-gray-800 border-gray-400 text-xs font-light"
+                    className="bg-gray-200 hover:bg-gray-300 hover:cursor-pointer h-56 p-2 flex flex-col dark:border dark:bg-backgrounddark  rounded dark:hover:bg-neutral-800 border-gray-400 text-xs font-light"
                   >
                     <div className="flex flex-col justify-start items-start">
                       <h3 className="text-base font-medium">{p.title}</h3>
                       <div className="flex items-baseline gap-2 text-gray-200 flex-wrap w-full">
-                        <p className=" flex-shrink-0 text-right  bg-primary mt-1 px-2 py-1 rounded-full dark:shadow shadow-gray-800">
+                        <p className=" flex-shrink-0 text-right  bg-primary mt-1 px-2 py-1 rounded-full dark:shadow shadow-neutral-800">
                           {p.status}
                         </p>
                         <p
                           className={`${
                             p.is_open ? "bg-green-600" : "bg-red-700"
-                          }  mt-1 px-2 py-1 rounded-full dark:shadow shadow-gray-800  flex-shrink-0`}
+                          }  mt-1 px-2 py-1 rounded-full dark:shadow shadow-neutral-800  flex-shrink-0`}
                         >
                           {p.is_open ? "Open" : "Closed"}
                         </p>
@@ -134,7 +134,7 @@ const MyProjects = () => {
                       </p>
                       <div className="relative group">
                         <FaCircleInfo className="text-sm text-primary" />
-                        <p className="text-gray-200 right-0 dark:shadow shadow-gray-800 transition-opacity opacity-0 group-hover:opacity-100 absolute bottom-6 bg-primary w-80 rounded-xl px-2 py-1  drop-shadow">
+                        <p className="text-gray-200 right-0 dark:shadow shadow-neutral-800 transition-opacity opacity-0 group-hover:opacity-100 absolute bottom-6 bg-primary w-80 rounded-xl px-2 py-1  drop-shadow">
                           {p.technologies}
                         </p>
                       </div>

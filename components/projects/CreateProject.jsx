@@ -143,14 +143,14 @@ const CreateProject = () => {
             <input
               onKeyDown={generateIdeaKeyDown}
               onChange={(e) => setIdeaPrompt(e.target.value)}
-              className="border-gray-400  border rounded-full bg-gray-200 focus:bg-gray-300 dark:bg-gray-900 dark:focus:bg-gray-800 focus:ring-0 focus:outline-none text-xs px-3 py-2 ml-auto min-w-0 w-96"
+              className="border-gray-400  border rounded-full bg-gray-200 focus:bg-gray-300 dark:bg-backgrounddark dark:focus:bg-neutral-800 focus:ring-0 focus:outline-none text-xs px-3 py-2 ml-auto min-w-0 w-96"
               type="text"
               placeholder="Prompt (e.g., Full-Stack React)"
             />
             <button
               type="button"
               onClick={generateIdea}
-              className="text-gray-200 px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-sm hover:text-gray-300 dark:shadow dark:shadow-gray-800 flex items-center"
+              className="text-gray-200 px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-sm hover:text-gray-300 dark:shadow dark:shadow-neutral-800 flex items-center"
             >
               <BsStars className="inline mr-2" />
               Generate Idea
@@ -158,12 +158,12 @@ const CreateProject = () => {
           </div>
           <hr className="border-0 h-[1px] bg-gray-400 my-4" />
           <form
-            className="mt-4 px-8 py-6 rounded-lg dark:bg-gray-900 bg-white flex flex-col gap-2 dark:border-gray-400 dark:border-[1px]"
+            className="mt-4 px-8 py-6 rounded-lg dark:bg-backgrounddark bg-white flex flex-col gap-2 dark:border-gray-400 dark:border-[1px]"
             onSubmit={handleSubmit(onSubmit)}
           >
             <input
               placeholder="Title"
-              className="focus:bg-gray-300 rounded-md bg-gray-200 dark:bg-gray-900 dark:focus:bg-gray-800 p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
+              className="focus:bg-gray-300 rounded-md bg-gray-200 dark:bg-backgrounddark dark:focus:bg-neutral-800 p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
               {...register("title", { required: "Title is required" })}
               type="text"
             />
@@ -174,7 +174,7 @@ const CreateProject = () => {
             )}
             <textarea
               placeholder="Description"
-              className="resize-none overflow-y-auto focus:bg-gray-300 rounded-md bg-gray-200 dark:bg-gray-900 dark:focus:bg-gray-800 p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
+              className="resize-none overflow-y-auto focus:bg-gray-300 rounded-md bg-gray-200 dark:bg-backgrounddark dark:focus:bg-neutral-800 p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
               id="scrollableDiv"
               rows={10}
               {...register("description", { required: "Description is required" })}
@@ -195,7 +195,7 @@ const CreateProject = () => {
                   type="number"
                   min={2}
                   id="teamSize"
-                  className="w-12 focus:bg-gray-300 rounded-md bg-gray-200 dark:bg-gray-900 dark:focus:bg-gray-800 p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
+                  className="w-12 focus:bg-gray-300 rounded-md bg-gray-200 dark:bg-backgrounddark dark:focus:bg-neutral-800 p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
                   {...register("teamSize", { required: "Team size is required" })}
                 />
               </div>
@@ -207,13 +207,13 @@ const CreateProject = () => {
                   type="number"
                   min={1}
                   id="durationLength"
-                  className="w-12 focus:bg-gray-300 rounded-md bg-gray-200 dark:bg-gray-900 dark:focus:bg-gray-800 p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
+                  className="w-12 focus:bg-gray-300 rounded-md bg-gray-200 dark:bg-backgrounddark dark:focus:bg-neutral-800 p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
                   {...register("durationLength", { required: "Duration is required" })}
                 />
 
                 <select
                   defaultValue={"week"}
-                  className="text-sm p-2 rounded border bg-gray-200 hover:bg-gray-300 dark:bg-gray-900  dark:hover:bg-gray-800 border-gray-400"
+                  className="text-sm p-2 rounded border bg-gray-200 hover:bg-gray-300 dark:bg-backgrounddark  dark:hover:bg-neutral-800 border-gray-400"
                   {...register("durationType", { required: true })}
                 >
                   <option value={"day"}>Days</option>
@@ -237,7 +237,7 @@ const CreateProject = () => {
                 {...register("technology", {
                   validate: (value, formValues) => technologies.length > 0,
                 })}
-                className="min-w-0 flex-1 focus:bg-gray-300 rounded-md bg-gray-200 dark:bg-gray-900 dark:focus:bg-gray-800 p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
+                className="min-w-0 flex-1 focus:bg-gray-300 rounded-md bg-gray-200 dark:bg-backgrounddark dark:focus:bg-neutral-800 p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
                 type="text"
                 onKeyDown={technologyKeyDown}
               />
@@ -269,7 +269,7 @@ const CreateProject = () => {
               {showClear && (
                 <button
                   onClick={clearValues}
-                  className="mt-4 px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-sm hover:text-gray-300 dark:shadow dark:shadow-gray-800"
+                  className="mt-4 px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-sm hover:text-gray-300 dark:shadow dark:shadow-neutral-800"
                   type="button"
                 >
                   Clear
@@ -277,7 +277,7 @@ const CreateProject = () => {
               )}
               {session?.data.session ? (
                 <button
-                  className="mt-4 ml-auto px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-sm hover:text-gray-300 dark:shadow dark:shadow-gray-800"
+                  className="mt-4 ml-auto px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-sm hover:text-gray-300 dark:shadow dark:shadow-neutral-800"
                   type="submit"
                 >
                   Create
@@ -285,7 +285,7 @@ const CreateProject = () => {
               ) : (
                 <Link
                   href={"/signin"}
-                  className="mt-4 ml-auto px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-sm hover:text-gray-300 dark:shadow dark:shadow-gray-800"
+                  className="mt-4 ml-auto px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-sm hover:text-gray-300 dark:shadow dark:shadow-neutral-800"
                 >
                   Create
                 </Link>
