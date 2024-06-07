@@ -1,22 +1,34 @@
 import { supabase } from "@/utils/supabase";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req, res) {
+export async function POST(req, res) {
   try {
     // Authentication
     const access_token = req.headers.get("x-supabase-auth").split(" ")[0];
     const refresh_token = req.headers.get("x-supabase-auth").split(" ")[1];
-    if (!access_token || !refresh_token) throw Error("You must be authorized to do this action!");
+    if (!access_token || !refresh_token)
+      throw Error("You must be authorized to do this action!");
     const auth = await supabase.auth.setSession({
       access_token,
       refresh_token,
     });
     if (auth.error) throw auth.error;
 
-    const { projectId } = res.params;
-    const { data, error } = await supabase.from("post").select("*, like(*), comment(*)").eq("project_id", projectId);
+    const { userId, postId, comment, commentId } = await req.json();
+    const { error } = await supabase
+      .from("comment")
+      .insert({
+        id: commentId,
+        post_id: postId,
+        user_id: userId,
+        comment,
+      });
     if (error) throw error;
-    return NextResponse.json({ posts: data }, { status: 200 });
+
+    return NextResponse.json(
+      { message: "Post created successfully!" },
+      { status: 201 }
+    );
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error }, { status: 500 });

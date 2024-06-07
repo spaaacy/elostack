@@ -53,6 +53,7 @@ const Feed = ({ id, session, members, project }) => {
             project_id: id,
             id: postId,
             like: [],
+            comment: []
           },
           ...prevPosts,
         ]);
@@ -77,6 +78,7 @@ const Feed = ({ id, session, members, project }) => {
       if (response.status === 200) {
         const { posts } = await response.json();
         setPosts(posts);
+        console.log(posts)
       }
     } catch (error) {
       console.error(error);
@@ -97,11 +99,6 @@ const Feed = ({ id, session, members, project }) => {
           className="p-2 text-sm w-full bg-gray-200 rounded-xl resize-none focus:bg-gray-300 dark:bg-backgrounddark dark:focus:bg-neutral-800 dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
           rows={3}
         />
-        {errors.content && (
-          <p role="alert" className="text-xs text-red-500">
-            {errors.content.message}
-          </p>
-        )}
         <button
           className="ml-auto px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-xs text-gray-200 hover:text-gray-300 dark:shadow dark:shadow-neutral-800"
           type="submit"
