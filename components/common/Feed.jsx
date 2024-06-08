@@ -4,12 +4,12 @@ import toast from "react-hot-toast";
 import { v4 as uuidv4 } from "uuid";
 import Post from "./Post";
 import { UserContext } from "@/context/UserContext";
+import Loader from "./Loader";
 
 const Feed = ({ id, project }) => {
   const { profile, session } = useContext(UserContext);
   const [posts, setPosts] = useState([]);
   const [dataLoaded, setDataLoaded] = useState(false);
-  console.log(profile);
 
   useEffect(() => {
     const loadData = async () => {
@@ -103,29 +103,33 @@ const Feed = ({ id, project }) => {
 
   return (
     <div className=" sm:ml-4 max-sm:mt-4 sm:col-span-2 lg:col-span-4">
-      <form
-        onSubmit={handleSubmit(createPost)}
-        className="rounded-xl bg-neutral-50 px-3 py-2 dark:bg-backgrounddark dark:border dark:border-gray-400 flex flex-col gap-2"
-      >
-        <p className="text-base font-semibold ">Post an update</p>
-        <textarea
-          {...register("content", { required: "Content cannot be empty" })}
-          id="scrollableDiv"
-          placeholder="Tell everyone what's new..."
-          className="p-2 text-sm w-full bg-gray-200 rounded-xl resize-none focus:bg-gray-300 dark:bg-backgrounddark dark:focus:bg-neutral-800 dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
-          rows={3}
-        />
-        <button
-          className="ml-auto px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-xs text-gray-200 hover:text-gray-300 dark:shadow dark:shadow-neutral-800"
-          type="submit"
-        >
-          Create
-        </button>
-      </form>
-      <hr className="border-0 h-[1px] bg-gray-400 my-4" />
-      <ul className="flex flex-col gap-2 mt-4">
+      {session?.data.session && (
+        <>
+          <form
+            onSubmit={handleSubmit(createPost)}
+            className="rounded-xl bg-neutral-50 px-3 py-2 dark:bg-backgrounddark dark:border dark:border-gray-400 flex flex-col gap-2"
+          >
+            <p className="text-base font-semibold ">Post an update</p>
+            <textarea
+              {...register("content", { required: "Content cannot be empty" })}
+              id="scrollableDiv"
+              placeholder="Tell everyone what's new..."
+              className="p-2 text-sm w-full bg-gray-200 rounded-xl resize-none focus:bg-gray-300 dark:bg-backgrounddark dark:focus:bg-neutral-800 dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
+              rows={3}
+            />
+            <button
+              className="ml-auto px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-xs text-gray-200 hover:text-gray-300 dark:shadow dark:shadow-neutral-800"
+              type="submit"
+            >
+              Create
+            </button>
+          </form>
+          <hr className="border-0 h-[1px] bg-gray-400 my-4" />
+        </>
+      )}
+      <ul className="flex flex-col gap-6 mt-4">
         {posts.map((p, i) => (
-          <Post key={i} post={p} session={session} setPosts={setPosts} project={project} />
+          <Post key={p.id} post={p} setPosts={setPosts} project={project} />
         ))}
       </ul>
     </div>

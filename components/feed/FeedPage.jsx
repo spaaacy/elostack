@@ -11,19 +11,13 @@ import { UserContext } from "@/context/UserContext";
 const FeedPage = () => {
   const { session } = useContext(UserContext);
 
-  const [loading, setLoading] = useState(false);
-
   return (
     <div className="flex flex-col min-h-screen">
       <NavBar />
-      {loading ? (
-        <Loader />
-      ) : (
-        <main className="max-w-[820px]">
-          {/* <h1 className="text-xl font-semibold mb-4">Latest Posts</h1> */}
-          <Feed />
-        </main>
-      )}
+      <main className="max-w-[820px]">
+        {/* <h1 className="text-xl font-semibold mb-4">Latest Posts</h1> */}
+        <Feed />
+      </main>
       <Footer />
       <Toaster />
     </div>
