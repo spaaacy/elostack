@@ -247,7 +247,7 @@ const ChatBox = ({ session, isLeader, project, id, members }) => {
                       return (
                         <div key={i} className={"px-3 py-2 rounded-lg bg-gray-100 dark:bg-backgrounddark   mb-4 "}>
                           <p key={i}>
-                            <span className="font-semibold">{r.user.username}</span>
+                            <span className="font-semibold">{r.profile.username}</span>
                             <br />
                             {r.message}
                             <br />
@@ -289,7 +289,7 @@ const ChatBox = ({ session, isLeader, project, id, members }) => {
                       >
                         <p>
                           <span className="font-semibold">
-                            {members.find((m) => m.user_id === message.user_id).user.username}
+                            {members.find((m) => m.user_id === message.user_id).profile.username}
                           </span>
                           <br />
                           {message.message}

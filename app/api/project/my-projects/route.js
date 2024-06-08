@@ -5,13 +5,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req, res) {
   try {
-    // Authentication
-    const auth = await supabase.auth.signInWithPassword({
-      email: process.env.SUPABASE_ADMIN_EMAIL,
-      password: process.env.SUPABASE_ADMIN_PASSWORD,
-    });
-    if (auth.error) throw auth.error;
-
     const { userId } = await req.json();
     const { data, error } = await supabase.rpc("get_projects_by_user_id", { p_user_id: userId });
     if (error) throw error;

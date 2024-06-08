@@ -1,12 +1,15 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { v4 as uuidv4 } from "uuid";
 import Post from "./Post";
+import { UserContext } from "@/context/UserContext";
 
-const Feed = ({ id, session, project }) => {
+const Feed = ({ id, project }) => {
+  const { profile, session } = useContext(UserContext);
   const [posts, setPosts] = useState([]);
   const [dataLoaded, setDataLoaded] = useState(false);
+  console.log(profile);
 
   useEffect(() => {
     const loadData = async () => {
@@ -49,13 +52,13 @@ const Feed = ({ id, session, project }) => {
         setValue("content", "");
         setPosts((prevPosts) => [
           {
+            username: profile.username,
             content: data.content,
             user_id: userId,
             projectId: id ? id : null,
             id: postId,
             likes: [],
             comment: [],
-            username: "[Username]",
           },
           ...prevPosts,
         ]);

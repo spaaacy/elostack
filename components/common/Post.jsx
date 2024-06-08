@@ -170,7 +170,7 @@ const Post = ({ post, session, setPosts, project }) => {
             {post.comment.map((c, i) => (
               <p key={i} className="text-sm">
                 <span className="font-medium"> 
-                  {`${members.find((m) => m.user_id === post.user_id).user.username}: `}
+                  {`${members.find((m) => m.user_id === post.user_id).profile.username}: `}
                   
                   </span>
                 {c.comment}

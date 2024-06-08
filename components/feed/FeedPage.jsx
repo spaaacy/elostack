@@ -21,7 +21,7 @@ const FeedPage = () => {
       ) : (
         <main className="max-w-[820px]">
           {/* <h1 className="text-xl font-semibold mb-4">Latest Posts</h1> */}
-          <Feed session={session} />
+          <Feed />
         </main>
       )}
       <Footer />

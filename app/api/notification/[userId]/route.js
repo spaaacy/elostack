@@ -11,7 +11,6 @@ export async function GET(req, res) {
     if (auth.error) throw auth.error;
 
     const { userId } = res.params;
-    // console.log(userId);
     const { data, error } = await supabase.from("notification").select("*, project(*)").eq("user_id", userId);
 
     if (error) throw error;
