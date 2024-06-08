@@ -11,7 +11,7 @@ import Loader from "../common/Loader";
 import toast, { Toaster } from "react-hot-toast";
 import SettingsDropdown from "./SettingsDropdown";
 import ChatBox from "./ChatBox";
-import Feed from "./Feed";
+import Feed from "../common/Feed";
 
 const ProjectView = () => {
   const { id } = useParams();
@@ -148,14 +148,14 @@ const ProjectView = () => {
                 <p className="mt-4 font-semibold">Members</p>
                 <ul>
                   <p href={"/"} className=" ">{`${
-                    members.find((m) => m.user.user_id === project.leader).user.username
+                    members.find((m) => m.user_id === project.leader).profile.username
                   } (Leader)`}</p>
                   {members
                     .filter((member) => member.user_id !== project.leader && !member.banned)
                     .map((member, i) => {
                       return (
                         <li key={i}>
-                          <p className=" ">{member.user.username}</p>
+                          <p className=" ">{member.profile.username}</p>
                         </li>
                       );
                     })}
@@ -188,7 +188,7 @@ const ProjectView = () => {
                 </button>
               )}
             </div>
-            <Feed id={id} session={session} members={members} project={project} />
+            <Feed id={id} members={members} project={project} />
             <ChatBox session={session} isLeader={isLeader} project={project} id={id} members={members} />
           </div>
         </main>

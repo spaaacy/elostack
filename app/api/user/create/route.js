@@ -24,6 +24,11 @@ export async function POST(req, res) {
       email: user.email,
     });
 
+    response = await supabase
+      .from("profile")
+      .insert({ user_id: user.user_id, email: user.email, username: user.username });
+    if (response.error) throw response.error;
+
     console.log(customer);
 
     response = await supabase.from("user").update({ stripe_customer_id: customer.id }).eq("user_id", user.user_id);

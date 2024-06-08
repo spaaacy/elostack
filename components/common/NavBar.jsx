@@ -81,7 +81,12 @@ const NavBar = () => {
       <div className={`px-8 lg:px-16 py-2 flex items-center justify-start ${isHomePage ? "max-lg:bg-black" : ""}`}>
         <Link href={"/"} className={`${kanit.className} flex justify-center items-center text-2xl flex-shrink-0`}>
           {currentTheme && (
-            <Image src={isHomePage || currentTheme === "dark" ? "/logo.png" : "/logo_black.png"} alt={"logo"} width={50} height={50} />
+            <Image
+              src={isHomePage || currentTheme === "dark" ? "/logo.png" : "/logo_black.png"}
+              alt={"logo"}
+              width={50}
+              height={50}
+            />
           )}
           <span className="max-lg:hidden">EloStack</span>
         </Link>
@@ -116,6 +121,12 @@ export default NavBar;
 const DesktopNav = ({ showSignIn, signOut, session, user, currentTheme, toggleTheme, router, isHomePage }) => {
   return (
     <div className="ml-12 flex justify-start items-center gap-4 max-lg:hidden w-full">
+      <Link
+        href={"/feed"}
+        className="p-2 border-b-2 border-transparent hover:text-gray-500 hover:border-b-gray-500 dark:hover:border-b-gray-300 dark:hover:text-gray-300"
+      >
+        Feed
+      </Link>
       <Link
         href={"/projects"}
         className="p-2 border-b-2 border-transparent hover:text-gray-500 hover:border-b-gray-500 dark:hover:border-b-gray-300 dark:hover:text-gray-300"
@@ -155,7 +166,9 @@ const DesktopNav = ({ showSignIn, signOut, session, user, currentTheme, toggleTh
             {currentTheme === "light" ? <MdDarkMode /> : <MdLightMode />}
           </button>
         )}
-        {!isHomePage && user && <p className="italic text-sm text-neutral-600 dark:text-gray-300">{`${user.username}`}</p>}
+        {!isHomePage && user && (
+          <p className="italic text-sm text-neutral-600 dark:text-gray-300">{`${user.username}`}</p>
+        )}
         {showSignIn && (
           <div
             className="ml-4 hover:bg-gray-300 dark:hover:bg-neutral-600 px-3 py-1 rounded-full 
@@ -193,6 +206,9 @@ const MobileNav = ({ setShowMobileDropdown, showMobileDropdown, currentTheme, to
 const MobileDropdown = ({ showSignIn, signOut, session, isHomePage }) => {
   return (
     <div className={`${isHomePage ? "bg-black" : ""} flex flex-col justify-center items-center lg:hidden`}>
+      <Link href={"/feed"} className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center">
+        Feed
+      </Link>
       <Link href={"/projects"} className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center">
         Projects
       </Link>
@@ -223,7 +239,7 @@ const MobileDropdown = ({ showSignIn, signOut, session, isHomePage }) => {
 
 const NotificationBell = ({ session }) => {
   const [showNotifications, setShowNotifications] = useState(false);
-  const [notifications, setNotifications] = useState();
+  const [notifications, setNotifications] = useState([]);
   const [dataLoaded, setDataLoaded] = useState(false);
   const notificationsRef = useRef();
 
@@ -341,6 +357,7 @@ const NotificationBell = ({ session }) => {
           ref={notificationsRef}
           className="absolute top-8 right-0 bg-gray-300 rounded border border-gray-400 py-2 text-xs z-50 w-56  dark:bg-backgrounddark dark:text-gray-300"
         >
+          {console.log(notifications)}
           {notifications?.length > 0 ? (
             notifications.map((n) => (
               <div
@@ -366,8 +383,10 @@ const NotificationBell = ({ session }) => {
                     ? `You were removed from ${n.payload.projectTitle}`
                     : n.payload.type === "member-ban"
                     ? `You were banned from ${n.payload.projectTitle}`
-                    : n.payload.type === "like"
+                    : n.payload.type === "like" && n.payload.projectTitle
                     ? `Your post in ${n.payload.projectTitle} received a like!`
+                    : n.payload.type === "like" && !n.payload.projectTitle
+                    ? "Your post in received a like!"
                     : ""}
                 </button>
                 <button type="button" onClick={() => handleNotificationClick(n, false)}>

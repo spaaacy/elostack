@@ -3,17 +3,18 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req, res) {
   try {
-    // Authentication
-    const auth = await supabase.auth.signInWithPassword({
-      email: process.env.SUPABASE_ADMIN_EMAIL,
-      password: process.env.SUPABASE_ADMIN_PASSWORD,
-    });
-    if (auth.error) throw auth.error;
-
     const { projectId } = res.params;
-    const { data, error } = await supabase.from("member").select("*, user(*)").eq("project_id", projectId);
+    const { data, error } = await supabase.from("member").select().eq("project_id", projectId);
     if (error) throw error;
-    return NextResponse.json({ members: data }, { status: 200 });
+    let members = [];
+    for (let member of data) {
+      const { data, error } = await supabase.from("profile").select().eq("user_id", member.user_id).single();
+      if (error) throw error;
+      member["profile"] = data;
+      members.push(member);
+    }
+
+    return NextResponse.json({ members }, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error }, { status: 500 });

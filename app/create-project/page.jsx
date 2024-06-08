@@ -1,4 +1,4 @@
-import CreateProject from "@/components/projects/CreateProject";
+import CreateProject from "@/components/create-project/CreateProject";
 
 export const metadata = {
   title: "Create Project | EloStack",
