@@ -11,7 +11,7 @@ import Loader from "../common/Loader";
 import toast, { Toaster } from "react-hot-toast";
 import SettingsDropdown from "./SettingsDropdown";
 import ChatBox from "./ChatBox";
-import Feed from "./Feed";
+import Feed from "../common/Feed";
 
 const ProjectView = () => {
   const { id } = useParams();

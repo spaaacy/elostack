@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { v4 as uuidv4 } from "uuid";
 import Post from "./Post";
 
-const Feed = ({ id, session, members, project }) => {
+const Feed = ({ id, session, project }) => {
   const [posts, setPosts] = useState([]);
   const [dataLoaded, setDataLoaded] = useState(false);
 
@@ -40,8 +40,9 @@ const Feed = ({ id, session, members, project }) => {
         body: JSON.stringify({
           content: data.content,
           userId,
-          projectId: id,
+          projectId: id ? id : null,
           postId: postId,
+          isPublic: project ? false : true,
         }),
       });
       if (response.status === 201) {
@@ -50,10 +51,11 @@ const Feed = ({ id, session, members, project }) => {
           {
             content: data.content,
             user_id: userId,
-            project_id: id,
+            projectId: id ? id : null,
             id: postId,
-            like: [],
-            comment: []
+            likes: [],
+            comment: [],
+            username: "[Username]",
           },
           ...prevPosts,
         ]);
@@ -69,16 +71,27 @@ const Feed = ({ id, session, members, project }) => {
 
   const fetchPosts = async () => {
     try {
-      const response = await fetch(`/api/post/${id}`, {
-        method: "GET",
-        headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
-        },
-      });
+      let response;
+      if (project) {
+        response = await fetch(`/api/post/${id}`, {
+          method: "POST",
+          headers: {
+            "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+          },
+          body: JSON.stringify({ pageNumber: 1, pageSize: 10 }),
+        });
+      } else {
+        response = await fetch("/api/post", {
+          method: "POST",
+          body: JSON.stringify({
+            pageNumber: 1,
+            pageSize: 10,
+          }),
+        });
+      }
       if (response.status === 200) {
         const { posts } = await response.json();
         setPosts(posts);
-        console.log(posts)
       }
     } catch (error) {
       console.error(error);
@@ -107,13 +120,11 @@ const Feed = ({ id, session, members, project }) => {
         </button>
       </form>
       <hr className="border-0 h-[1px] bg-gray-400 my-4" />
-      {members && (
-        <ul className="flex flex-col gap-2 mt-4">
-          {posts.map((p, i) => (
-            <Post key={i} post={p} session={session} setPosts={setPosts} project={project} members={members} />
-          ))}
-        </ul>
-      )}
+      <ul className="flex flex-col gap-2 mt-4">
+        {posts.map((p, i) => (
+          <Post key={i} post={p} session={session} setPosts={setPosts} project={project} />
+        ))}
+      </ul>
     </div>
   );
 };

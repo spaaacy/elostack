@@ -9,7 +9,7 @@ import { FaRegComment } from "react-icons/fa";
 import { FaComment } from "react-icons/fa";
 import { v4 as uuidv4 } from "uuid";
 
-const Post = ({ post, session, setPosts, project, members }) => {
+const Post = ({ post, session, setPosts, project }) => {
   const [comments, setComments] = useState([]);
 
   const {
@@ -26,17 +26,14 @@ const Post = ({ post, session, setPosts, project, members }) => {
       const response = await fetch("/api/like/create", {
         method: "POST",
         headers: {
-          "X-Supabase-Auth":
-            session.data.session.access_token +
-            " " +
-            session.data.session.refresh_token,
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
         },
         body: JSON.stringify({
           userId,
           postId: post.id,
           postUserId: post.user_id,
-          projectId: project.id,
-          projectTitle: project.title,
+          projectId: project ? project.id : null,
+          projectTitle: project ? project.title : null,
         }),
       });
 
@@ -46,7 +43,7 @@ const Post = ({ post, session, setPosts, project, members }) => {
             prev.id === post.id
               ? {
                   ...prev,
-                  like: [...prev.like, { user_id: userId, post_id: post.id }],
+                  likes: [...prev.likes, userId],
                 }
               : prev
           )
@@ -68,10 +65,7 @@ const Post = ({ post, session, setPosts, project, members }) => {
       const response = await fetch("/api/like/delete", {
         method: "DELETE",
         headers: {
-          "X-Supabase-Auth":
-            session.data.session.access_token +
-            " " +
-            session.data.session.refresh_token,
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
         },
         body: JSON.stringify({
           userId,
@@ -84,7 +78,7 @@ const Post = ({ post, session, setPosts, project, members }) => {
             post.id === postId
               ? {
                   ...post,
-                  like: post.like.filter((like) => like.user_id !== userId),
+                  likes: post.likes.filter((like) => like !== userId),
                 }
               : post
           )
@@ -108,10 +102,7 @@ const Post = ({ post, session, setPosts, project, members }) => {
       const response = await fetch("/api/comment/create", {
         method: "POST",
         headers: {
-          "X-Supabase-Auth":
-            session.data.session.access_token +
-            " " +
-            session.data.session.refresh_token,
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
         },
         body: JSON.stringify({
           comment: data.comment,
@@ -127,7 +118,10 @@ const Post = ({ post, session, setPosts, project, members }) => {
             prev.id === post.id
               ? {
                   ...prev,
-                  comment: [...prev.comment, { id: commentId, comment: data.comment, user_id: userId, post_id: post.id }],
+                  comment: [
+                    ...prev.comment,
+                    { id: commentId, comment: data.comment, user_id: userId, post_id: post.id },
+                  ],
                 }
               : prev
           )
@@ -142,23 +136,18 @@ const Post = ({ post, session, setPosts, project, members }) => {
     }
   };
 
-  const liked = post.like.find((l) => l.post_id === post.id);
+  const liked = post.likes.find((l) => l === session?.data.session.user.id);
 
   return (
     <div className=" text-sm rounded-xl bg-neutral-50 px-3 py-2 dark:bg-backgrounddark dark:border dark:border-gray-400 flex flex-col gap-2">
       <div className="flex items-center">
-        <p className="font-bold">
-          {members.find((m) => m.user_id === post.user_id).user.username}
-        </p>
-        {post.like.length > 0 && <p className="ml-auto font-light text-xs">
-          {post.like.map(
-            (like, i) =>
-              `${
-                members.find((m) => m.user_id === like.user_id).user.username
-              }${i + 1 === post.like.length ? " " : ", "}`
-          )}
-          {"liked"}
-        </p>}
+        <p className="font-bold">{post.username}</p>
+        {/* {post.likes.length > 0 && (
+          <p className="ml-auto font-light text-xs">
+            {post.likes.map((like, i) => `${like}${i + 1 === post.likes.length ? " " : ", "}`)}
+            {"liked"}
+          </p>
+        )} */}
       </div>
       {post.content}
       <div className="text-neutral-600 dark:text-neutral-200 flex items-center gap-4 text-sm">
@@ -168,17 +157,13 @@ const Post = ({ post, session, setPosts, project, members }) => {
           className="items-center flex"
         >
           {liked ? "Liked " : "Like "}
-          {liked ? (
-            <BiSolidLike className="ml-2 inline" />
-          ) : (
-            <BiLike className="ml-2 inline" />
-          )}
+          {liked ? <BiSolidLike className="ml-2 inline" /> : <BiLike className="ml-2 inline" />}
         </button>
-        <p className="font-light text-xs ml-auto">{`${post.like.length} Likes`}</p>
+        <p className="font-light text-xs ml-auto">{`${post.likes.length} Likes`}</p>
       </div>
 
       <div className="flex flex-col gap-2 bg-gray-200 dark:bg-neutral-800 px-3 py-2 rounded-lg">
-        {post?.comment.length > 0 && (
+        {/* {post?.comment.length > 0 && (
           <div className="flex flex-col gap-2">
             <p className="text-sm font-semibold">Comments</p>
             <hr className="border-0 h-[1px] bg-white dark:bg-neutral-500 my-1" />
@@ -192,11 +177,8 @@ const Post = ({ post, session, setPosts, project, members }) => {
               </p>
             ))}
           </div>
-        )}
-        <form
-          onSubmit={handleSubmit(createComment)}
-          className="flex flex-col gap-2"
-        >
+        )} */}
+        <form onSubmit={handleSubmit(createComment)} className="flex flex-col gap-2">
           <textarea
             {...register("comment", { required: "Comment cannot be empty" })}
             id="scrollableDiv"
