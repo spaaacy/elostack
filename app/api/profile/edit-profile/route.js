@@ -1,7 +1,7 @@
 import { supabase } from "@/utils/supabase";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req, res) {
+export async function PATCH(req, res) {
   try {
     // Authentication
     const access_token = req.headers.get("x-supabase-auth").split(" ")[0];
@@ -10,18 +10,18 @@ export async function GET(req, res) {
     const auth = await supabase.auth.setSession({ access_token, refresh_token });
     if (auth.error) throw auth.error;
 
-    const { projectId } = res.params;
-    const { data, error } = await supabase.from("request").select("*, user(*)").eq("project_id", projectId);
-    let requests = [];
-    for (let request of data) {
-      const { data, error } = await supabase.from("profile").select().eq("user_id", request.user_id).single();
-      if (error) throw error;
-      request["profile"] = data;
-      requests.push(request);
-    }
+    const formData = await req.formData();
+    const profilePicture = formData.get("profilePicture");
+    const userId = formData.get("userId");
 
+    console.log(profilePicture, userId);
+
+    const { error } = await supabase.storage
+      .from("profile-picture")
+      .upload(`${userId}/default`, profilePicture, { cacheControl: 3600, upsert: true });
     if (error) throw error;
-    return NextResponse.json({ requests: data }, { status: 200 });
+
+    return NextResponse.json({ message: "Profile has been edited!" }, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error }, { status: 500 });

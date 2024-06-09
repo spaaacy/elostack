@@ -1,10 +1,12 @@
 "use client";
 
+import { UserContext } from "@/context/UserContext";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 
 const UserAccount = ({ signOut }) => {
+  const { profile } = useContext(UserContext);
   const accountRef = useRef();
   const [showAccountDropdown, setShowAccountDropdown] = useState(false);
 
@@ -27,13 +29,15 @@ const UserAccount = ({ signOut }) => {
         onClick={() => setShowAccountDropdown(!showAccountDropdown)}
         className="rounded-full max- "
       >
-        <Image
-          src={"/sample.jpg"}
-          alt="profile picture"
-          className="object-cover rounded-full w-10 h-10"
-          width={40}
-          height={40}
-        />
+        {profile && (
+          <Image
+            src={profile.picture ? profile.picture : "/default_user.png"}
+            alt="profile picture"
+            className="object-cover rounded-full w-9 h-9"
+            width={36}
+            height={36}
+          />
+        )}
       </button>
       {showAccountDropdown && (
         <div

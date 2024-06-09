@@ -15,8 +15,8 @@ export const UserProvider = ({ children }) => {
 
   useEffect(() => {
     const loadData = async () => {
-      await fetchUser();
       await fetchProfile();
+      await fetchUser();
     };
 
     if (!session) {
@@ -32,13 +32,18 @@ export const UserProvider = ({ children }) => {
   }, [session]);
 
   const fetchProfile = async () => {
+    const userId = session.data.session.user.id;
+    if (!userId) return;
     try {
-      const response = await fetch(`/api/profile/${session.data.session.user.id}`, {
+      const response = await fetch(`/api/profile/${userId}`, {
         method: "GET",
       });
       if (response.status === 200) {
         const { profile } = await response.json();
-        setProfile(profile);
+        setProfile({
+          ...profile,
+          picture: `${process.env.NEXT_PUBLIC_SUPABASE_URL}${process.env.NEXT_PUBLIC_STORAGE_PATH}/profile-picture/${userId}/default`,
+        });
       }
     } catch (error) {
       console.error(error);
@@ -47,7 +52,8 @@ export const UserProvider = ({ children }) => {
 
   const fetchUser = async () => {
     const userId = session.data.session?.user.id;
-    if (userId) {
+    if (!userId) return;
+    try {
       const response = await fetch(`/api/user/${userId}`, {
         headers: {
           "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
@@ -60,6 +66,8 @@ export const UserProvider = ({ children }) => {
       } else {
         router.push("/signup?google_oauth=true");
       }
+    } catch (error) {
+      console.error(error);
     }
   };
 

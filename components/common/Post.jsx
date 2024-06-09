@@ -1,6 +1,8 @@
 "use client";
 
 import { UserContext } from "@/context/UserContext";
+import imageExists from "@/utils/imageExists";
+import Image from "next/image";
 import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -9,28 +11,34 @@ import { BiSolidLike } from "react-icons/bi";
 import { FaRegComment } from "react-icons/fa";
 import { FaComment } from "react-icons/fa";
 import { v4 as uuidv4 } from "uuid";
+import Comment from "./Comment";
 
 const Post = ({ post, setPosts, project }) => {
   const { profile, session } = useContext(UserContext);
   const [comments, setComments] = useState([]);
   const [dataLoaded, setDataLoaded] = useState(false);
-
-  useEffect(() => {
-    const loadData = async () => {
-      if (!dataLoaded) {
-        fetchComments();
-        setDataLoaded(true);
-      }
-    };
-
-    loadData();
-  }, [session]);
+  const [imageValid, setImageValid] = useState(false);
+  const liked = post.likes.find((l) => l === session?.data.session?.user.id);
+  const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}${process.env.NEXT_PUBLIC_STORAGE_PATH}/profile-picture/${post.user_id}/default`;
   const {
     setValue,
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
+
+  useEffect(() => {
+    setImageValid(imageExists(imageUrl));
+
+    const loadData = async () => {
+      if (!dataLoaded) {
+        setDataLoaded(true);
+        fetchComments();
+      }
+    };
+
+    loadData();
+  }, []);
 
   const fetchComments = async () => {
     try {
@@ -153,11 +161,16 @@ const Post = ({ post, setPosts, project }) => {
     }
   };
 
-  const liked = post.likes.find((l) => l === session?.data.session?.user.id);
-
   return (
     <div className=" text-sm rounded-xl bg-neutral-50 px-3 py-3 dark:bg-backgrounddark dark:border dark:border-gray-400 flex flex-col gap-2">
-      <div className="flex items-center">
+      <div className="flex items-center gap-2">
+        <Image
+          src={imageValid ? imageUrl : "/default_user.png"}
+          alt="profile picture"
+          className="object-cover rounded-full w-9 h-9"
+          width={36}
+          height={36}
+        />
         <p className="font-bold">{post.username}</p>
         {/* {post.likes.length > 0 && (
           <p className="ml-auto font-light text-xs">
@@ -188,10 +201,7 @@ const Post = ({ post, setPosts, project }) => {
               <p className="text-sm font-semibold">Comments</p>
               <hr className="border-0 h-[1px] bg-white dark:bg-neutral-500 my-1" />
               {comments.map((c, i) => (
-                <p key={i} className="text-sm">
-                  <span className="font-medium">{`${c.username}: `}</span>
-                  {c.comment}
-                </p>
+                <Comment key={i} comment={c} />
               ))}
             </div>
           )}
