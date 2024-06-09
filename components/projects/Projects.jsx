@@ -1,7 +1,7 @@
 "use client";
 
 import Footer from "../common/Footer";
-import NavBar from "../common/NavBar";
+import NavBar from "../navbar/NavBar";
 import { formatDuration } from "@/utils/formatDuration";
 import { FaCircleInfo } from "react-icons/fa6";
 import { useContext, useEffect, useState } from "react";

@@ -1,7 +1,7 @@
 "use client";
 
 import Footer from "@/components/common/Footer";
-import NavBar from "@/components/common/NavBar";
+import NavBar from "@/components/navbar/NavBar";
 import { Cormorant, JetBrains_Mono, Kanit, Montserrat, Pixelify_Sans } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";

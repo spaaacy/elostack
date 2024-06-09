@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import Footer from "../common/Footer";
-import NavBar from "../common/NavBar";
+import NavBar from "../navbar/NavBar";
 import { useContext, useEffect, useRef, useState } from "react";
 import { IoAddCircleSharp } from "react-icons/io5";
 import { UserContext } from "@/context/UserContext";
