@@ -2,7 +2,7 @@
 
 import Footer from "@/components/common/Footer";
 import Loader from "@/components/common/Loader";
-import NavBar from "@/components/common/NavBar";
+import NavBar from "@/components/navbar/NavBar";
 import { UserContext } from "@/context/UserContext";
 import { supabase } from "@/utils/supabase";
 import Image from "next/image";

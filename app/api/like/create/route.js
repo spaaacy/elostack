@@ -13,16 +13,16 @@ export async function POST(req, res) {
     const requestData = await req.json();
     let results = await supabase.from("like").insert({ user_id: requestData.userId, post_id: requestData.postId });
     if (results.error) throw results.error;
-    if (requestData.postUserId !== requestData.userId) {
-      const payload = { type: "like" };
-      if (requestData.projectTitle) payload["projectTitle"] = requestData.projectTitle;
-      results = await supabase.from("notification").insert({
-        user_id: requestData.postUserId,
-        project_id: requestData.projectId,
-        payload: payload,
-      });
-      if (results.error) throw results.error;
-    }
+    // if (requestData.postUserId !== requestData.userId) {
+    const payload = { type: "like" };
+    if (requestData.projectTitle) payload["projectTitle"] = requestData.projectTitle;
+    results = await supabase.from("notification").insert({
+      user_id: requestData.postUserId,
+      project_id: requestData.projectId,
+      payload: payload,
+    });
+    if (results.error) throw results.error;
+    // }
 
     return NextResponse.json({ message: "Like created successfully!" }, { status: 201 });
   } catch (error) {

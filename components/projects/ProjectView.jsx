@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import NavBar from "../common/NavBar";
+import NavBar from "../navbar/NavBar";
 import Link from "next/link";
 import { FaGithub } from "react-icons/fa";
 import { formatDuration } from "@/utils/formatDuration";
