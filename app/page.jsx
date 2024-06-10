@@ -1,5 +1,3 @@
-import Home from "@/components/home/Home";
-export const dynamic = "force-dynamic";
 const kanit = Kanit({ subsets: ["latin"], weight: "600" });
 import Image from "next/image";
 import { Kanit } from "next/font/google";

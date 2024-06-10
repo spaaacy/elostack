@@ -1,9 +1,7 @@
 import { Inter } from "next/font/google";
 import "@/styles/globals.css";
 import "react-tooltip/dist/react-tooltip.css";
-import { UserProvider } from "@/context/UserContext";
 import GoogleAnalytics from "@/components/common/GoogleAnalytics";
-import { Providers } from "@/components/common/Providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
