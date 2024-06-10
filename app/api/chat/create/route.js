@@ -16,7 +16,8 @@ export async function POST(req, res) {
     results = await supabase.rpc("create_notifications", {
       p_user_id: chat.user_id,
       p_project_id: chat.project_id,
-      p_payload: { type: "chat", projectTitle },
+      p_payload: { projectTitle },
+      p_type: "chat",
     });
     if (results.error) throw results.error;
 

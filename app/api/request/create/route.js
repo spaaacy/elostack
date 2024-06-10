@@ -16,7 +16,8 @@ export async function POST(req, res) {
     results = await supabase.from("notification").insert({
       user_id: projectLeader,
       project_id: projectId,
-      payload: { type: "request-created", projectTitle, userId },
+      payload: { projectTitle, userId },
+      type: "request-created",
     });
     if (results.error) throw results.error;
 

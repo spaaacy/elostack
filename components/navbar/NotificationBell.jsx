@@ -74,27 +74,27 @@ const NotificationBell = ({ notifications, setNotifications }) => {
                 className="flex justify-between items-center hover:bg-gray-200 dark:hover:bg-neutral-800 w-full py-2 px-2 relative"
               >
                 <button type="button" className={"text-left"} onClick={() => handleNotificationClick(n, true)}>
-                  {n.payload.type === "chat"
+                  {n.type === "chat"
                     ? `New messages in ${n.payload.projectTitle}`
-                    : n.payload.type === "request-response" && n.payload.accepted === true
+                    : n.type === "request-response" && n.payload.accepted === true
                     ? `${
                         n.payload.userId === session.data.session.user.id
                           ? `You request was accepted into ${n.payload.projectTitle}`
                           : `A new member has joined ${n.payload.projectTitle}`
                       }`
-                    : n.payload.type === "request-response" &&
+                    : n.type === "request-response" &&
                       n.payload.accepted === false &&
                       n.payload.userId === session.data.session.user.id
                     ? `Your request into ${n.payload.projectTitle} was rejected`
-                    : n.payload.type === "request-created"
+                    : n.type === "request-created"
                     ? `You have a new request to join ${n.payload.projectTitle}`
-                    : n.payload.type === "member-remove"
+                    : n.type === "member-remove"
                     ? `You were removed from ${n.payload.projectTitle}`
-                    : n.payload.type === "member-ban"
+                    : n.type === "member-ban"
                     ? `You were banned from ${n.payload.projectTitle}`
-                    : n.payload.type === "like" && n.payload.projectTitle
+                    : n.type === "like" && n.payload.projectTitle
                     ? `Your post in ${n.payload.projectTitle} received a like!`
-                    : n.payload.type === "like" && !n.payload.projectTitle
+                    : n.type === "like" && !n.payload.projectTitle
                     ? "Your post in received a like!"
                     : ""}
                 </button>
