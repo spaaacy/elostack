@@ -1,20 +1,8 @@
-"use client";
-
-import FeedPage from "@/components/home/FeedPage";
-import LandingPage from "@/components/home/LandingPage";
-import { UserContext } from "@/context/UserContext";
-import { useContext, useEffect } from "react";
+import Home from "@/components/home/Home";
+export const dynamic = "force-dynamic";
 
 const Page = () => {
-  const { session } = useContext(UserContext);
-
-  useEffect(() => {}, [session]);
-
-  if (session) {
-    if (session?.data.session) {
-      return <FeedPage />;
-    } else return <LandingPage />;
-  }
+  return <Home />;
 };
 
 export default Page;
