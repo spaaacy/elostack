@@ -17,11 +17,7 @@ export default function RootLayout({ children }) {
       <head>
         <GoogleAnalytics ga_id={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS} />
       </head>
-      <body className={inter.className}>
-        <UserProvider>
-          <Providers>{children}</Providers>
-        </UserProvider>
-      </body>
+      <body className={`${inter.className} bg-white`}>{children}</body>
     </html>
   );
 }
