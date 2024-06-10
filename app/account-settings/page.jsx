@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import AccountSettings from "@/components/account-settings/AccountSettings";
 
 export const metadata = {
