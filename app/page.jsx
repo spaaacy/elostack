@@ -17,10 +17,6 @@ const Page = () => {
   const projectRef = useRef(null);
   const [isCursorInside, setIsCursorInside] = useState(false);
 
-  const handleContactUs = () => {
-    window.open(`mailto:aakifmohamed@elostack.com`, "_blank");
-  };
-
   useEffect(() => {
     const handleMouseMove = (e) => {
       const div = projectRef.current;
@@ -85,7 +81,7 @@ const Page = () => {
         </div>
       </section>
 
-      <div className=" bg-gradient-to-tr from-slate-900 to-black relative">
+      <div className=" bg-gradient-to-tr to-slate-800 from-black relative">
         <div className="absolute top-0 left-0 h-[200px] w-full z-60 bg-gradient-to-t from-transparent to-black"></div>
         <div className="absolute bottom-0 left-0 h-1/6 w-full z-40 bg-gradient-to-b  from-transparent to-black"></div>
         <section ref={sectionRef} className="z-10 py-24 sm:py-32 lg:py-48">
@@ -137,7 +133,7 @@ const Page = () => {
           <div
             className={`absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center flex flex-col items-center justify-center  w-full  ${cormorant.className}`}
           >
-            <div className=" h-1/3 w-3/4 xl:w-1/2 flex flex-col justify-center items-center py-16  px-8 relative rounded">
+            <div className="max-sm:h-72 h-1/3 w-3/4 xl:w-1/2 flex flex-col justify-center items-center py-16  px-8 relative rounded">
               <Image className="-z-50 object-cover rounded-[20px]" src={"/wormhole.jpg"} alt="wormhole" fill={true} />
               <div className="absolute top-0 bottom-0 h-full w-full opacity-50 -z-40 bg-black"></div>
               <h3 className="max-sm:text-2xl sm:text-4xl md:text-5xl">No ideas? No problem.</h3>

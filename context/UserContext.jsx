@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase";
 import { useRouter } from "next/navigation";
+import imageExists from "@/utils/imageExists";
 
 export const UserContext = React.createContext();
 
@@ -40,9 +41,13 @@ export const UserProvider = ({ children }) => {
       });
       if (response.status === 200) {
         const { profile } = await response.json();
+        const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}${
+          process.env.NEXT_PUBLIC_STORAGE_PATH
+        }/profile-picture/${userId}/default?${new Date().getTime()}`;
+        const imageValid = imageExists(imageUrl);
         setProfile({
           ...profile,
-          picture: `${process.env.NEXT_PUBLIC_SUPABASE_URL}${process.env.NEXT_PUBLIC_STORAGE_PATH}/profile-picture/${userId}/default`,
+          picture: imageValid ? imageUrl : null,
         });
       }
     } catch (error) {

@@ -19,7 +19,9 @@ const Post = ({ post, setPosts, project }) => {
   const [dataLoaded, setDataLoaded] = useState(false);
   const [imageValid, setImageValid] = useState(false);
   const liked = post.likes.find((l) => l === session?.data.session?.user.id);
-  const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}${process.env.NEXT_PUBLIC_STORAGE_PATH}/profile-picture/${post.user_id}/default`;
+  const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}${process.env.NEXT_PUBLIC_STORAGE_PATH}/profile-picture/${
+    post.user_id
+  }/default?${new Date().getTime()}`;
   const {
     setValue,
     register,

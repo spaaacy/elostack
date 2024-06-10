@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import Post from "./Post";
 import { UserContext } from "@/context/UserContext";
 import Loader from "./Loader";
+import NotificationBell from "../navbar/NotificationBell";
 
 const Feed = ({ id, project }) => {
   const { profile, session } = useContext(UserContext);

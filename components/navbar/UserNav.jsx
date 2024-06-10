@@ -5,13 +5,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { useContext, useEffect, useRef, useState } from "react";
 
-const UserAccount = ({ signOut }) => {
+const UserNav = ({ signOut }) => {
   const { profile } = useContext(UserContext);
+  const buttonRef = useRef();
   const accountRef = useRef();
   const [showAccountDropdown, setShowAccountDropdown] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
+      if (buttonRef.current && buttonRef.current.contains(event.target)) {
+        setShowAccountDropdown(true);
+      }
       if (accountRef.current && !accountRef.current.contains(event.target)) {
         setShowAccountDropdown(false);
       }
@@ -24,11 +28,7 @@ const UserAccount = ({ signOut }) => {
 
   return (
     <>
-      <button
-        disabled={showAccountDropdown}
-        onClick={() => setShowAccountDropdown(!showAccountDropdown)}
-        className="rounded-full max- "
-      >
+      <button className="rounded-full" ref={buttonRef}>
         {profile && (
           <Image
             src={profile.picture ? profile.picture : "/default_user.png"}
@@ -64,4 +64,4 @@ const UserAccount = ({ signOut }) => {
   );
 };
 
-export default UserAccount;
+export default UserNav;

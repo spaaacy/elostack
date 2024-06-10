@@ -14,8 +14,6 @@ export async function PATCH(req, res) {
     const profilePicture = formData.get("profilePicture");
     const userId = formData.get("userId");
 
-    console.log(profilePicture, userId);
-
     const { error } = await supabase.storage
       .from("profile-picture")
       .upload(`${userId}/default`, profilePicture, { cacheControl: 3600, upsert: true });
