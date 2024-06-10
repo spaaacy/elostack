@@ -35,6 +35,22 @@ const ChatBox = ({ session, isLeader, project, id, members }) => {
       var chatDiv = document.getElementById("scrollableDiv");
       if (chatDiv) chatDiv.scrollTop = chatDiv.scrollHeight;
     }
+
+    const handleResize = () => {
+      if (window.innerWidth < 640) {
+        // assuming 768px as the threshold for small screens
+        setShowChatBox(false);
+      } else {
+        setShowChatBox(true);
+      }
+    };
+
+    handleResize(); // Check screen size when component mounts
+    window.addEventListener("resize", handleResize); // Update on window resize
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, [session, chat]);
 
   const sendMessage = async (data, e) => {

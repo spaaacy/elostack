@@ -17,6 +17,11 @@ const SignUp = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const searchParams = useSearchParams();
+  const {
+    register,
+    formState: { errors },
+    handleSubmit,
+  } = useForm();
 
   useEffect(() => {
     const handleSearchParams = async () => {
@@ -24,13 +29,16 @@ const SignUp = () => {
       if (searchParams.has("google_oauth")) {
         const response = await fetch("api/user/create", {
           method: "POST",
+          headers: {
+            "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+          },
           body: JSON.stringify({
             username: session.data.session.user.user_metadata.full_name,
             email: session.data.session.user.email,
             user_id: session.data.session.user.id,
           }),
         });
-        if (response.status === 200) toast.success("Registration successful!");
+        if (response.status === 201) toast.success("Registration successful!");
         setTimeout(() => router.push("/"), 1000);
       } else {
         router.push("/");
@@ -59,12 +67,6 @@ const SignUp = () => {
     }
   };
 
-  const {
-    register,
-    formState: { errors },
-    handleSubmit,
-  } = useForm();
-
   const onSubmit = async (data, e) => {
     e.preventDefault();
     if (!session || session.data.session) return;
@@ -77,10 +79,12 @@ const SignUp = () => {
         },
       });
       if (error) throw error;
-      console.log(data);
 
       const response = await fetch("/api/user/create", {
         method: "POST",
+        headers: {
+          "X-Supabase-Auth": authData.session.access_token + " " + authData.session.refresh_token,
+        },
         body: JSON.stringify({
           username: data.username,
           email: data.email,

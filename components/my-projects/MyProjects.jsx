@@ -16,8 +16,6 @@ const MyProjects = () => {
   const [loading, setLoading] = useState(true);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [searchInput, setSearchInput] = useState("");
-  const [statusInput, setStatusInput] = useState("");
-  const [openInput, setOpenInput] = useState(true);
   const [projects, setProjects] = useState([]);
   const [filteredProjects, setFilteredProjects] = useState();
 
@@ -37,8 +35,6 @@ const MyProjects = () => {
     }
 
     const filteredProjects = projects.filter((project) =>
-      // (statusInput === "" ? true : project.status.toLowerCase() === statusInput) &&
-      // (openInput ? project.is_open : true) &&
       searchInput === ""
         ? true
         : project.title.toLowerCase().includes(searchInput) ||
@@ -47,7 +43,7 @@ const MyProjects = () => {
     );
 
     setFilteredProjects(filteredProjects);
-  }, [searchInput, statusInput, session, openInput, projects]);
+  }, [searchInput, session, projects]);
 
   const fetchProjects = async () => {
     const userId = session.data.session.user.id;
@@ -87,20 +83,6 @@ const MyProjects = () => {
               type="text"
               className="focus:ring-0 focus:outline-none min-w-0 w-96 text-sm px-3 py-2 rounded-full border bg-gray-200 dark:bg-backgrounddark hover:bg-gray-300 dark:hover:bg-neutral-800 focus:bg-gray-300 dark:focus:bg-neutral-800 border-gray-400"
             />
-            {/* <div className="bg-gray-200 dark:bg-backgrounddark p-2 text-sm rounded ml-auto flex items-center gap-2 border-gray-400 border">
-              <label>Open</label>
-              <input checked={openInput} onChange={() => setOpenInput(!openInput)} type="checkbox" />
-            </div>
-            <select
-              name="selectedStatus"
-              onChange={(e) => setStatusInput(e.target.value)}
-              className="min-w-0  text-sm p-2 rounded border bg-gray-200 hover:bg-gray-300 dark:bg-backgrounddark  dark:hover:bg-neutral-800 border-gray-400"
-            >
-              <option value={""}>Show All</option>
-              <option value={"just created"}>Just created</option>
-              <option value={"in progress"}>In Progress</option>
-              <option value={"complete"}>Complete</option>
-            </select> */}
           </div>
           <ul className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 grid gap-4 mt-4">
             {filteredProjects.map((p, i) => {

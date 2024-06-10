@@ -5,10 +5,10 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 export async function POST(req, res) {
   try {
     // Authentication
-    const auth = await supabase.auth.signInWithPassword({
-      email: process.env.SUPABASE_ADMIN_EMAIL,
-      password: process.env.SUPABASE_ADMIN_PASSWORD,
-    });
+    const access_token = req.headers.get("x-supabase-auth").split(" ")[0];
+    const refresh_token = req.headers.get("x-supabase-auth").split(" ")[1];
+    if (!access_token || !refresh_token) throw Error("You must be authorized to do this action!");
+    const auth = await supabase.auth.setSession({ access_token, refresh_token });
     if (auth.error) throw auth.error;
 
     // Create Stripe customer first
@@ -28,8 +28,6 @@ export async function POST(req, res) {
       .from("profile")
       .insert({ user_id: user.user_id, email: user.email, username: user.username });
     if (response.error) throw response.error;
-
-    console.log(customer);
 
     response = await supabase.from("user").update({ stripe_customer_id: customer.id }).eq("user_id", user.user_id);
     if (response.error) throw response.error;

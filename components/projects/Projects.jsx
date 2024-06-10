@@ -10,6 +10,7 @@ import Loader from "../common/Loader";
 import { UserContext } from "@/context/UserContext";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
+import Link from "next/link";
 
 const Projects = () => {
   const { session } = useContext(UserContext);
@@ -18,8 +19,6 @@ const Projects = () => {
   const [loading, setLoading] = useState(true);
   const [filteredProjects, setFilteredProjects] = useState();
   const [searchInput, setSearchInput] = useState("");
-  const [statusInput, setStatusInput] = useState("");
-  const [openInput, setOpenInput] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [modalProject, setModalProject] = useState();
   const [projects, setProjects] = useState([]);
@@ -43,8 +42,6 @@ const Projects = () => {
     }
 
     const filteredProjects = projects.filter((project) =>
-      // (statusInput === "" ? true : project.status.toLowerCase() === statusInput) &&
-      // (openInput ? project.is_open : true) &&
       searchInput === ""
         ? true
         : project.title.toLowerCase().includes(searchInput) ||
@@ -53,7 +50,7 @@ const Projects = () => {
     );
 
     setFilteredProjects(filteredProjects);
-  }, [searchInput, statusInput, showModal, session, openInput, projects]);
+  }, [searchInput, showModal, session, projects]);
 
   const createRequest = async (message) => {
     if (!session.data.session) return;
@@ -182,8 +179,16 @@ const Projects = () => {
         <Loader />
       ) : (
         <main>
-          <h1 className="text-2xl font-semibold">Find Projects</h1>
-
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <h1 className="text-2xl font-semibold">Find Projects</h1>
+            <Link
+              href={"/create-project"}
+              type="button"
+              className="text-gray-200 px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-sm hover:text-gray-300 dark:shadow dark:shadow-neutral-800 flex items-center"
+            >
+              Create Project
+            </Link>
+          </div>
           <hr className="border-0 h-[1px] bg-gray-400 my-4" />
           <div className="flex items-center gap-2 flex-wrap">
             <input
@@ -192,20 +197,6 @@ const Projects = () => {
               type="text"
               className="focus:ring-0 focus:outline-none min-w-0 w-96 text-sm px-3 py-2 rounded-full border bg-gray-200 dark:bg-backgrounddark hover:bg-gray-300 dark:hover:bg-neutral-800 focus:bg-gray-300 dark:focus:bg-neutral-800 border-gray-400"
             />
-            {/* <div className="bg-gray-200 dark:bg-backgrounddark p-2 text-sm rounded ml-auto flex items-center gap-2 border-gray-400 border">
-              <label>Open</label>
-              <input checked={openInput} onChange={() => setOpenInput(!openInput)} type="checkbox" />
-            </div>
-            <select
-              name="selectedStatus"
-              onChange={(e) => setStatusInput(e.target.value)}
-              className="min-w-0  text-sm p-2 rounded border bg-gray-200 hover:bg-gray-300 dark:bg-backgrounddark  dark:hover:bg-neutral-800 border-gray-400"
-            >
-              <option value={""}>Show All</option>
-              <option value={"just created"}>Just created</option>
-              <option value={"in progress"}>In Progress</option>
-              <option value={"complete"}>Complete</option>
-            </select> */}
           </div>
           <ul className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 grid gap-4 mt-4">
             {filteredProjects.map((p, i) => {

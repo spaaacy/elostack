@@ -163,22 +163,10 @@ const DesktopNav = ({
   return (
     <div className="ml-12 flex justify-start items-center gap-4 max-lg:hidden w-full">
       <Link
-        href={"/feed"}
-        className="p-2 border-b-2 border-transparent hover:text-gray-500 hover:border-b-gray-500 dark:hover:border-b-gray-300 dark:hover:text-gray-300"
-      >
-        Feed
-      </Link>
-      <Link
         href={"/projects"}
         className="p-2 border-b-2 border-transparent hover:text-gray-500 hover:border-b-gray-500 dark:hover:border-b-gray-300 dark:hover:text-gray-300"
       >
         Projects
-      </Link>
-      <Link
-        href={"/create-project"}
-        className="p-2 border-b-2 border-transparent hover:text-gray-500 hover:border-b-gray-500 dark:hover:border-b-gray-300 dark:hover:text-gray-300"
-      >
-        Create Project
       </Link>
       {session?.data.session && (
         <Link
@@ -193,7 +181,7 @@ const DesktopNav = ({
         href={"https://discord.gg/PPbGuu3u43"}
         className="p-2 border-b-2 border-transparent hover:text-gray-500 hover:border-b-gray-500 dark:hover:border-b-gray-300 dark:hover:text-gray-300"
       >
-        Community
+        Discord
       </Link>
 
       <div className="flex justify-center items-center ml-auto relative">
@@ -257,14 +245,8 @@ const MobileNav = ({
 const MobileDropdown = ({ isHomePage, showSignIn, session, signOut }) => {
   return (
     <div className={`${isHomePage ? "bg-black" : ""} flex flex-col justify-center items-center lg:hidden py-2`}>
-      <Link href={"/feed"} className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center">
-        Feed
-      </Link>
       <Link href={"/projects"} className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center">
         Projects
-      </Link>
-      <Link href={"/create-project"} className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center">
-        Create Project
       </Link>
       {session?.data.session && (
         <Link href={"/my-projects"} className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center">
@@ -276,7 +258,7 @@ const MobileDropdown = ({ isHomePage, showSignIn, session, signOut }) => {
         href={"https://discord.gg/PPbGuu3u43"}
         className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center"
       >
-        Community
+        Discord
       </Link>
       <hr className="border-0 h-[1px] bg-gray-400 my-2 w-full" />
       {session?.data.session && (
