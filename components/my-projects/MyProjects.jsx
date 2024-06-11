@@ -128,7 +128,6 @@ const MyProjects = () => {
           </ul>
         </main>
       )}
-      <Footer />
       <Toaster />
     </div>
   );

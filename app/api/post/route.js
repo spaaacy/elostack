@@ -3,9 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req, res) {
   try {
-    const { pageNumber, pageSize } = await req.json();
+    const { pageNumber } = await req.json();
 
-    const { data, error } = await supabase.rpc("fetch_posts", { p_page_number: pageNumber, p_page_size: pageSize });
+    const { data, error } = await supabase.rpc("fetch_posts", { p_page_number: pageNumber, p_page_size: 5 });
     if (error) throw error;
     return NextResponse.json({ posts: data }, { status: 200 });
   } catch (error) {

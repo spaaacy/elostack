@@ -17,7 +17,6 @@ const FeedPage = () => {
       <main className="max-w-[820px]">
         <Feed />
       </main>
-      <Footer />
       <Toaster />
     </div>
   );

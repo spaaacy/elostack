@@ -298,7 +298,6 @@ const CreateProject = () => {
           </form>
         </main>
       )}
-      <Footer />
       <Toaster />
     </div>
   );

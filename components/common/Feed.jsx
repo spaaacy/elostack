@@ -12,6 +12,8 @@ const Feed = ({ id, project }) => {
   const [posts, setPosts] = useState([]);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [publicPost, setPublicPost] = useState(false);
+  const [nextPostsPage, setNextPostsPage] = useState(1);
+  const [showLoadMorePosts, setShowLoadMorePosts] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -40,7 +42,10 @@ const Feed = ({ id, project }) => {
       const response = await fetch("/api/post/create", {
         method: "POST",
         headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+          "X-Supabase-Auth":
+            session.data.session.access_token +
+            " " +
+            session.data.session.refresh_token,
         },
         body: JSON.stringify({
           content: data.content,
@@ -48,7 +53,7 @@ const Feed = ({ id, project }) => {
           projectId: id ? id : null,
           postId: postId,
           isPublic: project ? publicPost : true,
-          projectTitle: project.title,
+          projectTitle: project ? project.title : null,
         }),
       });
       if (response.status === 201) {
@@ -78,27 +83,37 @@ const Feed = ({ id, project }) => {
 
   const fetchPosts = async () => {
     try {
+      setShowLoadMorePosts(false);
       let response;
       if (project) {
         response = await fetch(`/api/post/${id}`, {
           method: "POST",
           headers: {
-            "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+            "X-Supabase-Auth":
+              session.data.session.access_token +
+              " " +
+              session.data.session.refresh_token,
           },
-          body: JSON.stringify({ pageNumber: 1, pageSize: 10 }),
+          body: JSON.stringify({ pageNumber: nextPostsPage }),
         });
       } else {
         response = await fetch("/api/post", {
           method: "POST",
           body: JSON.stringify({
-            pageNumber: 1,
-            pageSize: 10,
+            pageNumber: nextPostsPage,
           }),
         });
       }
       if (response.status === 200) {
+        setNextPostsPage(nextPostsPage + 1);
         const { posts } = await response.json();
-        setPosts(posts);
+        if (posts.length === 5) {
+          setShowLoadMorePosts(true);
+        } else setShowLoadMorePosts(false);
+
+        if (nextPostsPage > 1) {
+          setPosts((prevPosts) => [...prevPosts, ...posts]);
+        } else setPosts(posts);
       }
     } catch (error) {
       console.error(error);
@@ -106,7 +121,7 @@ const Feed = ({ id, project }) => {
   };
 
   return (
-    <div className=" sm:ml-4 max-sm:mt-4 sm:col-span-2 lg:col-span-4">
+    <div className="flex flex-col sm:ml-4 max-sm:mt-4 sm:col-span-2 lg:col-span-4">
       {session?.data.session && (
         <>
           <form
@@ -147,6 +162,16 @@ const Feed = ({ id, project }) => {
           <Post key={p.id} post={p} setPosts={setPosts} project={project} />
         ))}
       </ul>
+      {showLoadMorePosts && (
+        <button
+          onClick={() => {
+            fetchPosts();
+          }}
+          className="my-10 mx-auto text-gray-400 hover:underline"
+        >
+          Load more posts...
+        </button>
+      )}
     </div>
   );
 };

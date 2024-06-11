@@ -15,7 +15,7 @@ export async function POST(req, res) {
     if (results.error) throw results.error;
     if (requestData.postUserId !== requestData.userId) {
       let payload = { postId: requestData.postId };
-      if (requestData.projectId) {
+      if (requestData.projectId && requestData.projectTitle) {
         payload["projectId"] = requestData.projectId;
         payload["projectTitle"] = requestData.projectTitle;
       }

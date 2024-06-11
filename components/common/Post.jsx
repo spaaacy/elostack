@@ -21,10 +21,13 @@ const Post = ({ post, setPosts, project }) => {
   const [comments, setComments] = useState([]);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [imageValid, setImageValid] = useState(false);
+  const [nextCommentsPage, setNextCommentsPage] = useState(1);
+  const [showLoadMoreComments, setShowLoadMoreComments] = useState(false);
+
   const liked = post.likes.find((l) => l === session?.data.session?.user.id);
-  const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}${process.env.NEXT_PUBLIC_STORAGE_PATH}/profile-picture/${
-    post.user_id
-  }/default?${new Date().getTime()}`;
+  const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}${
+    process.env.NEXT_PUBLIC_STORAGE_PATH
+  }/profile-picture/${post.user_id}/default?${new Date().getTime()}`;
   const {
     setValue,
     register,
@@ -47,13 +50,23 @@ const Post = ({ post, setPosts, project }) => {
 
   const fetchComments = async () => {
     try {
+      setShowLoadMoreComments(false)
       const response = await fetch(`/api/comment/${post.id}`, {
         method: "POST",
-        body: JSON.stringify({ pageNumber: 1, pageSize: 10 }),
+        body: JSON.stringify({ pageNumber: nextCommentsPage }),
       });
       if (response.status === 200) {
+        setNextCommentsPage(nextCommentsPage + 1);
         const { comments } = await response.json();
-        setComments(comments);
+        if (comments.length === 5) {
+          setShowLoadMoreComments(true);
+        } else setShowLoadMoreComments(false);
+
+        if (nextCommentsPage > 1) {
+          setComments((prevComments) => [...prevComments, ...comments]);
+        } else {
+          setComments(comments);
+        }
       }
     } catch (error) {
       console.error(error);
@@ -77,7 +90,10 @@ const Post = ({ post, setPosts, project }) => {
       const response = await fetch("/api/like/create", {
         method: "POST",
         headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+          "X-Supabase-Auth":
+            session.data.session.access_token +
+            " " +
+            session.data.session.refresh_token,
         },
         body: JSON.stringify({
           userId,
@@ -115,7 +131,10 @@ const Post = ({ post, setPosts, project }) => {
       const response = await fetch("/api/like/delete", {
         method: "DELETE",
         headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+          "X-Supabase-Auth":
+            session.data.session.access_token +
+            " " +
+            session.data.session.refresh_token,
         },
         body: JSON.stringify({
           userId,
@@ -138,10 +157,25 @@ const Post = ({ post, setPosts, project }) => {
     if (!userId) return;
     try {
       const commentId = uuidv4();
+      setValue("comment", "");
+      setComments((prevComments) => [
+        {
+          id: commentId,
+          comment: data.comment,
+          user_id: userId,
+          post_id: post.id,
+          username: profile.username,
+          created_at: new Date().toISOString(),
+        },
+        ...prevComments,
+      ]);
       const response = await fetch("/api/comment/create", {
         method: "POST",
         headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+          "X-Supabase-Auth":
+            session.data.session.access_token +
+            " " +
+            session.data.session.refresh_token,
         },
         body: JSON.stringify({
           comment: data.comment,
@@ -153,20 +187,7 @@ const Post = ({ post, setPosts, project }) => {
           projectTitle: project ? project.title : null,
         }),
       });
-      if (response.status === 201) {
-        setValue("comment", "");
-        setComments((prevComments) => [
-          {
-            id: commentId,
-            comment: data.comment,
-            user_id: userId,
-            post_id: post.id,
-            username: profile.username,
-            created_at: new Date().toISOString(),
-          },
-          ...prevComments,
-        ]);
-      } else {
+      if (response.status !== 201) {
         const { error } = await response.json();
         throw error;
       }
@@ -195,7 +216,9 @@ const Post = ({ post, setPosts, project }) => {
           height={36}
         />
         <p className="font-bold">{post.username}</p>
-        <p className="ml-auto font-light text-xs">{formatTime(post.created_at, true)}</p>
+        <p className="ml-auto font-light text-xs">
+          {formatTime(post.created_at, true)}
+        </p>
       </div>
       <p className="break-words">{post.content}</p>
       <div className="text-neutral-600 dark:text-neutral-200 flex items-center gap-4 text-sm">
@@ -206,7 +229,11 @@ const Post = ({ post, setPosts, project }) => {
             className="items-center flex"
           >
             {liked ? "Liked " : "Like "}
-            {liked ? <BiSolidLike className="ml-2 inline" /> : <BiLike className="ml-2 inline" />}
+            {liked ? (
+              <BiSolidLike className="ml-2 inline" />
+            ) : (
+              <BiLike className="ml-2 inline" />
+            )}
           </button>
         )}
         <p className="font-light text-xs ml-auto">{`${post.likes.length} Likes`}</p>
@@ -218,15 +245,31 @@ const Post = ({ post, setPosts, project }) => {
             <div className="flex flex-col gap-2">
               <p className="text-sm font-semibold">Comments</p>
               <hr className="border-0 h-[1px] bg-white dark:bg-neutral-500 my-1" />
+
               {comments.map((c, i) => (
                 <Comment key={i} comment={c} />
               ))}
             </div>
           )}
+          {showLoadMoreComments && (
+            <button
+              onClick={() => {
+                fetchComments();
+              }}
+              className=" mx-auto text-gray-400 hover:underline"
+            >
+              Load more comments...
+            </button>
+          )}
           {session?.data.session && (
-            <form onSubmit={handleSubmit(createComment)} className="flex flex-col gap-2">
+            <form
+              onSubmit={handleSubmit(createComment)}
+              className="flex flex-col gap-2"
+            >
               <textarea
-                {...register("comment", { required: "Comment cannot be empty" })}
+                {...register("comment", {
+                  required: "Comment cannot be empty",
+                })}
                 id="scrollableDiv"
                 placeholder="Share your thoughts..."
                 className="p-2 w-full bg-gray-white rounded-full text-xs dark:bg-backgrounddark dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none"

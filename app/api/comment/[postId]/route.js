@@ -4,11 +4,11 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req, res) {
   try {
     const { postId } = res.params;
-    const { pageNumber, pageSize } = await req.json();
+    const { pageNumber } = await req.json();
     const { data, error } = await supabase.rpc("get_comments", {
       p_post_id: postId,
       p_page_number: pageNumber,
-      p_page_size: pageSize,
+      p_page_size: 5,
     });
     if (error) throw error;
     return NextResponse.json({ comments: data }, { status: 200 });

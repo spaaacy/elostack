@@ -101,7 +101,6 @@ const AccountSettings = () => {
           </div>
         </main>
       )}
-      <Footer />
       <Toaster />
     </div>
   );

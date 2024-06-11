@@ -242,7 +242,6 @@ const Projects = () => {
           </ul>
         </main>
       )}
-      <Footer />
       {showModal && (
         <ProjectModal
           banned={memberList ? memberList.some((m) => m.banned && modalProject.id === m.project_id) : false}
