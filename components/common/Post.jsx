@@ -12,6 +12,8 @@ import { FaRegComment } from "react-icons/fa";
 import { FaComment } from "react-icons/fa";
 import { v4 as uuidv4 } from "uuid";
 import Comment from "./Comment";
+import { formatDuration } from "@/utils/formatDuration";
+import { formatTime } from "@/utils/formatTime";
 
 const Post = ({ post, setPosts, project }) => {
   const { profile, session } = useContext(UserContext);
@@ -174,14 +176,9 @@ const Post = ({ post, setPosts, project }) => {
           height={36}
         />
         <p className="font-bold">{post.username}</p>
-        {/* {post.likes.length > 0 && (
-          <p className="ml-auto font-light text-xs">
-            {post.likes.map((like, i) => `${like}${i + 1 === post.likes.length ? " " : ", "}`)}
-            {"liked"}
-          </p>
-        )} */}
+        <p className="ml-auto font-light">{formatTime(post.created_at, true)}</p>
       </div>
-      {post.content}
+      <p className="break-words">{post.content}</p>
       <div className="text-neutral-600 dark:text-neutral-200 flex items-center gap-4 text-sm">
         {session?.data.session && (
           <button

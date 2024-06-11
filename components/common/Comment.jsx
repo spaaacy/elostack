@@ -1,5 +1,6 @@
 "use client";
 
+import { formatTime } from "@/utils/formatTime";
 import imageExists from "@/utils/imageExists";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -25,8 +26,9 @@ const Comment = ({ comment }) => {
           height={28}
         />
         <p className="font-medium">{`${comment.username}`}</p>
+        <p className="ml-auto text-xs font-light">{formatTime(comment.created_at, true)}</p>
       </div>
-      <p className="text-sm">{comment.comment}</p>
+      <p className="text-sm break-words">{comment.comment}</p>
     </>
   );
 };

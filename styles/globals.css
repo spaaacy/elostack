@@ -81,18 +81,18 @@ input[type="number"] {
 /* Scrollable Div */
 /* width */
 #scrollableDiv::-webkit-scrollbar {
-  width: 10px;
+  width: 5px;
 }
 /* Track */
 #scrollableDiv::-webkit-scrollbar-track {
-  background: #111827;
+  background: transparent;
 }
 /* Handle */
 #scrollableDiv::-webkit-scrollbar-thumb {
-  background: #ff4500;
-  border-radius: 5px;
+  background: #c9c9c97d;
+  /* border-radius: 5px; */
 }
 /* Handle on hover */
 #scrollableDiv::-webkit-scrollbar-thumb:hover {
-  background: #cc3600;
+  background: #c9c9c9ff;
 }
