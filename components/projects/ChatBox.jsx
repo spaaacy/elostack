@@ -243,7 +243,7 @@ const ChatBox = ({ session, isLeader, project, id, members }) => {
       </div>
       {showChatBox && (
         <>
-          <hr className="h-[1px] bg-neutral-500 dark:bg-neutral-600 dark:border-0" />
+          <hr className="h-[0.5px] my-2 bg-gray-400 scale-y-50" />
           {isLeader && (
             <div className="flex items-center w-full gap-2 mb-2 p-2">
               <button
