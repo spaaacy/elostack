@@ -15,8 +15,7 @@ export async function PATCH(req, res) {
     if (results.error) throw results.error;
     results = await supabase.from("notification").insert({
       user_id: userId,
-      project_id: projectId,
-      payload: { userId, accepted: false, projectTitle },
+      payload: { userId, accepted: false, projectTitle, projectId },
       type: "request-response",
     });
     if (results.error) throw results.error;

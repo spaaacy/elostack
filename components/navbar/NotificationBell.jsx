@@ -43,11 +43,10 @@ const NotificationBell = ({ notifications, setNotifications }) => {
         body: JSON.stringify({ notificationId: notification.id }),
       });
       if (response.status !== 200) {
-        console.log("Not 200");
         const { error } = await response.json();
         throw error;
-      } else if (redirect === true && notification.project_id) {
-        if (notification.payload?.accepted !== false) router.push(`/projects/${notification.project_id}`);
+      } else if (redirect === true && notification.payload.projectId) {
+        if (notification.payload?.accepted !== false) router.push(`/projects/${notification.payload.projectId}`);
       }
     } catch (error) {
       console.error(error);
@@ -69,7 +68,7 @@ const NotificationBell = ({ notifications, setNotifications }) => {
           className="overflow-y-auto max-h-96 absolute top-8 right-0 bg-gray-200 rounded border border-gray-400 py-2 text-xs z-50 w-56  dark:bg-backgrounddark dark:text-gray-300"
         >
           {notifications?.length > 0 ? (
-            chat.map((n, i) => (
+            notifications.map((n, i) => (
               <div
                 key={i}
                 className="flex justify-between items-center hover:bg-gray-200 dark:hover:bg-neutral-800 w-full py-2 px-2 relative"

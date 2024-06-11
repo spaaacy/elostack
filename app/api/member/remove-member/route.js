@@ -13,8 +13,7 @@ export async function DELETE(req, res) {
     const { userId, projectId, projectTitle } = await req.json();
     let results = await supabase.from("notification").insert({
       user_id: userId,
-      project_id: projectId,
-      payload: { projectTitle },
+      payload: { projectTitle, projectId },
       type: "member-remove",
     });
     if (results.error) throw results.error;

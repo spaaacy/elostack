@@ -4,7 +4,6 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req, res) {
   try {
     const { ideaPrompt } = await req.json();
-    console.log(ideaPrompt);
     const prompt = `Generate an idea for a software project based on this entry:
 ${ideaPrompt}
 
@@ -41,7 +40,6 @@ durationType can only be "week" or "day" and technologies must be an array. team
         const result = await response.json();
         const rawString = result.candidates[0].content.parts[0].text;
         const cleanedString = rawString.replace(/```json/, "").replace(/```/, "");
-        console.log(cleanedString);
         idea = JSON.parse(cleanedString);
       } catch (error) {
         console.error(error);

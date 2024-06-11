@@ -56,7 +56,7 @@ const Page = () => {
     if (authData.user && authData.session) {
       location.reload();
     } else {
-      console.log(error);
+      console.error(error);
     }
   };
 

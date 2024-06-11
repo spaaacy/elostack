@@ -17,8 +17,7 @@ export async function PATCH(req, res) {
     if (results.error) throw results.error;
     results = await supabase.rpc("create_notifications", {
       p_user_id: userId,
-      p_project_id: member.project_id,
-      p_payload: { userId: member.user_id, accepted: true, projectTitle },
+      p_payload: { userId: member.user_id, accepted: true, projectTitle, projectId: member.project_id },
       p_type: "request-response",
     });
     if (results.error) throw results.error;
