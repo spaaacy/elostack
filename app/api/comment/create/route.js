@@ -6,29 +6,35 @@ export async function POST(req, res) {
     // Authentication
     const access_token = req.headers.get("x-supabase-auth").split(" ")[0];
     const refresh_token = req.headers.get("x-supabase-auth").split(" ")[1];
-    if (!access_token || !refresh_token)
-      throw Error("You must be authorized to do this action!");
+    if (!access_token || !refresh_token) throw Error("You must be authorized to do this action!");
     const auth = await supabase.auth.setSession({
       access_token,
       refresh_token,
     });
     if (auth.error) throw auth.error;
 
-    const { userId, postId, comment, commentId } = await req.json();
-    const { error } = await supabase
-      .from("comment")
-      .insert({
-        id: commentId,
-        post_id: postId,
-        user_id: userId,
-        comment,
+    const requestData = await req.json();
+    let results = await supabase.from("comment").insert({
+      id: requestData.commentId,
+      post_id: requestData.postId,
+      user_id: requestData.userId,
+      comment: requestData.comment,
+    });
+    if (results.error) throw results.error;
+    if (requestData.postUserId !== requestData.userId) {
+      let payload = { postId: requestData.postId };
+      if (requestData.projectId) {
+        payload["projectId"] = requestData.projectId;
+        payload["projectTitle"] = requestData.projectTitle;
+      }
+      results = await supabase.from("notification").insert({
+        user_id: requestData.postUserId,
+        payload,
+        type: "comment",
       });
-    if (error) throw error;
-
-    return NextResponse.json(
-      { message: "Post created successfully!" },
-      { status: 201 }
-    );
+      if (results.error) throw results.error;
+    }
+    return NextResponse.json({ message: "Post created successfully!" }, { status: 201 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error }, { status: 500 });

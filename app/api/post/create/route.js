@@ -13,16 +13,21 @@ export async function POST(req, res) {
     });
     if (auth.error) throw auth.error;
 
-    const { userId, projectId, content, postId, isPublic } = await req.json();
-    const { error } = await supabase.from("post").insert({
+    const { userId, projectId, content, postId, isPublic, projectTitle } = await req.json();
+    let results = await supabase.from("post").insert({
       id: postId,
       user_id: userId,
       project_id: projectId,
       content,
       public: isPublic,
     });
-    if (error) throw error;
-
+    if (results.error) throw results.error;
+    results = await supabase.rpc("create_notifications", {
+      p_user_id: userId,
+      p_payload: { projectTitle, projectId },
+      p_type: "post",
+    });
+    if (results.error) throw results.error;
     return NextResponse.json({ message: "Post created successfully!" }, { status: 201 });
   } catch (error) {
     console.error(error);

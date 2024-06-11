@@ -148,12 +148,14 @@ const Post = ({ post, setPosts, project }) => {
           userId,
           postId: post.id,
           commentId,
+          postUserId: post.user_id,
+          projectId: project ? project.id : null,
+          projectTitle: project ? project.title : null,
         }),
       });
       if (response.status === 201) {
         setValue("comment", "");
         setComments((prevComments) => [
-          ...prevComments,
           {
             id: commentId,
             comment: data.comment,
@@ -162,6 +164,7 @@ const Post = ({ post, setPosts, project }) => {
             username: profile.username,
             created_at: new Date().toISOString(),
           },
+          ...prevComments,
         ]);
       } else {
         const { error } = await response.json();
@@ -226,7 +229,7 @@ const Post = ({ post, setPosts, project }) => {
                 {...register("comment", { required: "Comment cannot be empty" })}
                 id="scrollableDiv"
                 placeholder="Share your thoughts..."
-                className="p-2 w-full bg-gray-white rounded-full text-xs resize-none dark:bg-backgrounddark dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
+                className="p-2 w-full bg-gray-white rounded-full text-xs dark:bg-backgrounddark dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
                 rows={1}
               />
               <button

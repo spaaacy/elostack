@@ -48,6 +48,7 @@ const Feed = ({ id, project }) => {
           projectId: id ? id : null,
           postId: postId,
           isPublic: project ? publicPost : true,
+          projectTitle: project.title,
         }),
       });
       if (response.status === 201) {

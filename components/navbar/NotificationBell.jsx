@@ -96,6 +96,12 @@ const NotificationBell = ({ notifications, setNotifications }) => {
                     ? `Your post in ${n.payload?.projectTitle} received a like!`
                     : n.type === "like" && !n.payload?.projectTitle
                     ? "Your post in received a like!"
+                    : n.type === "comment" && !n.payload?.projectTitle
+                    ? "Your post received a comment!"
+                    : n.type === "comment" && n.payload?.projectTitle
+                    ? `Your post in ${n.payload?.projectTitle} received a comment!`
+                    : n.type === "post"
+                    ? `New post in ${n.payload?.projectTitle}`
                     : ""}
                 </button>
                 <button type="button" onClick={() => handleNotificationClick(n, false)}>

@@ -14,8 +14,11 @@ export async function POST(req, res) {
     let results = await supabase.from("like").insert({ user_id: requestData.userId, post_id: requestData.postId });
     if (results.error) throw results.error;
     if (requestData.postUserId !== requestData.userId) {
-      let payload = { projectId: requestData.projectId };
-      if (requestData.projectTitle) payload["projectTitle"] = requestData.projectTitle;
+      let payload = { postId: requestData.postId };
+      if (requestData.projectId) {
+        payload["projectId"] = requestData.projectId;
+        payload["projectTitle"] = requestData.projectTitle;
+      }
       results = await supabase.from("notification").insert({
         user_id: requestData.postUserId,
         payload,
