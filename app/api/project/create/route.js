@@ -1,6 +1,5 @@
 import { supabase } from "@/utils/supabase";
 import { NextRequest, NextResponse } from "next/server";
-import { v4 as uuidv4 } from "uuid";
 
 export async function POST(req, res) {
   try {
@@ -12,12 +11,10 @@ export async function POST(req, res) {
     if (auth.error) throw auth.error;
 
     const project = await req.json();
-    const projectId = uuidv4();
-
-    let results = await supabase.from("project").insert({ ...project, id: projectId });
+    let results = await supabase.from("project").insert(project);
     if (results.error) throw results.error;
 
-    results = await supabase.from("member").insert({ user_id: project.leader, project_id: projectId });
+    results = await supabase.from("member").insert({ user_id: project.leader, project_id: project.id });
     if (results.error) throw results.error;
 
     return NextResponse.json({ message: "Project created successfully!" }, { status: 201 });

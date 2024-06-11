@@ -4,13 +4,14 @@ import toast from "react-hot-toast";
 import { v4 as uuidv4 } from "uuid";
 import Post from "./Post";
 import { UserContext } from "@/context/UserContext";
-import Loader from "./Loader";
-import NotificationBell from "../navbar/NotificationBell";
+import { MdOutlinePublic } from "react-icons/md";
+import { MdOutlinePublicOff } from "react-icons/md";
 
 const Feed = ({ id, project }) => {
   const { profile, session } = useContext(UserContext);
   const [posts, setPosts] = useState([]);
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [publicPost, setPublicPost] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -46,13 +47,14 @@ const Feed = ({ id, project }) => {
           userId,
           projectId: id ? id : null,
           postId: postId,
-          isPublic: project ? false : true,
+          isPublic: project ? publicPost : true,
         }),
       });
       if (response.status === 201) {
         setValue("content", "");
         setPosts((prevPosts) => [
           {
+            created_at: new Date().toISOString(),
             username: profile.username,
             content: data.content,
             user_id: userId,
@@ -110,7 +112,18 @@ const Feed = ({ id, project }) => {
             onSubmit={handleSubmit(createPost)}
             className="rounded-xl bg-neutral-50 px-3 py-2 dark:bg-backgrounddark dark:border dark:border-gray-400 flex flex-col gap-2"
           >
-            <p className="text-base font-semibold ">Post an update</p>
+            <div className="flex items-center">
+              <p className="text-base font-semibold ">Post an update</p>
+              {project && (
+                <button
+                  className="ml-auto flex items-center gap-2 rounded-full px-2 py-1 bg-sky-600 text-white text-sm"
+                  onClick={() => setPublicPost(!publicPost)}
+                >
+                  {publicPost ? "Public" : "Private"}
+                  {publicPost ? <MdOutlinePublic /> : <MdOutlinePublicOff />}
+                </button>
+              )}
+            </div>
             <textarea
               {...register("content", { required: "Content cannot be empty" })}
               id="scrollableDiv"

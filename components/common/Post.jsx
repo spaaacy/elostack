@@ -14,6 +14,7 @@ import { v4 as uuidv4 } from "uuid";
 import Comment from "./Comment";
 import { formatDuration } from "@/utils/formatDuration";
 import { formatTime } from "@/utils/formatTime";
+import Link from "next/link";
 
 const Post = ({ post, setPosts, project }) => {
   const { profile, session } = useContext(UserContext);
@@ -153,7 +154,14 @@ const Post = ({ post, setPosts, project }) => {
         setValue("comment", "");
         setComments((prevComments) => [
           ...prevComments,
-          { id: commentId, comment: data.comment, user_id: userId, post_id: post.id, username: profile.username },
+          {
+            id: commentId,
+            comment: data.comment,
+            user_id: userId,
+            post_id: post.id,
+            username: profile.username,
+            created_at: new Date().toISOString(),
+          },
         ]);
       } else {
         const { error } = await response.json();
@@ -167,6 +175,14 @@ const Post = ({ post, setPosts, project }) => {
 
   return (
     <div className=" text-sm rounded-xl bg-neutral-50 px-3 py-3 dark:bg-backgrounddark dark:border dark:border-gray-400 flex flex-col gap-2">
+      {post.project_id && !project && (
+        <Link
+          className="text-xs font-light text-neutral-600 hover:underline"
+          href={`/projects?id=${[post.project_id]}`}
+        >
+          {post.project_title}
+        </Link>
+      )}
       <div className="flex items-center gap-2">
         <Image
           src={imageValid ? imageUrl : "/default_user.png"}
@@ -176,7 +192,7 @@ const Post = ({ post, setPosts, project }) => {
           height={36}
         />
         <p className="font-bold">{post.username}</p>
-        <p className="ml-auto font-light">{formatTime(post.created_at, true)}</p>
+        <p className="ml-auto font-light text-xs">{formatTime(post.created_at, true)}</p>
       </div>
       <p className="break-words">{post.content}</p>
       <div className="text-neutral-600 dark:text-neutral-200 flex items-center gap-4 text-sm">

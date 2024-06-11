@@ -47,6 +47,7 @@ const ProjectView = () => {
       });
       if (response.status === 200) {
         const { project } = await response.json();
+        if (project.deleted) router.push("/projects");
         setProject(project);
         if (project.leader === session.data.session.user.id) {
           setIsLeader(true);
