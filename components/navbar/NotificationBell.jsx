@@ -47,7 +47,7 @@ const NotificationBell = ({ notifications, setNotifications }) => {
         const { error } = await response.json();
         throw error;
       } else if (redirect === true && notification.project_id) {
-        if (notification.payload.accepted !== false) router.push(`/projects/${notification.project_id}`);
+        if (notification.payload?.accepted !== false) router.push(`/projects/${notification.project_id}`);
       }
     } catch (error) {
       console.error(error);
@@ -75,26 +75,26 @@ const NotificationBell = ({ notifications, setNotifications }) => {
               >
                 <button type="button" className={"text-left"} onClick={() => handleNotificationClick(n, true)}>
                   {n.type === "chat"
-                    ? `New messages in ${n.payload.projectTitle}`
-                    : n.type === "request-response" && n.payload.accepted === true
+                    ? `New messages in ${n.payload?.projectTitle}`
+                    : n.type === "request-response" && n.payload?.accepted === true
                     ? `${
-                        n.payload.userId === session.data.session.user.id
-                          ? `You request was accepted into ${n.payload.projectTitle}`
-                          : `A new member has joined ${n.payload.projectTitle}`
+                        n.payload?.userId === session.data.session.user.id
+                          ? `You request was accepted into ${n.payload?.projectTitle}`
+                          : `A new member has joined ${n.payload?.projectTitle}`
                       }`
                     : n.type === "request-response" &&
-                      n.payload.accepted === false &&
-                      n.payload.userId === session.data.session.user.id
-                    ? `Your request into ${n.payload.projectTitle} was rejected`
+                      n.payload?.accepted === false &&
+                      n.payload?.userId === session.data.session.user.id
+                    ? `Your request into ${n.payload?.projectTitle} was rejected`
                     : n.type === "request-created"
-                    ? `You have a new request to join ${n.payload.projectTitle}`
+                    ? `You have a new request to join ${n.payload?.projectTitle}`
                     : n.type === "member-remove"
-                    ? `You were removed from ${n.payload.projectTitle}`
+                    ? `You were removed from ${n.payload?.projectTitle}`
                     : n.type === "member-ban"
-                    ? `You were banned from ${n.payload.projectTitle}`
-                    : n.type === "like" && n.payload.projectTitle
-                    ? `Your post in ${n.payload.projectTitle} received a like!`
-                    : n.type === "like" && !n.payload.projectTitle
+                    ? `You were banned from ${n.payload?.projectTitle}`
+                    : n.type === "like" && n.payload?.projectTitle
+                    ? `Your post in ${n.payload?.projectTitle} received a like!`
+                    : n.type === "like" && !n.payload?.projectTitle
                     ? "Your post in received a like!"
                     : ""}
                 </button>
