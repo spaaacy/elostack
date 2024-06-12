@@ -234,7 +234,7 @@ const Post = ({ post, setPosts, project }) => {
           <button
             type="button"
             onClick={liked ? () => unlikePost(post.id) : () => likePost(post)}
-            className={`items-center flex ${liked ? "text-sky-500" : ""}`}
+            className={`items-center flex ${liked ? "text-sky-500 dark:text-sky-600" : ""}`}
           >
             {liked ? "Liked " : "Like "}
             {liked ? <BiSolidLike className="ml-2 inline" /> : <BiLike className="ml-2 inline" />}

@@ -32,6 +32,7 @@ const CreatePost = ({ setPosts, project }) => {
     const newPost = {
       created_at: new Date().toISOString(),
       username: profile.username,
+      image_id: profile.image_id,
       content: data.content,
       user_id: userId,
       projectId: project ? project.id : null,
@@ -147,7 +148,7 @@ const CreatePost = ({ setPosts, project }) => {
         )}
         <div className="flex items-center">
           <div onClick={() => fileInputRef.current.click()} className="hover:cursor-pointer">
-            <FaRegImage className="text-gray-900 hover:text-gray-700" />
+            <FaRegImage className="text-gray-900 hover:text-gray-700 dark:text-neutral-300 dark:hover:text-neutral-200" />
             <input type="file" ref={fileInputRef} accept="image/*" className="hidden" onChange={handleFileChange} />
           </div>
           <button
