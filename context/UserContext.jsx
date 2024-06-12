@@ -41,9 +41,7 @@ export const UserProvider = ({ children }) => {
       });
       if (response.status === 200) {
         const { profile } = await response.json();
-        const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}${
-          process.env.NEXT_PUBLIC_STORAGE_PATH
-        }/profile-picture/${userId}/default?${new Date().getTime()}`;
+        const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}${process.env.NEXT_PUBLIC_STORAGE_PATH}/profile-picture/${userId}/${profile.image_id}`;
         const imageValid = imageExists(imageUrl);
         setProfile({
           ...profile,

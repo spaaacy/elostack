@@ -108,7 +108,11 @@ const NavBar = () => {
   };
 
   return (
-    <nav className={`${isHomePage && !session?.data.session ? "text-white" : ""} min-h-16`}>
+    <nav
+      className={`${
+        isHomePage && !session?.data.session ? "text-white" : ""
+      } min-h-16 sticky top-0 bg-backgroundlight  dark:bg-backgrounddark border-b border-b-1 border-gray-400 drop-shadow`}
+    >
       <div
         className={`px-8 lg:px-16 py-2 flex items-center justify-start ${
           isHomePage && !session?.data.session ? "max-lg:bg-black" : ""

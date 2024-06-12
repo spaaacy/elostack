@@ -6,9 +6,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 const Comment = ({ comment }) => {
-  const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}${process.env.NEXT_PUBLIC_STORAGE_PATH}/profile-picture/${
-    comment.user_id
-  }/default?${new Date().getTime()}`;
+  const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}${process.env.NEXT_PUBLIC_STORAGE_PATH}/profile-picture/${comment.user_id}/${comment.image_id}`;
   const [imageValid, setImageValid] = useState(false);
 
   useEffect(() => {

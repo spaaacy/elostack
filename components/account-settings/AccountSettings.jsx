@@ -36,12 +36,14 @@ const AccountSettings = () => {
 
   const uploadImage = async () => {
     const userId = session.data.session.user.id;
-    if (!userId) return;
+    if (!userId || !profile) return;
     try {
       setLoading(true);
       const formData = new FormData();
       if (avatar) formData.append("profilePicture", file);
       formData.append("userId", userId);
+      formData.append("imageId", profile.image_id);
+
       const response = await fetch("/api/profile/edit-profile", {
         method: "PATCH",
         headers: {
