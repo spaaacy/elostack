@@ -150,10 +150,10 @@ const Feed = ({ id, project }) => {
               Create
             </button>
           </form>
-          <hr className="border-0 h-[1px] bg-gray-400 my-4" />
+          <hr className="border-0 h-[1px] bg-gray-400 my-8" />
         </>
       )}
-      <ul className="flex flex-col gap-6 mt-4">
+      <ul className="flex flex-col gap-6 ">
         {posts.map((p, i) => (
           <Post key={p.id} post={p} setPosts={setPosts} project={project} />
         ))}
