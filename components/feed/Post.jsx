@@ -14,17 +14,16 @@ import Comment from "./Comment";
 import { formatDuration } from "@/utils/formatDuration";
 import { formatTime } from "@/utils/formatTime";
 import Link from "next/link";
+import UserAvatar from "../common/UserAvatar";
 
 const Post = ({ post, setPosts, project }) => {
   const { profile, session } = useContext(UserContext);
   const [comments, setComments] = useState([]);
   const [dataLoaded, setDataLoaded] = useState(false);
-  const [imageValid, setImageValid] = useState(false);
   const [nextCommentsPage, setNextCommentsPage] = useState(1);
   const [showLoadMoreComments, setShowLoadMoreComments] = useState(false);
 
   const liked = post.likes.find((l) => l === session?.data.session?.user.id);
-  console.log(post);
   const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}${process.env.NEXT_PUBLIC_STORAGE_PATH}/profile-picture/${post.user_id}/${post.image_id}`;
   const {
     setValue,
@@ -34,8 +33,6 @@ const Post = ({ post, setPosts, project }) => {
   } = useForm();
 
   useEffect(() => {
-    setImageValid(imageExists(imageUrl));
-
     const loadData = async () => {
       if (!dataLoaded) {
         setDataLoaded(true);
@@ -47,6 +44,7 @@ const Post = ({ post, setPosts, project }) => {
   }, []);
 
   const fetchComments = async () => {
+    if (post.id === "0") return;
     try {
       setShowLoadMoreComments(false);
       const response = await fetch(`/api/comment/${post.id}`, {
@@ -201,13 +199,17 @@ const Post = ({ post, setPosts, project }) => {
         </Link>
       )}
       <div className="flex items-center gap-2">
-        <Image
-          src={imageValid ? imageUrl : "/default_user.png"}
-          alt="profile picture"
-          className="object-cover rounded-full w-9 h-9"
-          width={36}
-          height={36}
-        />
+        {post.image_id ? (
+          <Image
+            src={imageUrl}
+            alt="profile picture"
+            className="object-cover rounded-full w-9 h-9"
+            width={36}
+            height={36}
+          />
+        ) : (
+          <UserAvatar size={36} username={post.username} />
+        )}
         <p className="font-bold">{post.username}</p>
         <p className="ml-auto font-light text-xs">{formatTime(post.created_at, true)}</p>
       </div>
@@ -217,7 +219,7 @@ const Post = ({ post, setPosts, project }) => {
           <button
             type="button"
             onClick={liked ? () => unlikePost(post.id) : () => likePost(post)}
-            className="items-center flex"
+            className={`items-center flex ${liked ? "text-sky-500" : ""}`}
           >
             {liked ? "Liked " : "Like "}
             {liked ? <BiSolidLike className="ml-2 inline" /> : <BiLike className="ml-2 inline" />}
