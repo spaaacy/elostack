@@ -19,8 +19,11 @@ export async function POST(req, res) {
       if (results.error) throw results.error;
 
       let imageIds = [];
-      results.data.forEach((image) => imageIds.push(image.name));
+      for (let image of results.data) {
+        imageIds.push(image.name)
+      }
       posts = posts.map((mapPost) => (post === mapPost ? { ...mapPost, imageIds } : mapPost));
+      console.log(imageIds)
     }
 
     return NextResponse.json({ posts }, { status: 200 });
