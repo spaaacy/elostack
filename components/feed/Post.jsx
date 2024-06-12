@@ -236,7 +236,7 @@ const Post = ({ post, setPosts, project }) => {
           {post.image_id.map((imageId, i) => {
             const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}${process.env.NEXT_PUBLIC_STORAGE_PATH}/post-image/${imageId}`;
             return (
-              <Link target="_blank" href={imageUrl}>
+              <Link target="_blank" href={imageUrl} className="mx-auto">
                 <Image
                   key={imageId}
                   src={imageUrl}

@@ -137,12 +137,7 @@ const CreatePost = ({ setPosts, project }) => {
             {imagePreviews.map((image, i) => (
               <div className="relative">
                 <Image key={i} alt={`image_${i}`} src={image} width={100} height={100} className="rounded" />
-                <button
-                  className="absolute -bottom-2 -right-2 p-[1px] bg-white rounded-full"
-                  onClick={() => removeImage(i)}
-                >
-                  <IoIosRemoveCircle className="text-primary" />
-                </button>
+                  <IoIosRemoveCircle onClick={() => removeImage(i)} className="hover:cursor-pointer text-primary absolute -bottom-2 -right-2 p-[1px] bg-white dark:bg-backgrounddark rounded-full" />
               </div>
             ))}
           </ul>

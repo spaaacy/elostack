@@ -230,7 +230,7 @@ const Projects = () => {
                       </p>
                       <div className="relative group">
                         <FaCircleInfo className="text-sm text-primary" />
-                        <p className="text-gray-200 right-0 dark:shadow shadow-neutral-800 transition-opacity opacity-0 group-hover:opacity-100 absolute bottom-6 bg-primary w-80 rounded-xl px-2 py-1  drop-shadow">
+                        <p className="text-gray-200 right-0 dark:shadow shadow-neutral-800 transition-opacity opacity-0 group-hover:opacity-100 absolute bottom-6 bg-primary w-80 rounded-xl px-2 py-1  drop-shadow ">
                           {p.technologies}
                         </p>
                       </div>

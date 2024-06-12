@@ -426,12 +426,12 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
                 .map((m) => {
                   return (
                     <button
-                      key={m.user.user_id}
+                      key={m.user_id}
                       type="button"
                       onClick={() => setConfirmChangeLeader(m.user_id)}
                       className="w-full hover:bg-gray-200 dark:hover:bg-neutral-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
                     >
-                      {m.user.username}
+                      {m.profile.username}
                     </button>
                   );
                 })}
@@ -519,12 +519,12 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
                 .map((m) => {
                   return (
                     <button
-                      key={m.user.user_id}
+                      key={m.user_id}
                       type="button"
                       onClick={() => setConfirmBanMember(m.user_id)}
                       className="w-full hover:bg-gray-200 dark:hover:bg-neutral-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
                     >
-                      {m.user.username}
+                      {m.profile.username}
                     </button>
                   );
                 })}
@@ -575,12 +575,12 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
                 .map((m) => {
                   return (
                     <button
-                      key={m.user.user_id}
+                      key={m.user_id}
                       type="button"
                       onClick={() => setConfirmRemoveMember(m.user_id)}
                       className="w-full hover:bg-gray-200 dark:hover:bg-neutral-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
                     >
-                      {m.user.username}
+                      {m.profile.username}
                     </button>
                   );
                 })}
