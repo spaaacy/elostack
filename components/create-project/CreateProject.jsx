@@ -1,7 +1,6 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import Footer from "../common/Footer";
 import NavBar from "../navbar/NavBar";
 import { useContext, useEffect, useRef, useState } from "react";
 import { IoAddCircleSharp } from "react-icons/io5";
@@ -11,7 +10,6 @@ import { useRouter } from "next/navigation";
 import Loader from "../common/Loader";
 import { BsStars } from "react-icons/bs";
 import Link from "next/link";
-import { v4 as uuidv4 } from "uuid";
 
 const CreateProject = () => {
   const { session } = useContext(UserContext);
@@ -44,14 +42,12 @@ const CreateProject = () => {
     if (!session.data.session) return;
     try {
       setLoading(true);
-      const projectId = uuidv4();
       const response = await fetch("/api/project/create", {
         method: "POST",
         headers: {
           "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
         },
         body: JSON.stringify({
-          id: projectId,
           title: data.title,
           description: data.description,
           technologies: technologies.join(", "),
@@ -65,6 +61,7 @@ const CreateProject = () => {
         }),
       });
       if (response.status === 201) {
+        const { projectId } = await response.json();
         router.push(`/projects/${projectId}`);
       } else {
         const { error } = await response.json();

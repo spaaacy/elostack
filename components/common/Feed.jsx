@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { v4 as uuidv4 } from "uuid";
 import Post from "./Post";
 import { UserContext } from "@/context/UserContext";
 import { MdOutlinePublic } from "react-icons/md";
@@ -37,45 +36,45 @@ const Feed = ({ id, project }) => {
     e?.preventDefault();
     const userId = session?.data.session.user.id;
     if (!userId) return;
+
+    setValue("content", "");
+    const newPost = {
+      created_at: new Date().toISOString(),
+      username: profile.username,
+      content: data.content,
+      user_id: userId,
+      projectId: id ? id : null,
+      likes: [],
+      comment: [],
+      id: "0",
+    };
+    setPosts((prevPosts) => [newPost, ...prevPosts]);
+
     try {
-      const postId = uuidv4();
       const response = await fetch("/api/post/create", {
         method: "POST",
         headers: {
-          "X-Supabase-Auth":
-            session.data.session.access_token +
-            " " +
-            session.data.session.refresh_token,
+          "Content-Type": "application/json",
+          "X-Supabase-Auth": `${session.data.session.access_token} ${session.data.session.refresh_token}`,
         },
         body: JSON.stringify({
           content: data.content,
           userId,
           projectId: id ? id : null,
-          postId: postId,
           isPublic: project ? publicPost : true,
           projectTitle: project ? project.title : null,
         }),
       });
+
       if (response.status === 201) {
-        setValue("content", "");
-        setPosts((prevPosts) => [
-          {
-            created_at: new Date().toISOString(),
-            username: profile.username,
-            content: data.content,
-            user_id: userId,
-            projectId: id ? id : null,
-            id: postId,
-            likes: [],
-            comment: [],
-          },
-          ...prevPosts,
-        ]);
+        const { postId } = await response.json();
+        setPosts((prevPosts) => prevPosts.map((post) => (post.id === "0" ? { ...post, id: postId } : post)));
       } else {
         const { error } = await response.json();
         throw error;
       }
     } catch (error) {
+      setPosts((prevPosts) => prevPosts.filter((post) => post.id !== "0"));
       toast.error("Oops, something went wrong...");
       console.error(error);
     }
@@ -89,10 +88,7 @@ const Feed = ({ id, project }) => {
         response = await fetch(`/api/post/${id}`, {
           method: "POST",
           headers: {
-            "X-Supabase-Auth":
-              session.data.session.access_token +
-              " " +
-              session.data.session.refresh_token,
+            "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
           },
           body: JSON.stringify({ pageNumber: nextPostsPage }),
         });

@@ -1,5 +1,6 @@
 import { supabase } from "@/utils/supabase";
 import { NextRequest, NextResponse } from "next/server";
+import { v4 as uuidv4 } from "uuid";
 
 export async function POST(req, res) {
   try {
@@ -14,8 +15,10 @@ export async function POST(req, res) {
     if (auth.error) throw auth.error;
 
     const requestData = await req.json();
+    const commentId = uuidv4();
+
     let results = await supabase.from("comment").insert({
-      id: requestData.commentId,
+      id: commentId,
       post_id: requestData.postId,
       user_id: requestData.userId,
       comment: requestData.comment,
@@ -34,7 +37,7 @@ export async function POST(req, res) {
       });
       if (results.error) throw results.error;
     }
-    return NextResponse.json({ message: "Post created successfully!" }, { status: 201 });
+    return NextResponse.json({ message: "Post created successfully!", commentId }, { status: 201 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error }, { status: 500 });
