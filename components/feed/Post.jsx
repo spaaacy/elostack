@@ -242,9 +242,9 @@ const Post = ({ post, setPosts, project }) => {
                   key={imageId}
                   src={imageUrl}
                   alt={`image_${i}`}
-                  width={150}
-                  height={150}
-                  className="rounded "
+                  width={500}
+                  height={500}
+                  className="rounded object-cover max-h-[1000px] max-w-[1000px]"
                 />
               </Link>
             );
