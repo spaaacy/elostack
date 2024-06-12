@@ -14,16 +14,30 @@ export async function POST(req, res) {
     if (auth.error) throw auth.error;
 
     const { projectId } = res.params;
-    const { pageNumber, pageSize } = await req.json();
-    const { data, error } = await supabase.rpc("fetch_posts", {
+    const { pageNumber } = await req.json();
+    let results = await supabase.rpc("fetch_posts", {
       p_page_number: pageNumber,
-      p_page_size: pageSize,
+      p_page_size: 5,
       p_project_id: projectId,
     });
-    if (error) throw error;
+    if (results.error) throw results.error;
+    let posts = results.data;
 
-    if (error) throw error;
-    return NextResponse.json({ posts: data }, { status: 200 });
+    for (let post of results.data) {
+      if (!post.images) continue;
+      const results = await supabase.storage.from("post-image").list(post.id, {
+        limit: 100,
+        offset: 0,
+        sortBy: { column: "name", order: "asc" },
+      });
+      if (results.error) throw results.error;
+
+      let imageIds = [];
+      results.data.forEach((image) => imageIds.push(image.name));
+      posts = posts.map((mapPost) => (post === mapPost ? { ...mapPost, imageIds } : mapPost));
+    }
+
+    return NextResponse.json({ posts }, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error }, { status: 500 });

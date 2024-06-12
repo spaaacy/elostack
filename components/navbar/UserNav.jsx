@@ -1,9 +1,11 @@
 "use client";
 
 import { UserContext } from "@/context/UserContext";
+import Avatar from "boring-avatars";
 import Image from "next/image";
 import Link from "next/link";
 import { useContext, useEffect, useRef, useState } from "react";
+import UserAvatar from "../common/UserAvatar";
 
 const UserNav = ({ signOut }) => {
   const { profile } = useContext(UserContext);
@@ -28,17 +30,21 @@ const UserNav = ({ signOut }) => {
 
   return (
     <>
-      <button className="rounded-full" ref={buttonRef}>
-        {profile && (
-          <Image
-            src={profile.picture ? profile.picture : "/default_user.png"}
-            alt="profile picture"
-            className="object-cover rounded-full w-9 h-9"
-            width={36}
-            height={36}
-          />
-        )}
-      </button>
+      {profile && (
+        <button className="rounded-full" ref={buttonRef}>
+          {profile?.image_id ? (
+            <Image
+              src={profile.picture}
+              alt="profile picture"
+              className="object-cover rounded-full w-9 h-9"
+              width={36}
+              height={36}
+            />
+          ) : (
+            <UserAvatar size={36} name={profile.username} />
+          )}
+        </button>
+      )}
       {showAccountDropdown && (
         <div
           ref={accountRef}

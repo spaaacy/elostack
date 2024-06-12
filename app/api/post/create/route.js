@@ -14,18 +14,36 @@ export async function POST(req, res) {
     });
     if (auth.error) throw auth.error;
 
-    const requestData = await req.json();
+    const formData = await req.formData();
+    const requestData = JSON.parse(formData.get("requestBody"));
+    const totalImages = formData.get("totalImages");
 
     const postId = uuidv4();
 
+    // Create post
     let results = await supabase.from("post").insert({
       id: postId,
       user_id: requestData.userId,
       project_id: requestData.projectId,
       content: requestData.content,
       public: requestData.isPublic,
+      images: totalImages > 0,
     });
     if (results.error) throw results.error;
+
+    // Upload images
+    let imageIds = [];
+    for (let i = 0; i < totalImages; i++) {
+      const image = formData.get(`images[${i}]`);
+      const imageId = uuidv4();
+      imageIds.push(imageId);
+      const { error } = await supabase.storage
+        .from("post-image")
+        .upload(`${postId}/${imageId}`, image, { cacheControl: 3600, upsert: true });
+      if (error) throw error;
+    }
+
+    // Create notification
     if (requestData.projectId && requestData.projectTitle) {
       results = await supabase.rpc("create_notifications", {
         p_user_id: requestData.userId,
@@ -34,7 +52,8 @@ export async function POST(req, res) {
       });
       if (results.error) throw results.error;
     }
-    return NextResponse.json({ message: "Post created successfully!", postId }, { status: 201 });
+
+    return NextResponse.json({ message: "Post created successfully!", postId, imageIds }, { status: 201 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error }, { status: 500 });

@@ -8,6 +8,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { UserContext } from "@/context/UserContext";
 import { MdEdit } from "react-icons/md";
+import UserAvatar from "../common/UserAvatar";
 
 const AccountSettings = () => {
   const { session, profile } = useContext(UserContext);
@@ -38,6 +39,12 @@ const AccountSettings = () => {
     const userId = session.data.session.user.id;
     if (!userId || !profile) return;
     try {
+      const maxSize = 5 * 1024 * 1024;
+      if (file.size > maxSize) {
+        toast.error("File cannot exceed 5 mb");
+        return;
+      }
+
       setLoading(true);
       const formData = new FormData();
       if (avatar) formData.append("profilePicture", file);
@@ -77,13 +84,17 @@ const AccountSettings = () => {
 
           <div className="mx-auto justify-center items-center flex gap-10">
             <div className="relative cursor-pointer w-24 h-24" onClick={() => fileInputRef.current.click()}>
-              <Image
-                src={avatar ? avatar : profile.picture ? profile.picture : "/default_user.png"}
-                alt="profile picture"
-                width={96}
-                height={96}
-                className="object-cover w-full h-full rounded-full"
-              />
+              {avatar || profile?.image_id ? (
+                <Image
+                  src={avatar ? avatar : profile.picture}
+                  alt="profile picture"
+                  width={96}
+                  height={96}
+                  className="object-cover w-full h-full rounded-full"
+                />
+              ) : (
+                <UserAvatar username={profile.username} size={96} />
+              )}
               <div className="absolute inset-0 bg-white opacity-0 hover:opacity-25 rounded-full transition-opacity duration-200 flex justify-center items-center">
                 <MdEdit className="text-xl text-black" />
               </div>
