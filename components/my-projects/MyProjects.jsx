@@ -20,9 +20,6 @@ const MyProjects = () => {
   const [filteredProjects, setFilteredProjects] = useState();
 
   useEffect(() => {
-    if (session && !dataLoaded) {
-    }
-
     if (session) {
       if (session.data.session) {
         if (!dataLoaded) {

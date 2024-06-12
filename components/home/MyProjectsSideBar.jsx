@@ -12,17 +12,12 @@ const MyProjectsSideBar = () => {
   const [projects, setProjects] = useState([]);
 
   useEffect(() => {
-    if (session && !dataLoaded) {
-    }
-
     if (session) {
       if (session.data.session) {
         if (!dataLoaded) {
           setDataLoaded(true);
           fetchProjects();
         }
-      } else {
-        router.push("/signin");
       }
     }
   }, [session]);
@@ -47,7 +42,7 @@ const MyProjectsSideBar = () => {
   };
 
   return (
-    <div className="hidden xl:block fixed top-[10%] w-64 2xl:w-80 rounded-r-lg py-3 bg-white dark:bg-backgrounddark drop-shadow-xl dark:border-r dark:border-y dark:border-gray-400">
+    <div className="hidden xl:block fixed top-[83px] left-0 w-64 2xl:w-80 rounded-r-lg py-3 bg-white dark:bg-backgrounddark drop-shadow-xl dark:border-r dark:border-y dark:border-gray-400">
       <p className=" pl-3 font-medium">My Projects</p>
       <hr className="h-[0.5px] my-2 bg-gray-400 scale-y-50" />
       {projects.length > 0 ? (

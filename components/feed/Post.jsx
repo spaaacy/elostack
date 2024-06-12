@@ -86,10 +86,7 @@ const Post = ({ post, setPosts, project }) => {
       const response = await fetch("/api/like/create", {
         method: "POST",
         headers: {
-          "X-Supabase-Auth":
-            session.data.session.access_token +
-            " " +
-            session.data.session.refresh_token,
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
         },
         body: JSON.stringify({
           userId,
@@ -127,10 +124,7 @@ const Post = ({ post, setPosts, project }) => {
       const response = await fetch("/api/like/delete", {
         method: "DELETE",
         headers: {
-          "X-Supabase-Auth":
-            session.data.session.access_token +
-            " " +
-            session.data.session.refresh_token,
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
         },
         body: JSON.stringify({
           userId,
@@ -168,10 +162,7 @@ const Post = ({ post, setPosts, project }) => {
       const response = await fetch("/api/comment/create", {
         method: "POST",
         headers: {
-          "X-Supabase-Auth":
-            session.data.session.access_token +
-            " " +
-            session.data.session.refresh_token,
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
         },
         body: JSON.stringify({
           comment: data.comment,
@@ -185,18 +176,14 @@ const Post = ({ post, setPosts, project }) => {
       if (response.status === 201) {
         const { commentId } = await response.json();
         setComments((prevComments) =>
-          prevComments.map((comment) =>
-            comment.id === "0" ? { ...comment, id: commentId } : comment
-          )
+          prevComments.map((comment) => (comment.id === "0" ? { ...comment, id: commentId } : comment))
         );
       } else {
         const { error } = await response.json();
         throw error;
       }
     } catch (error) {
-      setComments((prevComments) =>
-        prevComments.filter((comment) => comment.id !== "0")
-      );
+      setComments((prevComments) => prevComments.filter((comment) => comment.id !== "0"));
       toast.error("Oops, something went wrong...");
       console.error(error);
     }
@@ -225,9 +212,7 @@ const Post = ({ post, setPosts, project }) => {
           <UserAvatar size={36} username={post.username} />
         )}
         <p className="font-bold">{post.username}</p>
-        <p className="ml-auto font-light text-xs">
-          {formatTime(post.created_at, true)}
-        </p>
+        <p className="ml-auto font-light text-xs">{formatTime(post.created_at, true)}</p>
       </div>
       <p className="break-words">{post.content}</p>
 
@@ -243,7 +228,7 @@ const Post = ({ post, setPosts, project }) => {
                   alt={`image_${i}`}
                   width={500}
                   height={500}
-                  className="rounded object-cover max-h-[1000px] max-w-[1000px]"
+                  className="w-full rounded object-cover max-w-72 max-h-72  md:max-w-96 md:max-h-96 xl:max-h-[500px] xl:max-w-[500px]"
                 />
               </Link>
             );
@@ -256,16 +241,10 @@ const Post = ({ post, setPosts, project }) => {
           <button
             type="button"
             onClick={liked ? () => unlikePost(post.id) : () => likePost(post)}
-            className={`items-center flex ${
-              liked ? "text-sky-500 dark:text-sky-600" : ""
-            }`}
+            className={`items-center flex ${liked ? "text-sky-500 dark:text-sky-600" : ""}`}
           >
             {liked ? "Liked " : "Like "}
-            {liked ? (
-              <BiSolidLike className="ml-2 inline" />
-            ) : (
-              <BiLike className="ml-2 inline" />
-            )}
+            {liked ? <BiSolidLike className="ml-2 inline" /> : <BiLike className="ml-2 inline" />}
           </button>
         )}
         <p className="font-light text-xs ml-auto">{`${post.likes.length} Likes`}</p>
@@ -294,10 +273,7 @@ const Post = ({ post, setPosts, project }) => {
             </button>
           )}
           {session?.data.session && (
-            <form
-              onSubmit={handleSubmit(createComment)}
-              className="flex flex-col gap-2"
-            >
+            <form onSubmit={handleSubmit(createComment)} className="flex flex-col gap-2">
               <textarea
                 {...register("comment", {
                   required: "Comment cannot be empty",

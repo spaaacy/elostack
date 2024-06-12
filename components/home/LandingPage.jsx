@@ -81,14 +81,14 @@ const LandingPage = () => {
         </div>
       </section>
 
-      <div className=" bg-gradient-to-t to-slate-600 from-backgroundlight dark:to-slate-700 dark:from-backgrounddark relative">
+      <div className=" bg-gradient-to-t to-slate-500 from-backgroundlight dark:to-slate-800 dark:from-backgrounddark relative">
         <div className="absolute top-0 left-0 h-[200px] w-full z-60 bg-gradient-to-t from-transparent to-black"></div>
         {/* <div className="absolute bottom-0 left-0 h-1/6 w-full z-40 bg-gradient-to-b  from-transparent to-black"></div> */}
         <section ref={sectionRef} className="z-10 py-24 sm:py-32 lg:py-48 mt-32">
           <div className="flex flex-col lg:flex-row gap-20 sm:gap-32 lg:gap-44  items-center justify-center w-3/4 text-left mx-auto ">
             <div
               ref={projectRef}
-              className="p-2 flex flex-col rounded text-xs font-light tilting gradient-purple text-[#ececec] select-none max-w-96"
+              className="p-2 flex flex-col rounded text-xs font-light tilting project-card text-[#ececec] select-none max-w-96"
             >
               <div className="flex flex-col justify-start items-start">
                 <h3 className="text-base font-medium">Multiplayer Retro Gaming Hub</h3>
@@ -204,7 +204,7 @@ const LandingPage = () => {
       <section className={`px-12 text-center py-32 flex flex-col items-center justify-center ${cormorant.className} `}>
         <p className="text-2xl md:text-3xl lg:text-4xl">Have something to say? We'd love to hear it!</p>
         <Link
-                className="text-center dark:bg-black bg-neutral-100 hover:bg-black dark:hover:bg-white border-2 py-2 px-4 text-xl mt-8 hover:text-white dark:hover:text-black  dark:text-white text-black dark:border-white border-black transition duration-200 font-semibold"
+          className="text-center dark:bg-black bg-neutral-100 hover:bg-black dark:hover:bg-white border-2 py-2 px-4 text-xl mt-8 hover:text-white dark:hover:text-black  dark:text-white text-black dark:border-white border-black transition duration-200 font-semibold"
           target="_blank"
           href={"mailto:aakifmohamed@elostack.com"}
         >

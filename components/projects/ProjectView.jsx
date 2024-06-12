@@ -131,7 +131,7 @@ const ProjectView = () => {
           </div>
           <p className="font-light ">{project.status}</p>
           <hr className="border-0 h-[1px] bg-gray-400 my-4" />
-          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 max-sm:mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 max-sm:mb-12 gap-4">
             <div>
               <div className="p-2 rounded dark:border bg-gray-300 dark:bg-backgrounddark  dark:border-gray-400 flex flex-col font-light text-sm ">
                 <p className="relative">

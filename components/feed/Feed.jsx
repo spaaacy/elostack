@@ -58,7 +58,7 @@ const Feed = ({ id, project }) => {
   };
 
   return (
-    <div className="flex flex-col sm:ml-4 max-sm:mt-4 sm:col-span-2 lg:col-span-4 ">
+    <div className="flex flex-col sm:col-span-2 lg:col-span-4 ">
       {session?.data.session && <CreatePost project={project} setPosts={setPosts} />}
       <ul className="flex flex-col gap-6 ">
         {posts.map((p, i) => (
