@@ -24,7 +24,7 @@ const Post = ({ post, setPosts, project }) => {
   const [showLoadMoreComments, setShowLoadMoreComments] = useState(false);
 
   const liked = post.likes.find((l) => l === session?.data.session?.user.id);
-  const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}${process.env.NEXT_PUBLIC_STORAGE_PATH}/profile-picture/${post.user_id}/${post.image_id}`;
+  const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}${process.env.NEXT_PUBLIC_STORAGE_PATH}/profile-picture/${post.user_id}/${post.user_image_id}`;
   const {
     setValue,
     register,
@@ -159,7 +159,7 @@ const Post = ({ post, setPosts, project }) => {
       user_id: userId,
       post_id: post.id,
       username: profile.username,
-      image_id: profile.image_id,
+      user_image_id: profile.image_id,
       created_at: new Date().toISOString(),
     };
     setComments((prevComments) => [newComment, ...prevComments]);
@@ -213,7 +213,7 @@ const Post = ({ post, setPosts, project }) => {
         </Link>
       )}
       <div className="flex items-center gap-2">
-        {post.image_id ? (
+        {post.user_image_id ? (
           <Image
             src={imageUrl}
             alt="profile picture"
@@ -231,14 +231,13 @@ const Post = ({ post, setPosts, project }) => {
       </div>
       <p className="break-words">{post.content}</p>
 
-      {console.log(post)}
-      {post.id !== "0" && post.images && (
+      {post.id !== "0" && post.image_id.length > 0 && (
         <ul className="gap-2 flex items-end">
-        {console.log(post)}
-          {post.imageIds.map((imageId, i) => {
-            const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}${process.env.NEXT_PUBLIC_STORAGE_PATH}/post-image/${post.id}/${imageId}`;
+          {console.log(post)}
+          {post.image_id.map((imageId, i) => {
+            const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}${process.env.NEXT_PUBLIC_STORAGE_PATH}/post-image/${imageId}`;
             return (
-              <Link href={imageUrl}>
+              <Link target="_blank" href={imageUrl}>
                 <Image
                   key={imageId}
                   src={imageUrl}

@@ -32,7 +32,7 @@ const CreatePost = ({ setPosts, project }) => {
     const newPost = {
       created_at: new Date().toISOString(),
       username: profile.username,
-      image_id: profile.image_id,
+      user_image_id: profile.image_id,
       content: data.content,
       user_id: userId,
       projectId: project ? project.id : null,
@@ -73,7 +73,8 @@ const CreatePost = ({ setPosts, project }) => {
 
       if (response.status === 201) {
         const { postId, imageIds } = await response.json();
-        setPosts((prevPosts) => prevPosts.map((post) => (post.id === "0" ? { ...post, id: postId, imageIds } : post)));
+        const newImageIds = imageIds.map(id => postId + "/" + id)
+        setPosts((prevPosts) => prevPosts.map((post) => (post.id === "0" ? { ...post, id: postId, image_id: newImageIds } : post)));
       } else {
         const { error } = await response.json();
         throw error;

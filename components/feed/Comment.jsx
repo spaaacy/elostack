@@ -6,12 +6,12 @@ import { useEffect, useState } from "react";
 import UserAvatar from "../common/UserAvatar";
 
 const Comment = ({ comment }) => {
-  const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}${process.env.NEXT_PUBLIC_STORAGE_PATH}/profile-picture/${comment.user_id}/${comment.image_id}`;
+  const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}${process.env.NEXT_PUBLIC_STORAGE_PATH}/profile-picture/${comment.user_id}/${comment.user_image_id}`;
 
   return (
     <>
       <div className="flex items-center justify-start gap-2">
-        {comment.image_id ? (
+        {comment.user_image_id ? (
           <Image
             src={imageUrl}
             alt="profile picture"
