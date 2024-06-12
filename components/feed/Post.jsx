@@ -214,6 +214,21 @@ const Post = ({ post, setPosts, project }) => {
         <p className="ml-auto font-light text-xs">{formatTime(post.created_at, true)}</p>
       </div>
       <p className="break-words">{post.content}</p>
+
+      {console.log(post)}
+      {post.id !== "0" && post.images && (
+        <ul className="gap-2 flex items-end">
+          {post.imageIds.map((imageId, i) => {
+            const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}${process.env.NEXT_PUBLIC_STORAGE_PATH}/post-image/${post.id}/${imageId}`;
+            return (
+              <Link href={imageUrl}>
+                <Image key={imageId} src={imageUrl} alt={`image_${i}`} width={150} height={150} className="rounded " />
+              </Link>
+            );
+          })}
+        </ul>
+      )}
+
       <div className="text-neutral-600 dark:text-neutral-200 flex items-center gap-4 text-sm">
         {post.id !== "0" && session?.data.session && (
           <button

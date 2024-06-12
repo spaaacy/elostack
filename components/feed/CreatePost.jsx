@@ -1,15 +1,19 @@
 "use client";
 
 import { UserContext } from "@/context/UserContext";
+import Image from "next/image";
 import { useContext, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { FaRegImage } from "react-icons/fa6";
+import { IoIosRemoveCircle } from "react-icons/io";
+import { MdOutlinePublic, MdOutlinePublicOff } from "react-icons/md";
 
 const CreatePost = ({ setPosts, project }) => {
   const { profile, session } = useContext(UserContext);
   const [publicPost, setPublicPost] = useState(false);
   const [images, setImages] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
   const fileInputRef = useRef();
   const {
     setValue,
@@ -24,6 +28,7 @@ const CreatePost = ({ setPosts, project }) => {
     if (!userId) return;
 
     setValue("content", "");
+    setImagePreviews([]);
     const newPost = {
       created_at: new Date().toISOString(),
       username: profile.username,
@@ -33,6 +38,7 @@ const CreatePost = ({ setPosts, project }) => {
       likes: [],
       comment: [],
       id: "0",
+      images: images.length > 0,
     };
     setPosts((prevPosts) => [newPost, ...prevPosts]);
 
@@ -54,6 +60,7 @@ const CreatePost = ({ setPosts, project }) => {
           projectTitle: project ? project.title : null,
         })
       );
+      setImages([]);
 
       const response = await fetch("/api/post/create", {
         method: "POST",
@@ -64,8 +71,8 @@ const CreatePost = ({ setPosts, project }) => {
       });
 
       if (response.status === 201) {
-        const { postId } = await response.json();
-        setPosts((prevPosts) => prevPosts.map((post) => (post.id === "0" ? { ...post, id: postId } : post)));
+        const { postId, imageIds } = await response.json();
+        setPosts((prevPosts) => prevPosts.map((post) => (post.id === "0" ? { ...post, id: postId, imageIds } : post)));
       } else {
         const { error } = await response.json();
         throw error;
@@ -84,13 +91,18 @@ const CreatePost = ({ setPosts, project }) => {
       return;
     }
     setImages((prevImages) => [...prevImages, file]);
-    // if (file) {
-    //   const reader = new FileReader();
-    //   reader.onloadend = () => {
-    //     setPostImages(reader.result);
-    //   };
-    //   reader.readAsDataURL(file);
-    // }
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreviews((prevImages) => [reader.result, ...prevImages]);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = (index) => {
+    setImages((prevImages) => prevImages.filter((_, i) => i !== index));
+    setImagePreviews((prevImages) => prevImages.filter((_, i) => i !== index));
   };
 
   return (
@@ -118,6 +130,21 @@ const CreatePost = ({ setPosts, project }) => {
           className="p-2 text-sm w-full bg-gray-200 rounded-xl resize-none focus:bg-gray-300 dark:bg-backgrounddark dark:focus:bg-neutral-800 dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none"
           rows={3}
         />
+        {imagePreviews.length > 0 && (
+          <ul className="flex gap-2 items-end">
+            {imagePreviews.map((image, i) => (
+              <div className="relative">
+                <Image key={i} alt={`image_${i}`} src={image} width={100} height={100} className="rounded" />
+                <button
+                  className="absolute -bottom-2 -right-2 p-[1px] bg-white rounded-full"
+                  onClick={() => removeImage(i)}
+                >
+                  <IoIosRemoveCircle className="text-primary" />
+                </button>
+              </div>
+            ))}
+          </ul>
+        )}
         <div className="flex items-center">
           <div onClick={() => fileInputRef.current.click()} className="hover:cursor-pointer">
             <FaRegImage className="text-gray-900 hover:text-gray-700" />

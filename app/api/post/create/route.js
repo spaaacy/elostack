@@ -32,9 +32,11 @@ export async function POST(req, res) {
     if (results.error) throw results.error;
 
     // Upload images
+    let imageIds = [];
     for (let i = 0; i < totalImages; i++) {
       const image = formData.get(`images[${i}]`);
       const imageId = uuidv4();
+      imageIds.push(imageId);
       const { error } = await supabase.storage
         .from("post-image")
         .upload(`${postId}/${imageId}`, image, { cacheControl: 3600, upsert: true });
@@ -51,7 +53,7 @@ export async function POST(req, res) {
       if (results.error) throw results.error;
     }
 
-    return NextResponse.json({ message: "Post created successfully!", postId }, { status: 201 });
+    return NextResponse.json({ message: "Post created successfully!", postId, imageIds }, { status: 201 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error }, { status: 500 });
