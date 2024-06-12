@@ -232,8 +232,7 @@ const Post = ({ post, setPosts, project }) => {
       <p className="break-words">{post.content}</p>
 
       {post.id !== "0" && post.image_id.length > 0 && (
-        <ul className="gap-2 flex items-end">
-          {console.log(post)}
+        <ul className="gap-2 flex items-end flex-wrap">
           {post.image_id.map((imageId, i) => {
             const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}${process.env.NEXT_PUBLIC_STORAGE_PATH}/post-image/${imageId}`;
             return (
