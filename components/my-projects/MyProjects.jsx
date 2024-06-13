@@ -85,8 +85,8 @@ const MyProjects = () => {
             {filteredProjects.map((p, i) => {
               return (
                 <li key={i}>
-                  <div
-                    onClick={() => router.push(`/projects/${p.id}`)}
+                  <Link
+                    href={`/projects/${p.id}`}
                     className="bg-gray-200 hover:bg-gray-300 hover:cursor-pointer h-56 p-2 flex flex-col dark:border dark:bg-backgrounddark  rounded dark:hover:bg-neutral-800 border-gray-400 text-xs font-light"
                   >
                     <div className="flex flex-col justify-start items-start">
@@ -118,7 +118,7 @@ const MyProjects = () => {
                         </p>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 </li>
               );
             })}

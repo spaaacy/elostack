@@ -37,7 +37,7 @@ const ChatBox = ({ session, isLeader, project, id, members }) => {
     }
 
     const handleResize = () => {
-      if (window.innerWidth < 640) {
+      if (window.innerWidth < 1280) {
         // assuming 768px as the threshold for small screens
         setShowChatBox(false);
       } else {
@@ -216,7 +216,7 @@ const ChatBox = ({ session, isLeader, project, id, members }) => {
 
   return (
     <div
-      className={`fixed max-sm:left-1/2 max-sm:-translate-x-1/2 bottom-0 right-4 text-xs drop-shadow-xl  dark:bg-backgrounddark dark:border-t dark:border-x dark:border-gray-400 bg-white rounded max-sm:w-[80%] w-72 ${
+      className={`fixed max-sm:left-1/2 max-sm:-translate-x-1/2 bottom-0 right-4 text-xs drop-shadow-xl  dark:bg-backgrounddark border-t border-x border-gray-300 dark:border-gray-400 bg-white rounded max-sm:w-[80%] w-72 ${
         showChatBox ? "max-sm:h-[85%] h-[480px] pb-2" : ""
       } flex flex-col`}
     >

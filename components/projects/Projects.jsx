@@ -1,44 +1,26 @@
 "use client";
 
-import Footer from "../common/Footer";
 import NavBar from "../navbar/NavBar";
 import { formatDuration } from "@/utils/formatDuration";
 import { FaCircleInfo } from "react-icons/fa6";
 import { useContext, useEffect, useState } from "react";
-import ProjectModal from "./ProjectModal";
 import Loader from "../common/Loader";
 import { UserContext } from "@/context/UserContext";
-import { useRouter, useSearchParams } from "next/navigation";
-import toast, { Toaster } from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
 import Link from "next/link";
 
 const Projects = () => {
   const { session } = useContext(UserContext);
-  const searchParams = useSearchParams();
-
   const [loading, setLoading] = useState(true);
   const [filteredProjects, setFilteredProjects] = useState();
   const [searchInput, setSearchInput] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [modalProject, setModalProject] = useState();
   const [projects, setProjects] = useState([]);
-  const router = useRouter();
   const [dataLoaded, setDataLoaded] = useState(false);
-  const [memberList, setMemberList] = useState();
-  const [requests, setRequests] = useState();
 
   useEffect(() => {
     if (session && !dataLoaded) {
       setDataLoaded(true);
       fetchProjects();
-      fetchUserMemberList();
-      fetchUserRequests();
-    }
-
-    if (showModal) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
     }
 
     const filteredProjects = projects.filter((project) =>
@@ -50,89 +32,7 @@ const Projects = () => {
     );
 
     setFilteredProjects(filteredProjects);
-  }, [searchInput, showModal, session, projects]);
-
-  const createRequest = async (message) => {
-    if (!session.data.session) return;
-    try {
-      setShowModal(false);
-      setLoading(true);
-      const response = await fetch("/api/request/create", {
-        method: "POST",
-        headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
-        },
-        body: JSON.stringify({
-          userId: session.data.session.user.id,
-          projectId: modalProject.id,
-          message,
-          projectLeader: modalProject.leader,
-          projectTitle: modalProject.title,
-        }),
-      });
-      if (response.status === 201) {
-        toast.success("Request has been made!");
-        setRequests((prevRequests) => [
-          ...prevRequests,
-          {
-            user_id: session.data.session.user.id,
-            project_id: modalProject.id,
-            message,
-            accepted: false,
-            rejected: false,
-          },
-        ]);
-        setShowModal(false);
-      } else {
-        const { error } = await response.json();
-        throw error;
-      }
-    } catch (error) {
-      toast.error("Oops, something went wrong...");
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchUserMemberList = async () => {
-    const userId = session.data.session?.user.id;
-    if (!userId) return;
-    try {
-      const response = await fetch(`/api/member/${userId}`, {
-        method: "GET",
-        headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
-        },
-      });
-      if (response.status === 200) {
-        const { data } = await response.json();
-        setMemberList(data);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const fetchUserRequests = async () => {
-    const userId = session.data.session?.user.id;
-    if (!userId) return;
-    try {
-      const response = await fetch("/api/request/user", {
-        method: "POST",
-        headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
-        },
-        body: JSON.stringify({ userId }),
-      });
-      if (response.status === 200) {
-        const { requests } = await response.json();
-        setRequests(requests);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  }, [searchInput, session, projects]);
 
   const fetchProjects = async () => {
     try {
@@ -142,33 +42,11 @@ const Projects = () => {
       if (response.status === 200) {
         const { projects } = await response.json();
         setProjects(projects);
-
-        if (searchParams.has("id")) {
-          const id = searchParams.get("id");
-          const project = projects.find((p) => p.id === id);
-          if (project) {
-            if (session.data.session?.user.id === project.leader) {
-              router.push(`/projects/${project.id}`);
-            } else {
-              setShowModal(true);
-              setModalProject(project);
-            }
-          }
-        }
       }
     } catch (error) {
       console.error(error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleClick = (project) => {
-    if (session.data.session && memberList.some((m) => m.project_id === project.id && !m.banned)) {
-      router.push(`/projects/${project.id}`);
-    } else {
-      setShowModal(true);
-      setModalProject(project);
     }
   };
 
@@ -202,8 +80,8 @@ const Projects = () => {
             {filteredProjects.map((p, i) => {
               return (
                 <li key={i}>
-                  <div
-                    onClick={() => handleClick(p)}
+                  <Link
+                    href={`/projects/${p.id}`}
                     className="bg-gray-200 hover:bg-gray-300 hover:cursor-pointer h-56 p-2 flex flex-col dark:border dark:bg-backgrounddark  rounded dark:hover:bg-neutral-800 border-gray-400 text-xs font-light"
                   >
                     <div className="flex flex-col justify-start items-start">
@@ -235,22 +113,12 @@ const Projects = () => {
                         </p>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 </li>
               );
             })}
           </ul>
         </main>
-      )}
-      {showModal && (
-        <ProjectModal
-          banned={memberList ? memberList.some((m) => m.banned && modalProject.id === m.project_id) : false}
-          request={requests ? requests.find((r) => r.project_id === modalProject.id) : null}
-          project={modalProject}
-          setShowModal={setShowModal}
-          createRequest={createRequest}
-          session={session}
-        />
       )}
       <Toaster />
     </div>

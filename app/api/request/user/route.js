@@ -10,8 +10,12 @@ export async function POST(req, res) {
     const auth = await supabase.auth.setSession({ access_token, refresh_token });
     if (auth.error) throw auth.error;
 
-    const { userId } = await req.json();
-    const { data, error } = await supabase.from("request").select().eq("user_id", userId);
+    const { userId, projectId } = await req.json();
+    const { data, error } = await supabase
+      .from("request")
+      .select()
+      .match({ user_id: userId, project_id: projectId })
+      .single();
 
     if (error) throw error;
     return NextResponse.json({ requests: data }, { status: 200 });

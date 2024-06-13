@@ -6,7 +6,7 @@ import LandingPage from "@/components/home/LandingPage";
 import { UserContext } from "@/context/UserContext";
 import { useContext, useEffect } from "react";
 
-const Home = () => {
+const HomeWrapper = () => {
   const { session } = useContext(UserContext);
 
   useEffect(() => {}, [session]);
@@ -18,4 +18,4 @@ const Home = () => {
   }
 };
 
-export default Home;
+export default HomeWrapper;

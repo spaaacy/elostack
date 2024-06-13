@@ -1,11 +1,11 @@
-import ProjectView from "@/components/projects/ProjectView";
+import ProjectWrapper from "@/components/projects/ProjectWrapper";
 
 export const metadata = {
   title: "Project View | EloStack",
 };
 
 const Page = () => {
-  return <ProjectView />;
+  return <ProjectWrapper />;
 };
 
 export default Page;
