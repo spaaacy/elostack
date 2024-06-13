@@ -15,6 +15,7 @@ import { formatDuration } from "@/utils/formatDuration";
 import { formatTime } from "@/utils/formatTime";
 import Link from "next/link";
 import UserAvatar from "../common/UserAvatar";
+import { MdOutlinePublic } from "react-icons/md";
 
 const Post = ({ post, setPosts, project }) => {
   const { profile, session } = useContext(UserContext);
@@ -212,6 +213,8 @@ const Post = ({ post, setPosts, project }) => {
           <UserAvatar size={36} username={post.username} />
         )}
         <p className="font-bold">{post.username}</p>
+        {console.log(post)}
+        {post.project_id && post.public && <MdOutlinePublic/>}
         <p className="ml-auto font-light text-xs">{formatTime(post.created_at, true)}</p>
       </div>
       <p className="break-words">{post.content}</p>
