@@ -10,7 +10,7 @@ const FeedPage = () => {
     <div className="flex flex-col min-h-screen relative">
       <NavBar />
       <MyProjectsSideBar />
-      <main className="max-w-[820px]">
+      <main className="max-w-[840px]">
         <Feed />
       </main>
       <Toaster />

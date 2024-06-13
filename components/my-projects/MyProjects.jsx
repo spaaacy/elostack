@@ -19,6 +19,9 @@ const MyProjects = () => {
   const [searchInput, setSearchInput] = useState("");
   const [projects, setProjects] = useState([]);
   const [filteredProjects, setFilteredProjects] = useState();
+  const [pages, setPages] = useState();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [lastPage, setLastPage] = useState();
 
   useEffect(() => {
     if (session) {
@@ -43,7 +46,7 @@ const MyProjects = () => {
     setFilteredProjects(filteredProjects);
   }, [searchInput, session, projects]);
 
-  const fetchProjects = async () => {
+  const fetchProjects = async (page) => {
     const userId = session.data.session.user.id;
     if (!userId) return;
     try {
@@ -51,17 +54,58 @@ const MyProjects = () => {
         method: "POST",
         body: JSON.stringify({
           userId,
+          pageNumber: page?page:1
         }),
       });
       if (response.status === 200) {
-        const { projects } = await response.json();
+        const { projects, count } = await response.json();
         setProjects(projects);
+        const lastPage = Math.ceil(count / 10);
+        setLastPage(lastPage);
+        if (!page) {
+          const pagesArray = [];
+          for (let i = 0; i < lastPage; i++) {
+            if (i === 4) break;
+            pagesArray.push(i + 1);
+            if (i === 3 && lastPage != i) pagesArray.push(lastPage);
+          }
+          setCurrentPage(1);
+          setPages(pagesArray);
+          console.log(pagesArray)
+        }
       }
     } catch (error) {
       console.error(error);
     } finally {
       setLoading(false);
     }
+  };
+
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    fetchProjects(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    if (lastPage <= 5) {
+      const pagesArray = [];
+      for (let i = 0; i < lastPage; i++) pagesArray.push(i + 1);
+      setPages(pagesArray);
+      return;
+    }
+
+    // Generate page array
+    const pagesArray = [1];
+    if (page === 1 || page === 2) {
+      pagesArray.push(2, 3, 4);
+      pagesArray.push(lastPage);
+    } else if (page === lastPage || page === lastPage - 1) {
+      pagesArray.push(lastPage - 3, lastPage - 2, lastPage - 1, lastPage);
+    } else {
+      pagesArray.push(lastPage);
+      pagesArray.splice(1, 0, page - 1, page, page + 1);
+    }
+    setPages(pagesArray);
   };
 
   return (
@@ -73,8 +117,8 @@ const MyProjects = () => {
         <main>
           <h1 className="text-2xl font-semibold">My Projects</h1>
 
-          <hr className="border-0 h-[1px] bg-gray-400 my-4" />
-          <div className="flex items-center gap-2 flex-wrap">
+          <hr className="border-0 h-[1px] bg-gray-400 my-4 " />
+          <div className="flex items-center gap-2 flex-wrap ">
             <input
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder={"Search..."}
@@ -82,7 +126,7 @@ const MyProjects = () => {
               className="focus:ring-0 focus:outline-none min-w-0 w-96 text-sm px-3 py-2 rounded-full border bg-gray-200 dark:bg-backgrounddark hover:bg-gray-300 dark:hover:bg-neutral-800 focus:bg-gray-300 dark:focus:bg-neutral-800 border-gray-400"
             />
           </div>
-          <ul className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 grid gap-4 mt-4">
+          <ul className="flex flex-col gap-4 mt-4 max-w-[840px] mx-auto">
             {filteredProjects.map((p, i) => {
               return (
                 <li key={i}>
@@ -124,8 +168,41 @@ const MyProjects = () => {
               );
             })}
           </ul>
+          <ul className="flex justify-center items-center my-4">
+            {pages?.length > 1 &&
+              pages.map((page, i) => {
+                return (
+                  <li key={i}>
+                    {i === 1 &&
+                      currentPage !== 1 &&
+                      lastPage !== 5 &&
+                      lastPage > 5 && (
+                        <p className="ml-8 text-sm text-gray-400">...</p>
+                      )}
+                    {i === 4 &&
+                      currentPage !== lastPage &&
+                      lastPage !== 5 &&
+                      lastPage > 5 && (
+                        <p className="ml-8 text-sm text-gray-400">...</p>
+                      )}
+                    <button
+                      onClick={() => handlePageChange(page)}
+                      className={`inline ml-8 hover:underline text-sm w-8 h-8  ${
+                        page === currentPage
+                          ? "bg-neutral-800 text-white dark:bg-white dark:text-black rounded-full drop-shadow"
+                          : "dark:text-neutral-200 text-neutral-800"
+                      }`}
+                      key={page}
+                    >
+                      {page}
+                    </button>
+                  </li>
+                );
+              })}
+          </ul>
         </main>
       )}
+      <Footer/>
       <Toaster />
     </div>
   );
