@@ -10,6 +10,8 @@ import { UserContext } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 import Link from "next/link";
+import Image from "next/image";
+import Avatar from "boring-avatars";
 
 const MyProjects = () => {
   const { session } = useContext(UserContext);
@@ -54,7 +56,7 @@ const MyProjects = () => {
         method: "POST",
         body: JSON.stringify({
           userId,
-          pageNumber: page?page:1
+          pageNumber: page ? page : 1,
         }),
       });
       if (response.status === 200) {
@@ -71,7 +73,7 @@ const MyProjects = () => {
           }
           setCurrentPage(1);
           setPages(pagesArray);
-          console.log(pagesArray)
+          console.log(pagesArray);
         }
       }
     } catch (error) {
@@ -81,12 +83,11 @@ const MyProjects = () => {
     }
   };
 
-
   const handlePageChange = (page) => {
     setCurrentPage(page);
     fetchProjects(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    
+    window.scrollTo({ top: 0, behavior: "smooth" });
+
     if (lastPage <= 5) {
       const pagesArray = [];
       for (let i = 0; i < lastPage; i++) pagesArray.push(i + 1);
@@ -126,41 +127,60 @@ const MyProjects = () => {
               className="focus:ring-0 focus:outline-none min-w-0 w-96 text-sm px-3 py-2 rounded-full border bg-gray-200 dark:bg-backgrounddark hover:bg-gray-300 dark:hover:bg-neutral-800 focus:bg-gray-300 dark:focus:bg-neutral-800 border-gray-400"
             />
           </div>
-          <ul className="flex flex-col gap-4 mt-4 max-w-[840px] mx-auto">
+          <ul className="flex flex-col gap-4 mt-4 mx-auto">
             {filteredProjects.map((p, i) => {
               return (
                 <li key={i}>
                   <Link
                     href={`/projects/${p.id}`}
-                    className="bg-gray-200 hover:bg-gray-300 hover:cursor-pointer h-56 p-2 flex flex-col dark:border dark:bg-backgrounddark  rounded dark:hover:bg-neutral-800 border-gray-400 text-xs font-light"
+                    className="drop-shadow bg-neutral-200 hover:bg-neutral-300 hover:cursor-pointer h-56 p-4 flex gap-8 items-start border dark:bg-backgrounddark  rounded dark:hover:bg-neutral-800 border-gray-400 text-xs font-light"
                   >
-                    <div className="flex flex-col justify-start items-start">
-                      <h3 className="text-base font-medium">{p.title}</h3>
-                      <div className="flex items-baseline gap-2 text-gray-200 flex-wrap w-full">
-                        <p className=" flex-shrink-0 text-right  bg-primary mt-1 px-2 py-1 rounded-full dark:shadow shadow-neutral-800">
-                          {p.status}
-                        </p>
-                        <p
-                          className={`${
-                            p.is_open ? "bg-green-600" : "bg-red-700"
-                          }  mt-1 px-2 py-1 rounded-full dark:shadow shadow-neutral-800  flex-shrink-0`}
-                        >
-                          {p.is_open ? "Open" : "Closed"}
-                        </p>
-                        <p className="ml-auto dark:font-normal font-medium text-primary flex-shrink-0">{`Leader: ${p.leader_username}`}</p>
+                    {p.ai_image_url || p.image_id ? (
+                      <Image
+                        src={
+                          p.ai_image_url
+                            ? p.ai_image_url
+                            : `${process.env.NEXT_PUBLIC_SUPABASE_URL}${process.env.NEXT_PUBLIC_STORAGE_PATH}/project-image/${p.id}/${p.image_id}`
+                        }
+                        alt={`project ${i} image`}
+                        height={176}
+                        width={176}
+                        className="object-cover h-44 w-44 rounded drop-shadow"
+                      />
+                    ) : (
+                      <div className="drop-shadow">
+                        <Avatar variant="sunset" square={true} name={p.title} size={176} className="rounded" />
                       </div>
-                    </div>
-                    <p className="text-sm mt-2 line-clamp-4 ">{p.description}</p>
-                    <p className="dark:font-normal font-medium text-primary mt-auto">{`Team ${p.total_members}/${p.team_size}`}</p>
-                    <div className="flex justify-between items-center pt-1">
-                      <p className="dark:font-normal font-medium text-primary">
-                        {formatDuration(p.duration_length, p.duration_type)}
-                      </p>
-                      <div className="relative group">
-                        <FaCircleInfo className="text-sm text-primary" />
-                        <p className="text-gray-200 right-0 dark:shadow shadow-neutral-800 transition-opacity opacity-0 group-hover:opacity-100 absolute bottom-6 bg-primary w-80 rounded-xl px-2 py-1  drop-shadow">
-                          {p.technologies}
+                    )}
+                    <div className="flex flex-col h-full">
+                      <div className="flex flex-col justify-start items-start">
+                        <h3 className="text-base font-medium">{p.title}</h3>
+                        <div className="flex items-baseline gap-2 text-gray-200 flex-wrap w-full">
+                          <p className=" flex-shrink-0 text-right  bg-primary mt-1 px-2 py-1 rounded-full dark:shadow shadow-neutral-800">
+                            {p.status}
+                          </p>
+                          <p
+                            className={`${
+                              p.is_open ? "bg-green-600" : "bg-red-700"
+                            }  mt-1 px-2 py-1 rounded-full dark:shadow shadow-neutral-800  flex-shrink-0`}
+                          >
+                            {p.is_open ? "Open" : "Closed"}
+                          </p>
+                          <p className="ml-auto dark:font-normal font-medium text-primary flex-shrink-0">{`Leader: ${p.leader_username}`}</p>
+                        </div>
+                      </div>
+                      <p className="text-sm mt-2 line-clamp-4 ">{p.description}</p>
+                      <p className="dark:font-normal font-medium text-primary mt-auto">{`Team ${p.total_members}/${p.team_size}`}</p>
+                      <div className="flex justify-between items-center pt-1 ">
+                        <p className="dark:font-normal font-medium text-primary">
+                          {formatDuration(p.duration_length, p.duration_type)}
                         </p>
+                        <div className="relative group">
+                          <FaCircleInfo className="text-sm text-primary" />
+                          <p className="text-gray-200 right-0 dark:shadow shadow-neutral-800 transition-opacity opacity-0 group-hover:opacity-100 absolute bottom-6 bg-primary w-80 rounded-xl px-2 py-1  drop-shadow ">
+                            {p.technologies}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </Link>
@@ -173,18 +193,12 @@ const MyProjects = () => {
               pages.map((page, i) => {
                 return (
                   <li key={i}>
-                    {i === 1 &&
-                      currentPage !== 1 &&
-                      lastPage !== 5 &&
-                      lastPage > 5 && (
-                        <p className="ml-8 text-sm text-gray-400">...</p>
-                      )}
-                    {i === 4 &&
-                      currentPage !== lastPage &&
-                      lastPage !== 5 &&
-                      lastPage > 5 && (
-                        <p className="ml-8 text-sm text-gray-400">...</p>
-                      )}
+                    {i === 1 && currentPage !== 1 && lastPage !== 5 && lastPage > 5 && (
+                      <p className="ml-8 text-sm text-gray-400">...</p>
+                    )}
+                    {i === 4 && currentPage !== lastPage && lastPage !== 5 && lastPage > 5 && (
+                      <p className="ml-8 text-sm text-gray-400">...</p>
+                    )}
                     <button
                       onClick={() => handlePageChange(page)}
                       className={`inline ml-8 hover:underline text-sm w-8 h-8  ${
@@ -202,7 +216,7 @@ const MyProjects = () => {
           </ul>
         </main>
       )}
-      <Footer/>
+      <Footer />
       <Toaster />
     </div>
   );

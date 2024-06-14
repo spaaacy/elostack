@@ -17,15 +17,21 @@ const CreateProject = () => {
   const [technologies, setTechnologies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [ideaPrompt, setIdeaPrompt] = useState();
+  const [imagePrompt, setImagePrompt] = useState();
   const [showClear, setShowClear] = useState(false);
   const router = useRouter();
   const [imageUrl, setImageUrl] = useState();
+  const [file, setFile] = useState();
+  const [customImage, setCustomImage] = useState();
+  const fileInputRef = useRef();
+  const [useCustomImage, setUseCustomImage] = useState();
 
   const {
     watch,
     reset,
     getValues,
     clearErrors,
+    setError,
     register,
     handleSubmit,
     setValue,
@@ -43,15 +49,11 @@ const CreateProject = () => {
     if (!session.data.session) return;
     try {
       setLoading(true);
-      const response = await fetch("/api/project/create", {
-        method: "POST",
-        headers: {
-          "X-Supabase-Auth":
-            session.data.session.access_token +
-            " " +
-            session.data.session.refresh_token,
-        },
-        body: JSON.stringify({
+
+      const formData = new FormData();
+      formData.append(
+        "project",
+        JSON.stringify({
           title: data.title,
           description: data.description,
           technologies: technologies.join(", "),
@@ -62,7 +64,17 @@ const CreateProject = () => {
           status: "Just created",
           is_open: true,
           deleted: false,
-        }),
+          ai_image_url: !useCustomImage && imageUrl ? imageUrl : null,
+        })
+      );
+      if (useCustomImage) formData.append("projectImage", file);
+
+      const response = await fetch("/api/project/create", {
+        method: "POST",
+        headers: {
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+        },
+        body: formData,
       });
       if (response.status === 201) {
         const { projectId } = await response.json();
@@ -107,17 +119,26 @@ const CreateProject = () => {
   };
 
   const generateImage = async () => {
-    setLoading(true);
+    const title = getValues("title");
+    const imagePrompt = getValues("imagePrompt");
+    if (!title && !imagePrompt) {
+      setError("imagePrompt", { type: "custom", message: "Image prompt or project title must be provided" });
+      return;
+    }
     try {
+      let body = {};
+      if (imagePrompt) {
+        body["imagePrompt"] = imagePrompt;
+      } else body["title"] = title;
+      setLoading(true);
+      clearErrors("imagePrompt");
       const response = await fetch("/api/dall-e/generate-image", {
         method: "POST",
-        body: JSON.stringify({
-          title: getValues("title"),
-          description: getValues("description"),
-        }),
+        body: JSON.stringify(body),
       });
       if (response.status === 200) {
         const { imageUrl } = await response.json();
+        setUseCustomImage(false);
         setImageUrl(imageUrl);
       } else {
         const { error } = await response.json();
@@ -128,6 +149,19 @@ const CreateProject = () => {
       console.error(error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    setFile(file);
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUseCustomImage(true);
+        setCustomImage(reader.result);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -153,6 +187,12 @@ const CreateProject = () => {
   const generateIdeaKeyDown = (e) => {
     if (e.key === "Enter") {
       generateIdea();
+    }
+  };
+
+  const generateImageKeyDown = (e) => {
+    if (e.key === "Enter") {
+      generateImage();
     }
   };
 
@@ -188,33 +228,53 @@ const CreateProject = () => {
             </button>
           </div>
           <hr className="border-0 h-[1px] bg-gray-400 my-4" />
+
           <form
-            className="mt-4 px-8 py-6 rounded-lg dark:bg-backgrounddark bg-white flex flex-col gap-2 dark:border-gray-400 dark:border-[1px]"
+            className="mt-4 px-8 py-4 rounded-lg dark:bg-backgrounddark bg-white flex flex-col gap-2 dark:border-gray-400 dark:border-[1px]"
             onSubmit={handleSubmit(onSubmit)}
           >
-            <div className="flex flex-col items-center justify-center gap-2">
+            <div className="flex justify-start items-center gap-2">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current.click()}
+                className="text-gray-200 px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-sm hover:text-gray-300 dark:shadow dark:shadow-neutral-800 flex items-center flex-shrink-0"
+              >
+                Select File
+              </button>
+              <p className="text-sm text-neutral-400 font-light">OR</p>
+              <input
+                onKeyDown={generateImageKeyDown}
+                {...register("imagePrompt")}
+                className="border-gray-400  border rounded-full bg-gray-200 focus:bg-gray-300 dark:bg-backgrounddark dark:focus:bg-neutral-800 focus:ring-0 focus:outline-none text-xs px-3 py-2 min-w-0 w-full"
+                type="text"
+                placeholder="Logo for clothing e-commerce platform. Simple. Abstract"
+              />
               <button
                 type="button"
                 onClick={generateImage}
-                className="text-gray-200 px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-sm hover:text-gray-300 dark:shadow dark:shadow-neutral-800 flex items-center"
+                className="text-gray-200 px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-sm hover:text-gray-300 dark:shadow dark:shadow-neutral-800 flex items-center flex-shrink-0"
               >
                 <BsStars className="inline mr-2" />
                 Generate Image
               </button>
-              {imageUrl && (
-                <Image
-                  src={
-                    // "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/SMPTE_Color_Bars.svg/1200px-SMPTE_Color_Bars.svg.png"
-                    imageUrl
-                  }
-                  alt={"project image"}
-                  width={256}
-                  height={256}
-                  unoptimized
-                  className="mx-auto max-w-64 max-h-64 object-cover"
-                />
-              )}
             </div>
+            <input type="file" ref={fileInputRef} accept="image/*" className="hidden" onChange={handleFileChange} />
+
+            {errors.imagePrompt && (
+              <p role="alert" className="text-xs text-red-500 ml-auto">
+                {errors.imagePrompt.message}
+              </p>
+            )}
+            {(imageUrl || customImage) && (
+              <Image
+                src={useCustomImage ? customImage : imageUrl}
+                alt={"project image"}
+                width={256}
+                height={256}
+                unoptimized
+                className="mx-auto max-w-64 max-h-64 object-cover"
+              />
+            )}
 
             <input
               placeholder="Title"

@@ -39,7 +39,6 @@ const CreatePost = ({ setPosts, project }) => {
       likes: [],
       comment: [],
       id: "0",
-      images: images.length > 0,
     };
     setPosts((prevPosts) => [newPost, ...prevPosts]);
 
@@ -73,8 +72,10 @@ const CreatePost = ({ setPosts, project }) => {
 
       if (response.status === 201) {
         const { postId, imageIds } = await response.json();
-        const newImageIds = imageIds.map(id => postId + "/" + id)
-        setPosts((prevPosts) => prevPosts.map((post) => (post.id === "0" ? { ...post, id: postId, image_id: newImageIds } : post)));
+        const newImageIds = imageIds.map((id) => postId + "/" + id);
+        setPosts((prevPosts) =>
+          prevPosts.map((post) => (post.id === "0" ? { ...post, id: postId, image_id: newImageIds } : post))
+        );
       } else {
         const { error } = await response.json();
         throw error;
@@ -137,7 +138,10 @@ const CreatePost = ({ setPosts, project }) => {
             {imagePreviews.map((image, i) => (
               <div className="relative">
                 <Image key={i} alt={`image_${i}`} src={image} width={100} height={100} className="rounded" />
-                  <IoIosRemoveCircle onClick={() => removeImage(i)} className="hover:cursor-pointer text-primary absolute -bottom-2 -right-2 p-[1px] bg-white dark:bg-backgrounddark rounded-full" />
+                <IoIosRemoveCircle
+                  onClick={() => removeImage(i)}
+                  className="hover:cursor-pointer text-primary absolute -bottom-2 -right-2 p-[1px] bg-white dark:bg-backgrounddark rounded-full"
+                />
               </div>
             ))}
           </ul>
