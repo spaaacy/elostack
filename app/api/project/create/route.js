@@ -11,13 +11,23 @@ export async function POST(req, res) {
     const auth = await supabase.auth.setSession({ access_token, refresh_token });
     if (auth.error) throw auth.error;
 
-    const project = await req.json();
     const projectId = uuidv4();
+    const formData = await req.formData();
+    const project = JSON.parse(formData.get("project"));
+    const projectImage = formData.get("projectImage");
 
-    let results = await supabase.from("project").insert({ ...project, id: projectId });
+    const imageId = uuidv4();
+    let results = await supabase
+      .from("project")
+      .insert({ ...project, id: projectId, image_id: projectImage ? imageId : null });
     if (results.error) throw results.error;
 
     results = await supabase.from("member").insert({ user_id: project.leader, project_id: projectId });
+    if (results.error) throw results.error;
+
+    results = await supabase.storage
+      .from("project-image")
+      .upload(`${projectId}/${imageId}`, projectImage, { cacheControl: 3600, upsert: true });
     if (results.error) throw results.error;
 
     return NextResponse.json({ message: "Project created successfully!", projectId }, { status: 201 });
