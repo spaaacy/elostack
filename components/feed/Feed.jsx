@@ -64,7 +64,7 @@ const Feed = ({ project, isMember }) => {
   };
 
   return (
-    <div className="flex flex-col flex-1">
+    <div className="flex flex-col flex-1 ">
       {session?.data.session && isMember && <CreatePost project={project} setPosts={setPosts} />}
       {posts && (
         <>
@@ -75,7 +75,7 @@ const Feed = ({ project, isMember }) => {
               ))}
             </ul>
           ) : (
-            <div className="text-center text-sm rounded-xl bg-neutral-50 px-3 py-8 dark:bg-backgrounddark dark:border dark:border-gray-400 flex flex-col gap-2">
+            <div className="text-center text-sm rounded-xl bg-neutral-50 px-3 py-8 dark:bg-backgrounddark dark:border dark:border-gray-400">
               No public posts
             </div>
           )}

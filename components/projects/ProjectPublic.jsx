@@ -158,7 +158,7 @@ const ProjectPublic = ({ project, members }) => {
           </div>
           <p className="font-light ">{project.status}</p>
           <hr className="border-0 h-[1px] bg-gray-400 my-4" />
-          <div className="flex gap-4 items-start max-lg:flex-col">
+          <div className="flex gap-4 lg:items-start max-lg:flex-col">
             <div className="lg:w-72 p-2 rounded dark:border bg-gray-300 dark:bg-backgrounddark  dark:border-gray-400 flex flex-col font-light text-sm ">
               <p className="relative">
                 <span className="font-semibold">Description</span>

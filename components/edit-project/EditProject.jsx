@@ -1,5 +1,6 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import NavBar from "../navbar/NavBar";
 import { useContext, useEffect, useRef, useState } from "react";
@@ -12,11 +13,11 @@ import { BsStars } from "react-icons/bs";
 import Link from "next/link";
 import Image from "next/image";
 
-const CreateProject = () => {
+const EditProject = () => {
   const { session } = useContext(UserContext);
+  const { id } = useParams();
   const [technologies, setTechnologies] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [ideaPrompt, setIdeaPrompt] = useState();
   const [showClear, setShowClear] = useState(false);
   const router = useRouter();
   const [imageUrl, setImageUrl] = useState();
@@ -24,6 +25,7 @@ const CreateProject = () => {
   const [customImage, setCustomImage] = useState();
   const fileInputRef = useRef();
   const [useCustomImage, setUseCustomImage] = useState();
+  const [dataLoaded, setDataLoaded] = useState(false);
 
   const {
     watch,
@@ -42,6 +44,40 @@ const CreateProject = () => {
       setShowClear(true);
     });
   }, [watch]);
+
+  useEffect(() => {
+    if (session) {
+      if (session.data.session) {
+        if (!dataLoaded) {
+          setDataLoaded(true);
+          fetchProject();
+        }
+      } else router.push("/projects");
+    }
+  }, [session]);
+
+  const fetchProject = async () => {
+    try {
+      const response = await fetch(`/api/project/${id}`, {
+        method: "GET",
+      });
+      if (response.status === 200) {
+        const { project } = await response.json();
+        if (project.deleted || project.leader !== session.data.session.user.id) router.push("/projects");
+        setValue("title", project.title);
+        setValue("description", project.description);
+        setValue("durationType", project.duration_type);
+        setValue("durationLength", project.duration_length);
+        setValue("teamSize", project.team_size);
+        setTechnologies(project.technologies.split(", "));
+        setImageUrl(project.ai_image_url);
+      } else {
+        router.push("/projects");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const onSubmit = async (data, e) => {
     e.preventDefault();
@@ -85,35 +121,6 @@ const CreateProject = () => {
     } catch (error) {
       console.error(error);
       toast.error("Oops, something went wrong...");
-    }
-  };
-
-  const generateIdea = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch("/api/gemini/generate-idea", {
-        method: "POST",
-        body: JSON.stringify({
-          ideaPrompt: ideaPrompt ? ideaPrompt : "Full-Stack React",
-        }),
-      });
-      if (response.status === 200) {
-        const { idea } = await response.json();
-        setValue("title", idea.title);
-        setValue("description", idea.description);
-        setValue("durationType", idea.durationType);
-        setValue("durationLength", idea.durationLength);
-        setValue("teamSize", idea.teamSize);
-        setTechnologies(idea.technologies);
-      } else {
-        const { error } = await response.json();
-        throw error;
-      }
-    } catch (error) {
-      toast.error("Oops, something went wrong...");
-      console.error(error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -183,12 +190,6 @@ const CreateProject = () => {
     }
   };
 
-  const generateIdeaKeyDown = (e) => {
-    if (e.key === "Enter") {
-      generateIdea();
-    }
-  };
-
   const generateImageKeyDown = (e) => {
     if (e.key === "Enter") {
       generateImage();
@@ -208,24 +209,8 @@ const CreateProject = () => {
         <Loader />
       ) : (
         <main className="md:w-[860px]">
-          <div className="flex items-center relative flex-wrap gap-2">
-            <h1 className="text-2xl font-semibold">Create Project</h1>
-            <input
-              onKeyDown={generateIdeaKeyDown}
-              onChange={(e) => setIdeaPrompt(e.target.value)}
-              className="border-gray-400  border rounded-full bg-gray-200 focus:bg-gray-300 dark:bg-backgrounddark dark:focus:bg-neutral-800 focus:ring-0 focus:outline-none text-xs px-3 py-2 ml-auto min-w-0 w-96"
-              type="text"
-              placeholder="Prompt (e.g., Full-Stack React)"
-            />
-            <button
-              type="button"
-              onClick={generateIdea}
-              className="text-gray-200 px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-sm hover:text-gray-300 dark:shadow dark:shadow-neutral-800 flex items-center"
-            >
-              <BsStars className="inline mr-2" />
-              Generate Idea
-            </button>
-          </div>
+          <h1 className="text-2xl font-semibold">Edit Project</h1>
+
           <hr className="border-0 h-[1px] bg-gray-400 my-4" />
 
           <form
@@ -419,4 +404,4 @@ const CreateProject = () => {
   );
 };
 
-export default CreateProject;
+export default EditProject;

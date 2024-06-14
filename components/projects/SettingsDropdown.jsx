@@ -4,6 +4,7 @@ import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import Link from "next/link";
 
 const githubUrlPattern = /^https?:\/\/(?:www\.)?github\.com\/[\w-]+\/[\w-]+\/?$/;
 
@@ -294,6 +295,14 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
           ref={dropdownRef}
           className="absolute top-10 bg-gray-100 border-gray-400 border right-0 dark:bg-backgrounddark rounded p-2 text-sm flex flex-col text-black dark:text-gray-300 justify-center items-end"
         >
+          {isLeader && (
+            <Link
+              href={`/projects/${project.id}/edit-project`}
+              className="hover:bg-gray-200 dark:hover:bg-neutral-800 px-2 py-1 rounded  dark:hover:text-gray-200  w-full text-right"
+            >
+              Edit Project
+            </Link>
+          )}
           {isLeader && (
             <button
               type="button"
