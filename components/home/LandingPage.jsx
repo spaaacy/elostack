@@ -3,6 +3,7 @@
 import Footer from "@/components/common/Footer";
 import NavBar from "@/components/navbar/NavBar";
 import { Cormorant, JetBrains_Mono, Kanit, Montserrat, Pixelify_Sans } from "next/font/google";
+import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -54,6 +55,9 @@ const LandingPage = () => {
 
   return (
     <div className="flex flex-col ">
+      <Head>
+        <meta name="description" content="EloStack is your place to discover and collaborate on software projects." />
+      </Head>
       <section className="h-[calc(100dvh)] z-10 relative">
         <div className="absolute bg-black h-full w-full opacity-30 -z-40 md:hidden"></div>
         <NavBar />

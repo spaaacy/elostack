@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "EloStack",
-  description: "Find programming projects and collaborate",
+  description: "EloStack is your place to discover and collaborate on software projects.",
 };
 
 export default function RootLayout({ children }) {
