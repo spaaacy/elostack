@@ -213,7 +213,6 @@ const Post = ({ post, setPosts, project }) => {
           <UserAvatar size={36} username={post.username} />
         )}
         <p className="font-bold">{post.username}</p>
-        {console.log(post)}
         {post.project_id && post.public && <MdOutlinePublic/>}
         <p className="ml-auto font-light text-xs">{formatTime(post.created_at, true)}</p>
       </div>
@@ -224,7 +223,7 @@ const Post = ({ post, setPosts, project }) => {
           {post.image_id.map((imageId, i) => {
             const imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}${process.env.NEXT_PUBLIC_STORAGE_PATH}/post-image/${imageId}`;
             return (
-              <Link target="_blank" href={imageUrl} className="mx-auto">
+              <Link key={i} target="_blank" href={imageUrl} className="mx-auto">
                 <Image
                   key={imageId}
                   src={imageUrl}

@@ -16,7 +16,7 @@ export async function POST(req, res) {
     let response;
     response = await supabase
       .from("user")
-      .insert({ user_id: user.user_id, email: user.email, username: user.username });
+      .insert({ user_id: user.user_id, email: user.email });
     if (response.error) throw response.error;
 
     const customer = await stripe.customers.create({

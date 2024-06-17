@@ -10,7 +10,7 @@ import ProjectPublic from "./ProjectPublic";
 
 const ProjectWrapper = () => {
   const { id } = useParams();
-  const { session } = useContext(UserContext);
+  const { session, user } = useContext(UserContext);
   const [loading, setLoading] = useState(true);
   const [project, setProject] = useState();
   const [members, setMembers] = useState();
@@ -25,10 +25,10 @@ const ProjectWrapper = () => {
       await fetchMembers();
     };
 
-    if (session) {
+    if (session && user) {
       if (!dataLoaded) loadData();
     }
-  }, [session]);
+  }, [session, user]);
 
   const fetchProject = async () => {
     try {
@@ -57,7 +57,8 @@ const ProjectWrapper = () => {
         setMembers(members);
         const userId = session.data.session?.user.id;
         const access = members.some((m) => m.user_id === userId && !m.banned);
-        setAccess(access);
+        console.log(user);
+        if (access || user.admin) setAccess(access);
         setLoading(false);
       }
     } catch (error) {
