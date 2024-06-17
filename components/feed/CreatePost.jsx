@@ -118,6 +118,7 @@ const CreatePost = ({ setPosts, project }) => {
           <p className="text-base font-semibold ">Post an update</p>
           {project && (
             <button
+              type="button"
               className="ml-auto flex items-center gap-2 rounded-full px-2 py-1 bg-sky-600 text-white text-sm"
               onClick={() => setPublicPost(!publicPost)}
             >

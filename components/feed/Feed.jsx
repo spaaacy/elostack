@@ -65,7 +65,7 @@ const Feed = ({ project, isMember }) => {
 
   return (
     <div className="flex flex-col flex-1 ">
-      {session?.data.session && isMember && <CreatePost project={project} setPosts={setPosts} />}
+      {session?.data.session && (!project || isMember) && <CreatePost project={project} setPosts={setPosts} />}
       {posts && (
         <>
           {posts.length > 0 ? (
