@@ -131,7 +131,7 @@ const CreateProject = () => {
       } else body["title"] = title;
       setLoading(true);
       clearErrors("imagePrompt");
-      const response = await fetch("/api/dall-e/generate-image", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}${process.env.NEXT_PUBLIC_FUNCTIONS_PATH}/generate-image`, {
         method: "POST",
         body: JSON.stringify(body),
       });

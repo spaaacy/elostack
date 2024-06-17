@@ -9,7 +9,7 @@ import ProjectView from "./ProjectView";
 import ProjectPublic from "./ProjectPublic";
 
 const ProjectWrapper = () => {
-  const { id } = useParams();
+  const { id, user } = useParams();
   const { session } = useContext(UserContext);
   const [loading, setLoading] = useState(true);
   const [project, setProject] = useState();
@@ -57,7 +57,7 @@ const ProjectWrapper = () => {
         setMembers(members);
         const userId = session.data.session?.user.id;
         const access = members.some((m) => m.user_id === userId && !m.banned);
-        setAccess(access);
+        if (access || user.admin) setAccess(access);
         setLoading(false);
       }
     } catch (error) {
