@@ -3,7 +3,7 @@
 import NavBar from "../navbar/NavBar";
 import { formatDuration } from "@/utils/formatDuration";
 import { FaCircleInfo } from "react-icons/fa6";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useLayoutEffect, useState } from "react";
 import Loader from "../common/Loader";
 import { UserContext } from "@/context/UserContext";
 import { Toaster } from "react-hot-toast";
@@ -22,6 +22,16 @@ const Projects = () => {
   const [pages, setPages] = useState();
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState();
+  const [size, setSize] = useState([0, 0]);
+
+  useLayoutEffect(() => {
+    function updateSize() {
+      setSize([window.innerWidth, window.innerHeight]);
+    }
+    window.addEventListener("resize", updateSize);
+    updateSize();
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
 
   useEffect(() => {
     if (session && !dataLoaded) {
@@ -127,7 +137,7 @@ const Projects = () => {
                 <li key={i}>
                   <Link
                     href={`/projects/${p.id}`}
-                    className="drop-shadow bg-neutral-200 hover:bg-neutral-300 hover:cursor-pointer h-56 p-4 flex gap-8 items-start border dark:bg-backgrounddark  rounded dark:hover:bg-neutral-800 border-gray-400 text-xs font-light"
+                    className="drop-shadow bg-neutral-200 hover:bg-neutral-300 hover:cursor-pointer sm:h-56 p-4 flex max-sm:flex-col max-sm:items-center gap-8 items-start border dark:bg-backgrounddark  rounded dark:hover:bg-neutral-800 border-gray-400 text-xs font-light"
                   >
                     {p.ai_image_url || p.image_id ? (
                       <Image
@@ -143,7 +153,13 @@ const Projects = () => {
                       />
                     ) : (
                       <div className="drop-shadow">
-                        <Avatar variant="sunset" square={true} name={p.title} size={176} className="rounded" />
+                        <Avatar
+                          variant="sunset"
+                          square={true}
+                          name={p.title}
+                          className="rounded"
+                          size={size[0] < 640 ? 100 : 176}
+                        />
                       </div>
                     )}
                     <div className="flex flex-col h-full">
@@ -160,7 +176,7 @@ const Projects = () => {
                           >
                             {p.is_open ? "Open" : "Closed"}
                           </p>
-                          <p className="ml-auto dark:font-normal font-medium text-primary flex-shrink-0">{`Leader: ${p.leader_username}`}</p>
+                          <p className="ml-auto dark:font-normal font-medium text-primary flex-shrink-0 ">{`Leader: ${p.leader_username}`}</p>
                         </div>
                       </div>
                       <p className="text-sm mt-2 line-clamp-4 ">{p.description}</p>
