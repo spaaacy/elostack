@@ -285,7 +285,7 @@ const MobileDropdown = ({ isHomePage, showSignIn, session, signOut }) => {
   return (
     <div
       className={`${
-        isHomePage && !session?.data.session ? "bg-black" : ""
+        isHomePage && !session?.data.session ? "bg-black" : "bg-backgroundlight dark:bg-backgrounddark"
       } flex flex-col justify-center items-center lg:hidden py-2`}
     >
       {!session?.data.session && (
