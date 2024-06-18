@@ -99,7 +99,6 @@ const LandingPage = () => {
                 <div className="flex items-baseline gap-2 bg-text-[#ececec] flex-wrap w-full">
                   <p className=" flex-shrink-0 text-right mt-1 py-1 rounded-full">In progress</p>
                   <p className={"mt-1 py-1 rounded-full ml-2 flex-shrink-0"}>Open</p>
-                  <p className="ml-auto   flex-shrink-0">{`Leader: Alice`}</p>
                 </div>
               </div>
               <p className="text-sm mt-2 line-clamp-4 ">

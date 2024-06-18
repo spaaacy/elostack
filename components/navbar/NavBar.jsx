@@ -190,14 +190,6 @@ const DesktopNav = ({
       >
         Find Projects
       </Link>
-      <Link
-        href={"/create-project"}
-        className={`p-2  border-b-2 border-transparent  ${
-          isHomePage && !session?.data.session ? " hover:text-gray-300" : "hover:text-gray-500 dark:hover:text-gray-300"
-        }`}
-      >
-        Create Project
-      </Link>
       {session?.data.session && (
         <Link
           href={"/my-projects"}
@@ -295,9 +287,6 @@ const MobileDropdown = ({ isHomePage, showSignIn, session, signOut }) => {
       )}
       <Link href={"/projects"} className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center">
         Find Projects
-      </Link>
-      <Link href={"/create-project"} className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center">
-        Create Project
       </Link>
       {session?.data.session && (
         <Link href={"/my-projects"} className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center">

@@ -11,6 +11,7 @@ import Link from "next/link";
 import Footer from "../common/Footer";
 import Image from "next/image";
 import Avatar from "boring-avatars";
+import Head from "next/head";
 
 const Projects = () => {
   const { session } = useContext(UserContext);
@@ -107,6 +108,9 @@ const Projects = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <Head>
+        <meta name="description" content="EloStack is your place to discover and collaborate on software projects." />
+      </Head>
       <NavBar />
       {loading ? (
         <Loader />
@@ -176,7 +180,6 @@ const Projects = () => {
                           >
                             {p.is_open ? "Open" : "Closed"}
                           </p>
-                          <p className="ml-auto dark:font-normal font-medium text-primary flex-shrink-0 ">{`Leader: ${p.leader_username}`}</p>
                         </div>
                       </div>
                       <p className="text-sm mt-2 line-clamp-4 ">{p.description}</p>

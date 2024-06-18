@@ -166,7 +166,6 @@ const MyProjects = () => {
                           >
                             {p.is_open ? "Open" : "Closed"}
                           </p>
-                          <p className="ml-auto dark:font-normal font-medium text-primary flex-shrink-0">{`Leader: ${p.leader_username}`}</p>
                         </div>
                       </div>
                       <p className="text-sm mt-2 line-clamp-4 ">{p.description}</p>

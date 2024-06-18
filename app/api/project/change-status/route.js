@@ -14,7 +14,7 @@ export async function PATCH(req, res) {
     const { error } = await supabase.from("project").update({ status }).eq("id", projectId);
     if (error) throw error;
 
-    return NextResponse.json({ message: "Leader changed successfully!" }, { status: 200 });
+    return NextResponse.json({ message: "Status changed successfully!" }, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error }, { status: 500 });

@@ -175,11 +175,8 @@ const ProjectPublic = ({ project, members }) => {
 
               <p className="mt-4 font-semibold">Members</p>
               <ul>
-                <p href={"/"} className=" ">{`${
-                  members.find((m) => m.user_id === project.leader).profile.username
-                } (Leader)`}</p>
                 {members
-                  .filter((member) => member.user_id !== project.leader && !member.banned)
+                  .filter((member) => !member.banned)
                   .map((member, i) => {
                     return (
                       <li key={i}>

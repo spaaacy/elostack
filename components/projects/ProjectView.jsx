@@ -15,10 +15,9 @@ import Feed from "../feed/Feed";
 
 const ProjectView = ({ project, members }) => {
   const { id } = useParams();
-  const { session } = useContext(UserContext);
+  const { session, user } = useContext(UserContext);
   const [loading, setLoading] = useState(false);
   const [showMoreDescription, setShowMoreDescription] = useState(false);
-  const isLeader = project.leader === session.data.session.user.id;
 
   const changeStatus = async (status) => {
     if (!session.data.session) return;
@@ -57,13 +56,7 @@ const ProjectView = ({ project, members }) => {
         <main>
           <div className="flex justify-start items-end relative">
             <h1 className="font-bold text-2xl">{project.title}</h1>
-            <SettingsDropdown
-              isLeader={isLeader}
-              project={project}
-              members={members}
-              session={session}
-              setLoading={setLoading}
-            />
+            <SettingsDropdown project={project} members={members} setLoading={setLoading} />
           </div>
           <p className="font-light ">{project.status}</p>
           <hr className="border-0 h-[1px] bg-gray-400 my-4" />
@@ -84,11 +77,8 @@ const ProjectView = ({ project, members }) => {
                 </p>
                 <p className="mt-4 font-semibold">Members</p>
                 <ul>
-                  <p href={"/"} className=" ">{`${
-                    members.find((m) => m.user_id === project.leader).profile.username
-                  } (Leader)`}</p>
                   {members
-                    .filter((member) => member.user_id !== project.leader && !member.banned)
+                    .filter((member) => !member.banned)
                     .map((member, i) => {
                       return (
                         <li key={i}>
@@ -110,7 +100,7 @@ const ProjectView = ({ project, members }) => {
                   )}
                 </div>
               </div>
-              {isLeader && (
+              {user?.admin && (
                 <button
                   onClick={() =>
                     changeStatus(
@@ -133,7 +123,7 @@ const ProjectView = ({ project, members }) => {
               )}
             </div>
             <Feed project={project} isMember={true} />
-            <ChatBox session={session} isLeader={isLeader} project={project} id={id} members={members} />
+            <ChatBox session={session} project={project} id={id} members={members} />
           </div>
         </main>
       )}

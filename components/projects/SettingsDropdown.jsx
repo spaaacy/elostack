@@ -2,18 +2,19 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import { Tooltip } from "react-tooltip";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
+import { UserContext } from "@/context/UserContext";
 
 const githubUrlPattern = /^https?:\/\/(?:www\.)?github\.com\/[\w-]+\/[\w-]+\/?$/;
 
-const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) => {
+const SettingsDropdown = ({ project, members, setLoading }) => {
+  const { user, session } = useContext(UserContext);
   const dropdownRef = useRef();
   const githubRef = useRef();
   const banMemberRef = useRef();
   const removeMemberRef = useRef();
-  const changeLeaderRef = useRef();
   const deleteProjectRef = useRef();
   const leaveProjectRef = useRef();
 
@@ -26,8 +27,6 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
 
   const [confirmBanMember, setConfirmBanMember] = useState();
   const [confirmRemoveMember, setConfirmRemoveMember] = useState();
-  const [showChangeLeader, setShowChangeLeader] = useState(false);
-  const [confirmChangeLeader, setConfirmChangeLeader] = useState();
 
   const router = useRouter();
   const {
@@ -86,36 +85,6 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
       });
       if (response.status === 200) {
         toast.success(isOpen ? "New members allowed" : "New members can't join");
-        setTimeout(() => window.location.reload(), 1000);
-      } else {
-        const { error } = await response.json();
-        throw error;
-      }
-    } catch (error) {
-      toast.error("Oops, something went wrong...");
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const changeLeader = async (id) => {
-    if (!session.data.session) return;
-    try {
-      setShowChangeLeader(false);
-      setLoading(true);
-      const response = await fetch("/api/project/change-leader", {
-        method: "PATCH",
-        headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
-        },
-        body: JSON.stringify({
-          leader: id,
-          projectId: project.id,
-        }),
-      });
-      if (response.status === 200) {
-        toast.success("Leader changed");
         setTimeout(() => window.location.reload(), 1000);
       } else {
         const { error } = await response.json();
@@ -259,9 +228,6 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
     if (banMemberRef.current && !banMemberRef.current.contains(event.target)) {
       setShowBanMember(false);
     }
-    if (changeLeaderRef.current && !changeLeaderRef.current.contains(event.target)) {
-      setShowChangeLeader(false);
-    }
     if (deleteProjectRef.current && !deleteProjectRef.current.contains(event.target)) {
       setShowDeleteProject(false);
     }
@@ -281,7 +247,6 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
           showDropdown ||
           showGithubDropdown ||
           showBanMember ||
-          showChangeLeader ||
           showRemoveMember ||
           showLeaveProject ||
           showDeleteProject
@@ -295,7 +260,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
           ref={dropdownRef}
           className="absolute top-10 bg-gray-100 border-gray-400 border right-0 dark:bg-backgrounddark rounded p-2 text-sm flex flex-col text-black dark:text-gray-300 justify-center items-end"
         >
-          {isLeader && (
+          {user?.admin && (
             <Link
               href={`/projects/${project.id}/edit-project`}
               className="hover:bg-gray-200 dark:hover:bg-neutral-800 px-2 py-1 rounded  dark:hover:text-gray-200  w-full text-right"
@@ -303,7 +268,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
               Edit Project
             </Link>
           )}
-          {isLeader && (
+          {user?.admin && (
             <button
               type="button"
               onClick={() => changeOpen(!project.is_open)}
@@ -312,19 +277,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
               {project.is_open ? "Close project to new members" : "Open project to new members"}
             </button>
           )}
-          {isLeader && members.some((m) => !m.banned && m.user_id !== project.leader) && (
-            <button
-              type="button"
-              onClick={() => {
-                setShowChangeLeader(true);
-                setShowDropdown(false);
-              }}
-              className="hover:bg-gray-200 dark:hover:bg-neutral-800 px-2 py-1 rounded  dark:hover:text-gray-200  w-full text-right"
-            >
-              Change leader
-            </button>
-          )}
-          {isLeader && (
+          {user?.admin && (
             <button
               type="button"
               onClick={() => {
@@ -336,8 +289,8 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
               Set GitHub URL
             </button>
           )}
-          {isLeader && <hr className="border-0 h-[1px] bg-neutral-600 w-full my-1 rounded-full" />}
-          {isLeader && members.some((m) => !m.banned && m.user_id !== project.leader) && (
+          {user?.admin && <hr className="border-0 h-[1px] bg-neutral-600 w-full my-1 rounded-full" />}
+          {user?.admin && members.some((m) => !m.banned) && (
             <button
               type="button"
               onClick={() => {
@@ -349,7 +302,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
               Remove member
             </button>
           )}
-          {isLeader && members.some((m) => !m.banned && m.user_id !== project.leader) && (
+          {user?.admin && members.some((m) => !m.banned) && (
             <button
               type="button"
               onClick={() => {
@@ -361,26 +314,23 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
               Ban member
             </button>
           )}
-          <button
-            type="button"
-            disabled={isLeader}
-            onClick={() => {
-              setShowLeaveProject(true);
-              setShowDropdown(false);
-            }}
-            data-tooltip-id="leader-tooltip"
-            data-tooltip-content="Leader cannot leave project"
-            className={`${
-              isLeader
-                ? "text-gray-500 hover:cursor-not-allowed"
-                : "hover:bg-gray-200 dark:hover:bg-neutral-800 font-medium text-red-600 dark:font-normal dark:text-red-500  hover:text-red-600"
-            }  p-1 w-full text-right`}
-          >
-            Leave project
-          </button>
-          {isLeader && (
+          {user && !user.admin && (
             <button
-              disabled={members.some((m) => !m.banned && m.user_id !== project.leader)}
+              type="button"
+              onClick={() => {
+                setShowLeaveProject(true);
+                setShowDropdown(false);
+              }}
+              className={
+                "hover:bg-gray-200 dark:hover:bg-neutral-800 font-medium text-red-600 dark:font-normal dark:text-red-500  hover:text-red-600 p-1 w-full text-right"
+              }
+            >
+              Leave project
+            </button>
+          )}
+          {user?.admin && (
+            <button
+              disabled={members.some((m) => !m.banned)}
               data-tooltip-id="delete-tooltip"
               data-tooltip-content="Members are in this project"
               type="button"
@@ -389,7 +339,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
                 setShowDropdown(false);
               }}
               className={`${
-                members.some((m) => !m.banned && m.user_id !== project.leader)
+                members.some((m) => !m.banned)
                   ? "text-gray-500 hover:cursor-not-allowed"
                   : "hover:bg-gray-200 dark:hover:bg-neutral-800 font-medium text-red-600 dark:font-normal dark:text-red-500  hover:text-red-600"
               }  p-1 w-full text-right`}
@@ -397,66 +347,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
               Delete project
             </button>
           )}
-          {isLeader && <Tooltip id="leader-tooltip" place="bottom" type="dark" effect="float" />}
-          {members.some((m) => !m.banned && m.user_id !== project.leader) && (
-            <Tooltip id="delete-tooltip" place="bottom" type="dark" effect="float" />
-          )}
-        </div>
-      )}
-      {showChangeLeader && (
-        <div
-          ref={changeLeaderRef}
-          className="absolute top-10 bg-gray-100 border-gray-400 border right-0 dark:bg-backgrounddark rounded p-2 text-sm flex flex-col text-black dark:text-gray-300 justify-center items-end"
-        >
-          {confirmChangeLeader ? (
-            <>
-              <p className="font-medium text-red-600 dark:font-normal dark:text-red-500">Are you sure?</p>
-              <div className="flex justify-center mx-auto gap-4 mt-2">
-                <button
-                  type="button"
-                  onClick={() => changeLeader(confirmChangeLeader)}
-                  className=" hover:bg-gray-200 dark:hover:bg-neutral-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
-                >
-                  Yes
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setConfirmChangeLeader(false)}
-                  className=" hover:bg-gray-200 dark:hover:bg-neutral-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
-                >
-                  No
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
-              {members
-                .filter((m) => m.user_id !== project.leader && !m.banned)
-                .map((m) => {
-                  return (
-                    <button
-                      key={m.user_id}
-                      type="button"
-                      onClick={() => setConfirmChangeLeader(m.user_id)}
-                      className="w-full hover:bg-gray-200 dark:hover:bg-neutral-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
-                    >
-                      {m.profile.username}
-                    </button>
-                  );
-                })}
-              <hr className="border-0 h-[1px] bg-neutral-600 w-full my-1 rounded-full" />
-              <button
-                type="button"
-                onClick={() => {
-                  setShowChangeLeader(false);
-                  setShowDropdown(true);
-                }}
-                className="w-full hover:bg-gray-200 dark:hover:bg-neutral-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
-              >
-                Back
-              </button>
-            </>
-          )}
+          {members.some((m) => !m.banned) && <Tooltip id="delete-tooltip" place="bottom" type="dark" effect="float" />}
         </div>
       )}
       {showGithubDropdown && (
@@ -524,7 +415,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
           ) : (
             <>
               {members
-                .filter((m) => m.user_id !== project.leader && !m.banned)
+                .filter((m) => !m.banned)
                 .map((m) => {
                   return (
                     <button
@@ -580,7 +471,7 @@ const SettingsDropdown = ({ project, isLeader, members, session, setLoading }) =
           ) : (
             <>
               {members
-                .filter((m) => m.user_id !== project.leader && !m.banned)
+                .filter((m) => !m.banned)
                 .map((m) => {
                   return (
                     <button

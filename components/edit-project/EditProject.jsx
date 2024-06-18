@@ -14,7 +14,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 const EditProject = () => {
-  const { session } = useContext(UserContext);
+  const { session, user } = useContext(UserContext);
   const { id } = useParams();
   const [technologies, setTechnologies] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -43,7 +43,7 @@ const EditProject = () => {
   }, [watch]);
 
   useEffect(() => {
-    if (session) {
+    if (session && user) {
       if (session.data.session) {
         if (!dataLoaded) {
           setDataLoaded(true);
@@ -60,7 +60,7 @@ const EditProject = () => {
       });
       if (response.status === 200) {
         const { project } = await response.json();
-        if (project.deleted || project.leader !== session.data.session.user.id) router.push("/projects");
+        if (project.deleted || !user.admin) router.push("/projects");
         setValue("title", project.title);
         setValue("description", project.description);
         setValue("durationType", project.duration_type);

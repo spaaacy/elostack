@@ -1,12 +1,14 @@
 "use client";
 
 import { formatTime } from "@/utils/formatTime";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { supabase } from "@/utils/supabase";
 import toast from "react-hot-toast";
+import { UserContext } from "@/context/UserContext";
 
-const ChatBox = ({ session, isLeader, project, id, members }) => {
+const ChatBox = ({ project, id, members }) => {
+  const { session, user } = useContext(UserContext);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [showRequests, setShowRequests] = useState(false);
   const [chat, setChat] = useState();
@@ -23,12 +25,11 @@ const ChatBox = ({ session, isLeader, project, id, members }) => {
         setDataLoaded(true);
         await fetchChat();
         await listenToMessages();
-        if (isLeader === true) {
-          await fetchRequests();
-        }
+        if (user.admin) await fetchRequests();
       }
     };
-    loadData();
+
+    if (session && user) loadData();
 
     // Scrolls the chat to the bottom
     if (chat && !loadMoreMessages) {
@@ -51,7 +52,7 @@ const ChatBox = ({ session, isLeader, project, id, members }) => {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [session, chat]);
+  }, [session, user, chat]);
 
   const sendMessage = async (data, e) => {
     e.preventDefault();
@@ -229,7 +230,7 @@ const ChatBox = ({ session, isLeader, project, id, members }) => {
       {showChatBox && (
         <>
           <hr className="h-[0.5px] my-2 bg-gray-400 scale-y-50" />
-          {isLeader && (
+          {user?.admin && (
             <div className="flex items-center w-full gap-2 mb-2 p-2">
               <button
                 disabled={!showRequests}

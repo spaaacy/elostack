@@ -5,6 +5,7 @@ import Loader from "@/components/common/Loader";
 import NavBar from "@/components/navbar/NavBar";
 import { UserContext } from "@/context/UserContext";
 import { supabase } from "@/utils/supabase";
+import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -109,6 +110,9 @@ const SignUp = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <Head>
+        <meta name="description" content="EloStack is your place to discover and collaborate on software projects." />
+      </Head>
       <NavBar />
       {loading ? (
         <Loader />

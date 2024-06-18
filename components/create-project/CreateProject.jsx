@@ -13,9 +13,9 @@ import Link from "next/link";
 import Image from "next/image";
 
 const CreateProject = () => {
-  const { session } = useContext(UserContext);
+  const { session, user } = useContext(UserContext);
   const [technologies, setTechnologies] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [ideaPrompt, setIdeaPrompt] = useState();
   const [showClear, setShowClear] = useState(false);
   const router = useRouter();
@@ -35,10 +35,15 @@ const CreateProject = () => {
   } = useForm();
 
   useEffect(() => {
+    if (user) {
+      if (user.admin) {
+        setLoading(false);
+      } else router.push("/projects");
+    }
     watch(() => {
       setShowClear(true);
     });
-  }, [watch]);
+  }, [watch, user]);
 
   const onSubmit = async (data, e) => {
     e.preventDefault();
