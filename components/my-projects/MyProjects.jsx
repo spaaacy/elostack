@@ -135,13 +135,9 @@ const MyProjects = () => {
                     href={`/projects/${p.id}`}
                     className="drop-shadow bg-neutral-200 hover:bg-neutral-300 hover:cursor-pointer h-56 p-4 flex gap-8 items-start border dark:bg-backgrounddark  rounded dark:hover:bg-neutral-800 border-gray-400 text-xs font-light"
                   >
-                    {p.ai_image_url || p.image_id ? (
+                    {p.image_id ? (
                       <Image
-                        src={
-                          p.ai_image_url
-                            ? p.ai_image_url
-                            : `${process.env.NEXT_PUBLIC_SUPABASE_URL}${process.env.NEXT_PUBLIC_STORAGE_PATH}/project-image/${p.id}/${p.image_id}`
-                        }
+                        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}${process.env.NEXT_PUBLIC_STORAGE_PATH}/project-image/${p.id}/${p.image_id}`}
                         alt={`project ${i} image`}
                         height={176}
                         width={176}

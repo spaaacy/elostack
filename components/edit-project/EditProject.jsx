@@ -12,6 +12,7 @@ import Loader from "../common/Loader";
 import { BsStars } from "react-icons/bs";
 import Link from "next/link";
 import Image from "next/image";
+import { IoIosRemoveCircle } from "react-icons/io";
 
 const EditProject = () => {
   const { session, user } = useContext(UserContext);
@@ -25,6 +26,7 @@ const EditProject = () => {
   const fileInputRef = useRef();
   const [dataLoaded, setDataLoaded] = useState(false);
   const [project, setProject] = useState();
+  const [originalImageId, setOriginalImageId] = useState();
 
   const {
     watch,
@@ -68,6 +70,7 @@ const EditProject = () => {
         setValue("durationLength", project.duration_length);
         setValue("teamSize", project.team_size);
         setTechnologies(project.technologies.split(", "));
+        setOriginalImageId(project.image_id);
         setProject(project);
         setLoading(false);
       } else {
@@ -95,12 +98,11 @@ const EditProject = () => {
           duration_length: data.durationLength,
           duration_type: data.durationType,
           team_size: data.teamSize,
+          image_id: project.image_id,
         })
       );
-      if (image) {
-        // formData.append("oldImageId", project.image_id);
-        // formData.append("projectImage", file);
-      }
+      if (image) formData.append("projectImage", file);
+      if (originalImageId && (!project.image_id || image)) formData.append("oldImageId", originalImageId);
 
       const response = await fetch("/api/project/edit", {
         method: "PATCH",
@@ -117,8 +119,14 @@ const EditProject = () => {
       }
     } catch (error) {
       console.error(error);
+      setLoading(false);
       toast.error("Oops, something went wrong...");
     }
+  };
+
+  const removeImage = () => {
+    setImage();
+    setProject({ ...project, image_id: null });
   };
 
   const handleFileChange = (event) => {
@@ -189,15 +197,25 @@ const EditProject = () => {
                 {errors.imagePrompt.message}
               </p>
             )}
-            {image && (
-              <Image
-                src={image}
-                alt={"project image"}
-                width={256}
-                height={256}
-                unoptimized
-                className="mx-auto max-w-64 max-h-64 object-cover"
-              />
+            {(image || project.image_id) && (
+              <div className="mx-auto relative">
+                <Image
+                  src={
+                    image
+                      ? image
+                      : `${process.env.NEXT_PUBLIC_SUPABASE_URL}${process.env.NEXT_PUBLIC_STORAGE_PATH}/project-image/${project.id}/${project.image_id}`
+                  }
+                  alt={"project image"}
+                  width={256}
+                  height={256}
+                  unoptimized
+                  className=" max-w-64 max-h-64 object-cover"
+                />
+                <IoIosRemoveCircle
+                  onClick={removeImage}
+                  className="text-xl hover:cursor-pointer text-primary absolute -top-2 -right-2 p-[1px] bg-white dark:bg-backgrounddark rounded-full"
+                />
+              </div>
             )}
 
             <input

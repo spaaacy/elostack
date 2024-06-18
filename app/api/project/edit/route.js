@@ -12,26 +12,27 @@ export async function PATCH(req, res) {
     if (auth.error) throw auth.error;
 
     const formData = await req.formData();
-    const project = JSON.parse(formData.get("project"));
+    let project = JSON.parse(formData.get("project"));
     const projectImage = formData.get("projectImage");
-    const oldImageId = formData.get("imageId");
+    const oldImageId = formData.get("oldImageId");
 
     let results;
-    // results = await supabase.storage.from("project-image").remove([`${project.id}/${oldImageId}`]);
-    // if (results.error) throw results.error;
+    if (oldImageId) {
+      results = await supabase.storage.from("project-image").remove([`${project.id}/${oldImageId}`]);
+      if (results.error) throw results.error;
+    }
 
-    const imageId = uuidv4();
-    console.log(project);
-    results = await supabase
-      .from("project")
-      .update({ ...project, image_id: projectImage ? projectImage : oldImageId })
-      .eq("id", project.id);
+    if (projectImage) {
+      const imageId = uuidv4();
+      results = await supabase.storage
+        .from("project-image")
+        .upload(`${project.id}/${imageId}`, projectImage, { cacheControl: 3600, upsert: true });
+      if (results.error) throw results.error;
+      project["image_id"] = imageId;
+    }
+
+    results = await supabase.from("project").update(project).eq("id", project.id);
     if (results.error) throw results.error;
-
-    // results = await supabase.storage
-    //   .from("project-image")
-    //   .upload(`${project.id}/${imageId}`, projectImage, { cacheControl: 3600, upsert: true });
-    // if (results.error) throw results.error;
 
     return NextResponse.json({ message: "Project updated successfully!" }, { status: 200 });
   } catch (error) {

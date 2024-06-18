@@ -85,6 +85,7 @@ const CreateProject = () => {
       }
     } catch (error) {
       console.error(error);
+      setLoading(false);
       toast.error("Oops, something went wrong...");
     }
   };
