@@ -12,6 +12,7 @@ import toast, { Toaster } from "react-hot-toast";
 import SettingsDropdown from "./SettingsDropdown";
 import ChatBox from "./ChatBox";
 import Feed from "../feed/Feed";
+import Image from "next/image";
 
 const ProjectView = ({ project, members }) => {
   const { id } = useParams();
@@ -54,11 +55,22 @@ const ProjectView = ({ project, members }) => {
         <Loader />
       ) : (
         <main>
-          <div className="flex justify-start items-end relative">
-            <h1 className="font-bold text-2xl">{project.title}</h1>
+          <div className="flex items-center gap-4">
+            {project.image_id && (
+              <Image
+                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}${process.env.NEXT_PUBLIC_STORAGE_PATH}/project-image/${project.id}/${project.image_id}`}
+                alt="project image"
+                width={64}
+                height={64}
+                className="object-cover w-16 h-16 rounded-full"
+              />
+            )}
+            <div className="flex flex-col justify-start items-start">
+              <h1 className="font-bold text-2xl">{project.title}</h1>
+              <p className="font-light ">{project.status}</p>
+            </div>
             <SettingsDropdown project={project} members={members} setLoading={setLoading} />
           </div>
-          <p className="font-light ">{project.status}</p>
           <hr className="border-0 h-[1px] bg-gray-400 my-4" />
           <div className="flex gap-4 items-start max-lg:flex-col max-xl:mb-10">
             <div>

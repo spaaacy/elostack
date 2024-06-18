@@ -10,6 +10,7 @@ import { UserContext } from "@/context/UserContext";
 import { useForm } from "react-hook-form";
 import Loader from "../common/Loader";
 import toast, { Toaster } from "react-hot-toast";
+import Image from "next/image";
 
 const ProjectPublic = ({ project, members }) => {
   const { session } = useContext(UserContext);
@@ -116,47 +117,60 @@ const ProjectPublic = ({ project, members }) => {
         <Loader />
       ) : (
         <main>
-          <div className="flex justify-between items-center">
-            <h1 className="font-bold text-2xl">{project.title}</h1>
+          <div className="flex items-center gap-4">
+            {project.image_id && (
+              <Image
+                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}${process.env.NEXT_PUBLIC_STORAGE_PATH}/project-image/${project.id}/${project.image_id}`}
+                alt="project image"
+                width={64}
+                height={64}
+                className="object-cover w-16 h-16 rounded-full"
+              />
+            )}
+            <div className="flex flex-col justify-start items-start">
+              <h1 className="font-bold text-2xl">{project.title}</h1>
+              <p className="font-light ">{project.status}</p>
+            </div>
 
-            {session?.data.session ? (
-              project.is_open &&
-              !banned &&
-              !request && (
-                <button
-                  onClick={() => setShowRequest(true)}
-                  className="flex-shrink-0 bg-primary hover:bg-primarydark hover:text-gray-300 mt-auto self-end px-3 py-1  rounded-full text-sm  dark:shadow dark:shadow-neutral-800 text-gray-200"
+            <div className="ml-auto">
+              {session?.data.session ? (
+                project.is_open &&
+                !banned &&
+                !request && (
+                  <button
+                    onClick={() => setShowRequest(true)}
+                    className="flex-shrink-0 bg-primary hover:bg-primarydark hover:text-gray-300 mt-auto self-end px-3 py-1  rounded-full text-sm  dark:shadow dark:shadow-neutral-800 text-gray-200"
+                  >
+                    Request to Join
+                  </button>
+                )
+              ) : (
+                <Link
+                  href={"/signin"}
+                  className={
+                    "flex-shrink-0 bg-primary hover:bg-primarydark hover:text-gray-300 mt-auto self-end px-3 py-1  rounded-full text-sm  dark:shadow dark:shadow-neutral-800 text-gray-200"
+                  }
                 >
                   Request to Join
-                </button>
-              )
-            ) : (
-              <Link
-                href={"/signin"}
-                className={
-                  "flex-shrink-0 bg-primary hover:bg-primarydark hover:text-gray-300 mt-auto self-end px-3 py-1  rounded-full text-sm  dark:shadow dark:shadow-neutral-800 text-gray-200"
-                }
-              >
-                Request to Join
-              </Link>
-            )}
-            {banned ? (
-              <p className="bg-red-700 mt-auto self-end px-3 py-1  rounded-full text-sm  dark:shadow dark:shadow-neutral-800 flex-shrink-0 text-gray-200">
-                You were banned
-              </p>
-            ) : (
-              request && (
-                <p
-                  className={`${
-                    request.rejected ? "bg-red-700" : "bg-green-600"
-                  }  mt-auto self-end px-3 py-1  rounded-full text-sm  dark:shadow dark:shadow-neutral-800 flex-shrink-0 text-gray-200`}
-                >
-                  {request.rejected ? "Your were rejected" : "Request made"}
+                </Link>
+              )}
+              {banned ? (
+                <p className="bg-red-700 mt-auto self-end px-3 py-1  rounded-full text-sm  dark:shadow dark:shadow-neutral-800 flex-shrink-0 text-gray-200">
+                  You were banned
                 </p>
-              )
-            )}
+              ) : (
+                request && (
+                  <p
+                    className={`${
+                      request.rejected ? "bg-red-700" : "bg-green-600"
+                    }  mt-auto self-end px-3 py-1  rounded-full text-sm  dark:shadow dark:shadow-neutral-800 flex-shrink-0 text-gray-200`}
+                  >
+                    {request.rejected ? "Your were rejected" : "Request made"}
+                  </p>
+                )
+              )}
+            </div>
           </div>
-          <p className="font-light ">{project.status}</p>
           <hr className="border-0 h-[1px] bg-gray-400 my-4" />
           <div className="flex gap-4 lg:items-start max-lg:flex-col">
             <div className="lg:w-72 p-2 rounded dark:border bg-gray-300 dark:bg-backgrounddark  dark:border-gray-400 flex flex-col font-light text-sm ">
