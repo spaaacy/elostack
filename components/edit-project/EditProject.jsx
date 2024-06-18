@@ -46,9 +46,9 @@ const EditProject = () => {
   }, [watch]);
 
   useEffect(() => {
-    if (session && user) {
+    if (session) {
       if (session.data.session) {
-        if (!dataLoaded) {
+        if (!dataLoaded && user) {
           setDataLoaded(true);
           fetchProject();
         }

@@ -11,6 +11,7 @@ import { useForm } from "react-hook-form";
 import Loader from "../common/Loader";
 import toast, { Toaster } from "react-hot-toast";
 import Image from "next/image";
+import ProjectOverview from "./ProjectOverview";
 
 const ProjectPublic = ({ project, members }) => {
   const { session } = useContext(UserContext);
@@ -20,6 +21,8 @@ const ProjectPublic = ({ project, members }) => {
   const [showRequest, setShowRequest] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [posts, setPosts] = useState();
+  const [currentState, setCurrentState] = useState("overview");
 
   const {
     register,
@@ -172,48 +175,35 @@ const ProjectPublic = ({ project, members }) => {
             </div>
           </div>
           <hr className="border-0 h-[1px] bg-gray-400 my-4" />
-          <div className="flex gap-4 lg:items-start max-lg:flex-col">
-            <div className="lg:w-72 p-2 rounded dark:border bg-gray-300 dark:bg-backgrounddark  dark:border-gray-400 flex flex-col font-light text-sm ">
-              <p className="relative">
-                <span className="font-semibold">Description</span>
-                <br />
-                {showMoreDescription ? project.description : `${project.description.substring(0, 265)}...`}
-                <button
-                  type="button"
-                  className="bg-gray-300 pl-2 dark:bg-backgrounddark absolute bottom-0 right-0 dark:text-blue-400 dark:hover:text-blue-500 text-blue-600 hover:text-blue-700 hover:underline"
-                  onClick={() => setShowMoreDescription(!showMoreDescription)}
-                >
-                  {showMoreDescription ? "Show Less" : "Show More"}
-                </button>
-              </p>
-
-              <p className="mt-4 font-semibold">Members</p>
-              <ul>
-                {members
-                  .filter((member) => !member.banned)
-                  .map((member, i) => {
-                    return (
-                      <li key={i}>
-                        <p className=" ">{member.profile.username}</p>
-                      </li>
-                    );
-                  })}
-              </ul>
-              <p className="mt-4 font-semibold">Technologies</p>
-              <p>{project.technologies}</p>
-              <div className="flex items-end">
-                <p className="text-primary mt-4 dark:font-normal font-medium">
-                  {`Duration: ${formatDuration(project.duration_length, project.duration_type)}`}
-                </p>
-                {project.github && (
-                  <Link className="ml-auto" href={project.github} target="_blank">
-                    <FaGithub className=" text-2xl dark:hover:text-gray-300 hover:text-gray-500" />
-                  </Link>
-                )}
-              </div>
-            </div>
-            <Feed isMember={false} project={project} />
+          <div className="flex gap-2 text-sm mb-4">
+            <button
+              type="button"
+              onClick={() => setCurrentState("overview")}
+              className={`${
+                currentState === "overview"
+                  ? "bg-primary text-white"
+                  : "bg-gray-200 dark:bg-backgrounddark hover:bg-gray-300 dark:hover:bg-neutral-800"
+              } rounded dark:border px-2 py-1`}
+            >
+              Overview
+            </button>
+            <button
+              type="button"
+              onClick={() => setCurrentState("updates")}
+              className={`${
+                currentState === "updates"
+                  ? "bg-primary text-white"
+                  : "bg-gray-200 dark:bg-backgrounddark hover:bg-gray-300 dark:hover:bg-neutral-800"
+              } rounded dark:border px-2 py-1`}
+            >
+              Updates
+            </button>
           </div>
+          {currentState === "overview" ? (
+            <ProjectOverview members={members} project={project} />
+          ) : (
+            <Feed posts={posts} setPosts={setPosts} project={project} isMember={false} />
+          )}
         </main>
       )}
       {showRequest && (

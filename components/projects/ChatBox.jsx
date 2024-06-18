@@ -29,7 +29,7 @@ const ChatBox = ({ project, id, members }) => {
       }
     };
 
-    if (session && user) loadData();
+    if (session) loadData();
 
     // Scrolls the chat to the bottom
     if (chat && !loadMoreMessages) {
@@ -52,7 +52,7 @@ const ChatBox = ({ project, id, members }) => {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [session, user, chat]);
+  }, [session, chat]);
 
   const sendMessage = async (data, e) => {
     e.preventDefault();

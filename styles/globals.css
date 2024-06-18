@@ -35,6 +35,10 @@
 }
 
 @layer utilities {
+  .markdown > * {
+    all: revert;
+  }
+
   .line-clamp-14 {
     overflow: hidden;
     display: -webkit-box;

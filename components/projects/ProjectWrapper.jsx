@@ -25,8 +25,8 @@ const ProjectWrapper = () => {
       await fetchMembers();
     };
 
-    if (session && user) {
-      if (!dataLoaded) loadData();
+    if (session) {
+      if ((session.data.session && user) || !session.data.session) if (!dataLoaded) loadData();
     }
   }, [session, user]);
 
@@ -57,7 +57,7 @@ const ProjectWrapper = () => {
         setMembers(members);
         const userId = session.data.session?.user.id;
         const access = members.some((m) => m.user_id === userId && !m.banned);
-        if (access || user.admin) setAccess(true);
+        if (access || user?.admin) setAccess(true);
         setLoading(false);
       }
     } catch (error) {

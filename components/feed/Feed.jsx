@@ -3,9 +3,8 @@ import Post from "./Post";
 import { UserContext } from "@/context/UserContext";
 import CreatePost from "./CreatePost";
 
-const Feed = ({ project, isMember }) => {
+const Feed = ({ posts, setPosts, project, isMember }) => {
   const { session } = useContext(UserContext);
-  const [posts, setPosts] = useState();
   const [dataLoaded, setDataLoaded] = useState(false);
   const [nextPostsPage, setNextPostsPage] = useState(1);
   const [showLoadMorePosts, setShowLoadMorePosts] = useState(false);
@@ -13,8 +12,8 @@ const Feed = ({ project, isMember }) => {
   useEffect(() => {
     const loadData = async () => {
       if (!dataLoaded) {
-        fetchPosts();
         setDataLoaded(true);
+        fetchPosts();
       }
     };
 
@@ -64,7 +63,7 @@ const Feed = ({ project, isMember }) => {
   };
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full max-w-[840px] mx-auto">
       {session?.data.session && (!project || isMember) && <CreatePost project={project} setPosts={setPosts} />}
       {posts && (
         <>
