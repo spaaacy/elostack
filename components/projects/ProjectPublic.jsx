@@ -198,7 +198,7 @@ const ProjectPublic = ({ project, members }) => {
                 )}
               </div>
             </div>
-            <Feed isMember={members.find((m) => m.user_id === session.data.session?.user.id)} project={project} />
+            <Feed isMember={false} project={project} />
           </div>
         </main>
       )}

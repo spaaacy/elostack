@@ -57,8 +57,7 @@ const ProjectWrapper = () => {
         setMembers(members);
         const userId = session.data.session?.user.id;
         const access = members.some((m) => m.user_id === userId && !m.banned);
-        console.log(user);
-        if (access || user.admin) setAccess(access);
+        if (access || user.admin) setAccess(true);
         setLoading(false);
       }
     } catch (error) {

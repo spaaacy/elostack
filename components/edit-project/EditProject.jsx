@@ -17,13 +17,14 @@ const EditProject = () => {
   const { session, user } = useContext(UserContext);
   const { id } = useParams();
   const [technologies, setTechnologies] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [showClear, setShowClear] = useState(false);
   const router = useRouter();
   const [file, setFile] = useState();
   const [image, setImage] = useState();
   const fileInputRef = useRef();
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [project, setProject] = useState();
 
   const {
     watch,
@@ -51,7 +52,7 @@ const EditProject = () => {
         }
       } else router.push("/projects");
     }
-  }, [session]);
+  }, [session, user]);
 
   const fetchProject = async () => {
     try {
@@ -67,6 +68,8 @@ const EditProject = () => {
         setValue("durationLength", project.duration_length);
         setValue("teamSize", project.team_size);
         setTechnologies(project.technologies.split(", "));
+        setProject(project);
+        setLoading(false);
       } else {
         router.push("/projects");
       }
@@ -85,30 +88,29 @@ const EditProject = () => {
       formData.append(
         "project",
         JSON.stringify({
+          id: project.id,
           title: data.title,
           description: data.description,
           technologies: technologies.join(", "),
-          leader: session.data.session.user.id,
           duration_length: data.durationLength,
           duration_type: data.durationType,
           team_size: data.teamSize,
-          status: "Just created",
-          is_open: true,
-          deleted: false,
         })
       );
-      if (image) formData.append("projectImage", file);
+      if (image) {
+        // formData.append("oldImageId", project.image_id);
+        // formData.append("projectImage", file);
+      }
 
-      const response = await fetch("/api/project/create", {
-        method: "POST",
+      const response = await fetch("/api/project/edit", {
+        method: "PATCH",
         headers: {
           "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
         },
         body: formData,
       });
-      if (response.status === 201) {
-        const { projectId } = await response.json();
-        router.push(`/projects/${projectId}`);
+      if (response.status === 200) {
+        router.push(`/projects/${project.id}`);
       } else {
         const { error } = await response.json();
         throw error;
@@ -318,21 +320,12 @@ const EditProject = () => {
                   Clear
                 </button>
               )}
-              {session?.data.session ? (
-                <button
-                  className="mt-4 ml-auto px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-sm hover:text-gray-300 dark:shadow dark:shadow-neutral-800"
-                  type="submit"
-                >
-                  Create
-                </button>
-              ) : (
-                <Link
-                  href={"/signin"}
-                  className="mt-4 ml-auto px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-sm hover:text-gray-300 dark:shadow dark:shadow-neutral-800"
-                >
-                  Create
-                </Link>
-              )}
+              <button
+                className="mt-4 ml-auto px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-sm hover:text-gray-300 dark:shadow dark:shadow-neutral-800"
+                type="submit"
+              >
+                Save Changes
+              </button>
             </div>
           </form>
         </main>

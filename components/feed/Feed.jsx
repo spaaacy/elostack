@@ -64,19 +64,19 @@ const Feed = ({ project, isMember }) => {
   };
 
   return (
-    <div className="flex flex-col flex-1 ">
+    <div className="flex flex-col w-full">
       {session?.data.session && (!project || isMember) && <CreatePost project={project} setPosts={setPosts} />}
       {posts && (
         <>
           {posts.length > 0 ? (
-            <ul className="flex flex-col gap-6 ">
+            <ul className="flex flex-col gap-6">
               {posts.map((p, i) => (
                 <Post key={p.id} post={p} setPosts={setPosts} project={project} />
               ))}
             </ul>
           ) : (
             <div className="text-center text-sm rounded-xl bg-neutral-50 px-3 py-8 dark:bg-backgrounddark dark:border dark:border-gray-400">
-              No public posts
+              No posts
             </div>
           )}
         </>

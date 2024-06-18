@@ -51,7 +51,7 @@ const AccountSettings = () => {
       formData.append("userId", userId);
       formData.append("imageId", profile.image_id);
 
-      const response = await fetch("/api/profile/edit-profile", {
+      const response = await fetch("/api/profile/edit", {
         method: "PATCH",
         headers: {
           "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
