@@ -160,13 +160,13 @@ const LandingPage = () => {
                 />{" "}
                 Idea.
               </p>
-              <Link
+              {/* <Link
                 target="_blank"
                 href={"/create-project"}
                 className="text-center dark:bg-black bg-neutral-100 hover:border-white border-transparent hover:bg-black dark:hover:bg-white border-2 py-2 px-4 text-xl mt-8 hover:text-white dark:hover:text-black  dark:text-white text-black dark:border-white transition duration-200 font-semibold"
               >
                 Try now
-              </Link>
+              </Link> */}
             </div>
           </div>
         </section>

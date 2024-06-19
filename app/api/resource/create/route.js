@@ -11,12 +11,12 @@ export async function POST(req, res) {
     const auth = await supabase.auth.setSession({ access_token, refresh_token });
     if (auth.error) throw auth.error;
 
-    const task = await req.json();
-    const taskId = uuidv4();
-    const { error } = await supabase.from("task").insert({ ...task, id: taskId });
+    const resource = await req.json();
+    const resourceId = uuidv4();
+    const { error } = await supabase.from("resource").insert({ ...resource, id: resourceId });
     if (error) throw error;
 
-    return NextResponse.json({ message: "Task created successfully!", taskId }, { status: 201 });
+    return NextResponse.json({ message: "Resource created successfully!", resourceId }, { status: 201 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error }, { status: 500 });

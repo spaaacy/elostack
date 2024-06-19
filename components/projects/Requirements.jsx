@@ -6,21 +6,21 @@ import { IoIosArrowDown } from "react-icons/io";
 import { IoAddCircle } from "react-icons/io5";
 import toast from "react-hot-toast";
 import { UserContext } from "@/context/UserContext";
+import { extractMarkdownLink } from "@/utils/extractMarkdownLink";
+import Link from "next/link";
 
-const Requirements = ({ role, project, setProject }) => {
+const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, setTasks, resources, setResources }) => {
   const { session, user, profile } = useContext(UserContext);
-  const [tasks, setTasks] = useState();
-  const [sprints, setSprints] = useState();
   const [currentSprint, setCurrentSprint] = useState(project.current_sprint);
   const [showRoles, setShowRoles] = useState(false);
   const [currentRole, setCurrentRole] = useState(
     role ? role.split(", ")[0] : project.roles ? project.roles.split(", ")[0] : null
   );
   const [sprintTitle, setSprintTitle] = useState("");
-  const [taskTitle, setTaskTitle] = useState("");
+  const [taskResourceTitle, setTaskResoruceTitle] = useState("");
   const [roleTitle, setRoleTitle] = useState("");
   const [dataLoaded, setDataLoaded] = useState(false);
-  const [showPending, setShowPending] = useState(true);
+  const [currentPage, setCurrentPage] = useState("pending");
   const roleRef = useRef();
   const buttonRef = useRef();
 
@@ -29,6 +29,7 @@ const Requirements = ({ role, project, setProject }) => {
       setDataLoaded(true);
       fetchSprints();
       fetchTasks();
+      fetchResources();
     };
 
     if (session) {
@@ -112,14 +113,14 @@ const Requirements = ({ role, project, setProject }) => {
 
   const createTask = async () => {
     const userId = session.data.session.user.id;
-    if (!taskTitle || !userId) return;
+    if (!taskResourceTitle || !userId) return;
 
     setTasks((prevTasks) => [
       ...prevTasks,
       {
         id: "0",
         role: currentRole.toLowerCase(),
-        title: taskTitle,
+        title: taskResourceTitle,
         sprint_id: currentSprint.id,
         complete: false,
         assignee: null,
@@ -134,7 +135,7 @@ const Requirements = ({ role, project, setProject }) => {
         },
         body: JSON.stringify({
           role: currentRole.toLowerCase(),
-          title: taskTitle,
+          title: taskResourceTitle,
           sprint_id: currentSprint,
           complete: false,
           assignee: null,
@@ -143,7 +144,7 @@ const Requirements = ({ role, project, setProject }) => {
       if (response.status === 201) {
         const { taskId } = await response.json();
         setTasks((prevTasks) => prevTasks.map((task) => (task.id === "0" ? { ...task, id: taskId } : task)));
-        setTaskTitle("");
+        setTaskResoruceTitle("");
       } else {
         const { error } = await response.json();
         throw error;
@@ -152,6 +153,55 @@ const Requirements = ({ role, project, setProject }) => {
       console.error(error);
       toast.error("Oops, something went wrong...");
       setTasks((prevTasks) => prevTasks.filter((task) => task.id !== "0"));
+    }
+  };
+
+  const createResource = async () => {
+    const userId = session.data.session.user.id;
+    if (!taskResourceTitle || !userId) return;
+
+    const linkObject = extractMarkdownLink(taskResourceTitle);
+    if (!linkObject) {
+      toast.error("Resource format invalid");
+      return;
+    }
+
+    setResources((prevRes) => [
+      ...prevRes,
+      {
+        id: "0",
+        role: currentRole.toLowerCase(),
+        title: linkObject.label,
+        url: linkObject.url,
+        sprint_id: currentSprint.id,
+      },
+    ]);
+
+    try {
+      const response = await fetch("/api/resource/create", {
+        method: "POST",
+        headers: {
+          "X-Supabase-Auth": `${session.data.session.access_token} ${session.data.session.refresh_token}`,
+        },
+        body: JSON.stringify({
+          role: currentRole.toLowerCase(),
+          title: linkObject.label,
+          url: linkObject.url,
+          sprint_id: currentSprint,
+        }),
+      });
+      if (response.status === 201) {
+        const { resourceId } = await response.json();
+        setResources((prevRes) => prevRes.map((res) => (res.id === "0" ? { ...res, id: resourceId } : res)));
+        setTaskResoruceTitle("");
+      } else {
+        const { error } = await response.json();
+        throw error;
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Oops, something went wrong...");
+      setResources((prevRes) => prevRes.filter((res) => res.id !== "0"));
     }
   };
 
@@ -222,6 +272,26 @@ const Requirements = ({ role, project, setProject }) => {
       if (response.status === 200) {
         const { tasks } = await response.json();
         setTasks(tasks);
+      } else {
+        const { error } = await response.json();
+        throw error;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchResources = async () => {
+    try {
+      const response = await fetch(`/api/resource/${project.id}`, {
+        method: "GET",
+        headers: {
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+        },
+      });
+      if (response.status === 200) {
+        const { resources } = await response.json();
+        setResources(resources);
       } else {
         const { error } = await response.json();
         throw error;
@@ -327,6 +397,13 @@ const Requirements = ({ role, project, setProject }) => {
     }
   };
 
+  const resourceKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      createResource();
+    }
+  };
+
   return (
     <div className="flex relative">
       <div className="flex flex-col gap-2 min-w-44">
@@ -361,130 +438,170 @@ const Requirements = ({ role, project, setProject }) => {
         )}
       </div>
 
-      <div className="flex flex-1 gap-2 flex-col px-8">
-        <div className="flex text-sm gap-2 items-center">
-          <button
-            type="button"
-            onClick={() => setShowPending(true)}
-            className={`${
-              showPending
-                ? "bg-primary text-white"
-                : "bg-gray-300 dark:bg-neutral-800 hover:bg-gray-400 dark:hover:bg-neutral-700"
-            } px-2 py-1 rounded `}
-          >
-            Pending Tasks
-          </button>
-          <button
-            type="button"
-            onClick={() => setShowPending(false)}
-            className={`${
-              !showPending
-                ? "bg-primary text-white"
-                : "bg-gray-300 dark:bg-neutral-800 hover:bg-gray-400 dark:hover:bg-neutral-700"
-            } px-2 py-1 rounded `}
-          >
-            Completed Tasks
-          </button>
-        </div>
-        <div className="flex gap-4">
-          {showPending ? (
-            <div className="flex flex-col w-full">
-              <h3 className="font-semibold mb-2 capitalize">{`${currentRole} pending tasks`}</h3>
-              <ul className="flex flex-col gap-1">
-                {tasks
-                  ?.filter((t) => !t.complete && t.role === currentRole && t.sprint_id === currentSprint)
-                  .map((t, i) => {
-                    return (
-                      <div key={i} className="flex items-center gap-2">
-                        <button
-                          disabled={!role?.includes(currentRole) || t.assignee !== session.data.session.user.id}
-                          onClick={() => completeTask(t)}
-                          type="button"
-                          className={`${
-                            !role?.includes(currentRole) || t.assignee !== session.data.session.user.id
-                              ? ""
-                              : "hover:text-neutral-600 dark:hover:text-neutral-300"
-                          } flex gap-2 items-center `}
-                        >
-                          <MdOutlineCheckBoxOutlineBlank className="text-xl flex-shrink-0" />
-                          <p className={`text-sm text-left`}>{t.title}</p>
-                        </button>
-                        {!t.assignee && role?.includes(currentRole) ? (
+      {project.roles ? (
+        <div className="flex flex-1 gap-2 flex-col px-8">
+          <div className="flex text-sm gap-2 items-center">
+            <button
+              type="button"
+              onClick={() => setCurrentPage("pending")}
+              className={`${
+                currentPage === "pending"
+                  ? "bg-primary text-white"
+                  : "bg-gray-300 dark:bg-neutral-800 hover:bg-gray-400 dark:hover:bg-neutral-700"
+              } px-2 py-1 rounded `}
+            >
+              Pending Tasks
+            </button>
+            <button
+              type="button"
+              onClick={() => setCurrentPage("completed")}
+              className={`${
+                currentPage === "completed"
+                  ? "bg-primary text-white"
+                  : "bg-gray-300 dark:bg-neutral-800 hover:bg-gray-400 dark:hover:bg-neutral-700"
+              } px-2 py-1 rounded `}
+            >
+              Completed Tasks
+            </button>
+            <button
+              type="button"
+              onClick={() => setCurrentPage("resources")}
+              className={`${
+                currentPage === "resources"
+                  ? "bg-primary text-white"
+                  : "bg-gray-300 dark:bg-neutral-800 hover:bg-gray-400 dark:hover:bg-neutral-700"
+              } px-2 py-1 rounded `}
+            >
+              Resources
+            </button>
+          </div>
+          <div className="flex gap-4">
+            {currentPage === "pending" ? (
+              <div className="flex flex-col w-full">
+                <h3 className="font-semibold mb-2 capitalize">{`${currentRole} pending tasks`}</h3>
+                <ul className="flex flex-col gap-1">
+                  {tasks
+                    ?.filter((t) => !t.complete && t.role === currentRole && t.sprint_id === currentSprint)
+                    .map((t, i) => {
+                      return (
+                        <div key={i} className="flex items-start gap-2">
                           <button
+                            disabled={!role?.includes(currentRole) || t.assignee !== session.data.session.user.id}
+                            onClick={() => completeTask(t)}
                             type="button"
-                            onClick={() => assignYourself(t.id, session.data.session.user.id)}
-                            className="text-xs px-2 py-1 rounded-full bg-primary hover:bg-primarydark text-white hover:text-neutral-200 flex-shrink-0 ml-auto"
-                          >
-                            Assign Yourself
-                          </button>
-                        ) : t.assignee === session.data.session.user.id ? (
-                          <button
-                            type="button"
-                            onClick={() => assignYourself(t.id, null)}
-                            className="text-xs px-2 py-1 rounded-full dark:bg-sky-500 bg-sky-400 text-white ml-auto hover:bg-red-500 dark:hover:hover:bg-red-600 flex-shrink-0"
-                          >
-                            {t.username}
-                          </button>
-                        ) : (
-                          <p
                             className={`${
-                              t.username ? " dark:bg-sky-500 bg-sky-400" : "bg-neutral-600"
-                            } text-xs px-2 py-1 rounded-full text-white ml-auto flex-shrink-0`}
+                              !role?.includes(currentRole) || t.assignee !== session.data.session.user.id
+                                ? ""
+                                : "hover:text-neutral-600 dark:hover:text-neutral-300"
+                            } flex gap-2 items-start `}
                           >
-                            {t.username ? t.username : "None assigned"}
+                            <MdOutlineCheckBoxOutlineBlank className="text-xl flex-shrink-0" />
+                            <p className={`text-sm text-left`}>{t.title}</p>
+                          </button>
+                          {!t.assignee && role?.includes(currentRole) ? (
+                            <button
+                              type="button"
+                              onClick={() => assignYourself(t.id, session.data.session.user.id)}
+                              className="text-xs px-2 py-1 rounded-full bg-primary hover:bg-primarydark text-white hover:text-neutral-200 flex-shrink-0 ml-auto"
+                            >
+                              Assign Yourself
+                            </button>
+                          ) : t.assignee === session.data.session.user.id ? (
+                            <button
+                              type="button"
+                              onClick={() => assignYourself(t.id, null)}
+                              className="text-xs px-2 py-1 rounded-full dark:bg-sky-500 bg-sky-400 text-white ml-auto hover:bg-red-500 dark:hover:hover:bg-red-600 flex-shrink-0"
+                            >
+                              {t.username}
+                            </button>
+                          ) : (
+                            <p
+                              className={`${
+                                t.username ? " dark:bg-sky-500 bg-sky-400" : "bg-neutral-600"
+                              } text-xs px-2 py-1 rounded-full text-white ml-auto flex-shrink-0`}
+                            >
+                              {t.username ? t.username : "None assigned"}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
+                </ul>
+              </div>
+            ) : currentPage === "completed" ? (
+              <div className="flex flex-col w-full">
+                <h3 className="font-semibold capitalize">{`${currentRole} completed tasks`}</h3>
+                <ul className="mt-2 flex flex-col gap-1">
+                  {tasks
+                    ?.filter((t) => t.complete && t.role === currentRole && t.sprint_id === currentSprint)
+                    .map((t, i) => {
+                      return (
+                        <div key={i} className="flex items-start gap-2">
+                          <button
+                            disabled={!role?.includes(currentRole)}
+                            onClick={() => completeTask(t)}
+                            type="button"
+                            className={`${
+                              !role?.includes(currentRole) ? "" : "hover:text-neutral-600 dark:hover:text-neutral-300"
+                            } flex gap-2 items-start `}
+                          >
+                            <MdOutlineCheckBox className="text-xl flex-shrink-0" />
+                            <p className={`"line-through text-sm text-left`}>{t.title}</p>
+                          </button>
+                          <p className="text-xs px-2 py-1 rounded-full dark:bg-sky-500 bg-sky-400 text-white ml-auto  flex-shrink-0">
+                            {t.username}
                           </p>
-                        )}
-                      </div>
-                    );
-                  })}
-              </ul>
-            </div>
-          ) : (
-            <div className="flex flex-col w-full">
-              <h3 className="font-semibold capitalize">{`${currentRole} completed tasks`}</h3>
-              <ul className="mt-2 flex flex-col gap-1">
-                {tasks
-                  ?.filter((t) => t.complete && t.role === currentRole && t.sprint_id === currentSprint)
-                  .map((t, i) => {
+                        </div>
+                      );
+                    })}
+                </ul>
+              </div>
+            ) : (
+              <div className="flex flex-col w-full">
+                <h3 className="font-semibold capitalize">{`${currentRole} resource`}</h3>
+                <ul className="mt-2 flex flex-col gap-1">
+                  {resources.map((t, i) => {
                     return (
-                      <div key={i} className="flex items-center gap-2">
-                        <button
-                          disabled={!role?.includes(currentRole)}
-                          onClick={() => completeTask(t)}
-                          type="button"
-                          className={`${
-                            !role?.includes(currentRole) ? "" : "hover:text-neutral-600 dark:hover:text-neutral-300"
-                          } flex gap-2 items-center `}
-                        >
-                          <MdOutlineCheckBox className="text-xl flex-shrink-0" />
-                          <p className={`"line-through text-sm text-left`}>{t.title}</p>
-                        </button>
-                        <p className="text-xs px-2 py-1 rounded-full dark:bg-sky-500 bg-sky-400 text-white ml-auto  flex-shrink-0">
-                          {t.username}
-                        </p>
-                      </div>
+                      <Link
+                        key={i}
+                        href={t.url}
+                        className={
+                          "flex gap-2 items-start dark:text-blue-400 dark:hover:text-blue-500 text-blue-600 hover:text-blue-700 hover:underline"
+                        }
+                      >
+                        <p className={` text-sm text-left`}>{t.title}</p>
+                      </Link>
                     );
                   })}
-              </ul>
+                </ul>
+              </div>
+            )}
+          </div>
+          {user?.admin && currentRole && currentSprint && (
+            <div className="mt-4 flex items-center gap-1 ">
+              <input
+                placeholder={`Create ${
+                  currentPage === "resources" ? "resource. Use format: [Google](https://www.google.com/)" : "task"
+                }`}
+                value={taskResourceTitle}
+                onChange={(e) => setTaskResoruceTitle(e.target.value)}
+                onKeyDown={currentPage === "resources" ? resourceKeyDown : taskKeyDown}
+                type="text"
+                className="rounded text-sm px-2 py-1 focus:ring-0 focus:outline-none focus:bg-neutral-50 dark:focus:bg-neutral-800 w-full"
+              />
+              <button
+                type="button"
+                onClick={currentPage === "resources" ? createResource : createTask}
+                className="text-primary text-lg"
+              >
+                <IoAddCircle />
+              </button>
             </div>
           )}
         </div>
-        {user?.admin && currentRole && currentSprint && (
-          <div className="mt-8 flex items-center gap-1 ">
-            <input
-              placeholder="Create task"
-              value={taskTitle}
-              onChange={(e) => setTaskTitle(e.target.value)}
-              onKeyDown={taskKeyDown}
-              type="text"
-              className="rounded text-sm px-2 py-1 focus:ring-0 focus:outline-none focus:bg-neutral-50 dark:focus:bg-neutral-800 w-full"
-            />
-            <button type="button" onClick={createTask} className="text-primary text-lg">
-              <IoAddCircle />
-            </button>
-          </div>
-        )}
-      </div>
+      ) : (
+        <p className="flex-1 font-semibold  px-8">Create a role and sprint to begin</p>
+      )}
 
       <div className="text-xs relative">
         {project.roles && (
@@ -497,7 +614,7 @@ const Requirements = ({ role, project, setProject }) => {
           </button>
         )}
         {user?.admin && (
-          <div className="mt-8 max-w-40 flex items-center gap-1 ">
+          <div className="mt-4 max-w-40 flex items-center gap-1 ">
             <input
               placeholder="Add role"
               value={roleTitle}

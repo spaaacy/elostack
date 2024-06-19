@@ -19,14 +19,15 @@ const ProjectView = ({ project, members, setProject }) => {
   const { session, user } = useContext(UserContext);
   const [loading, setLoading] = useState(false);
   const [currentState, setCurrentState] = useState("overview");
-  const [posts, setPosts] = useState();
+  const [posts, setPosts] = useState([]);
+  const [tasks, setTasks] = useState([]);
+  const [resources, setResources] = useState([]);
+  const [sprints, setSprints] = useState();
   const [showSetupModal, setShowSetupModal] = useState(false);
 
   useEffect(() => {
     if (session) {
-      const member = members.find(
-        (m) => m.user_id === session.data.session.user.id
-      );
+      const member = members.find((m) => m.user_id === session.data.session.user.id);
       if (member && !member.role) setShowSetupModal(true);
     }
   }, [session]);
@@ -52,11 +53,7 @@ const ProjectView = ({ project, members, setProject }) => {
               <h1 className="font-bold text-2xl">{project.title}</h1>
               <p className="font-light ">{project.status}</p>
             </div>
-            <SettingsDropdown
-              project={project}
-              members={members}
-              setLoading={setLoading}
-            />
+            <SettingsDropdown project={project} members={members} setLoading={setLoading} />
           </div>
           <hr className="border-0 h-[1px] bg-gray-400 my-4" />
           <div className="flex gap-2 text-sm mb-4">
@@ -95,40 +92,26 @@ const ProjectView = ({ project, members, setProject }) => {
             </button>
           </div>
           {currentState === "overview" ? (
-            <ProjectOverview
-              user={user}
-              members={members}
-              project={project}
-              setLoading={setLoading}
-            />
+            <ProjectOverview user={user} members={members} project={project} setLoading={setLoading} />
           ) : currentState === "updates" ? (
-            <Feed
-              posts={posts}
-              setPosts={setPosts}
-              project={project}
-              isMember={true}
-            />
+            <Feed posts={posts} setPosts={setPosts} project={project} isMember={true} />
           ) : (
             <Requirements
-              role={
-                members.find((m) => m.user_id === session.data.session.user.id)
-                  ?.role
-              }
+              role={members.find((m) => m.user_id === session.data.session.user.id)?.role}
               project={project}
               setProject={setProject}
+              sprints={sprints}
+              setSprints={setSprints}
+              tasks={tasks}
+              setTasks={setTasks}
+              resources={resources}
+              setResources={setResources}
             />
           )}
-          <ChatBox
-            session={session}
-            project={project}
-            id={id}
-            members={members}
-          />
+          <ChatBox session={session} project={project} id={id} members={members} />
         </main>
       )}
-      {showSetupModal && (
-        <SetupModal project={project} setShowModal={setShowSetupModal} />
-      )}
+      {showSetupModal && <SetupModal project={project} setShowModal={setShowSetupModal} />}
       <Toaster />
     </div>
   );

@@ -12,6 +12,7 @@ import Footer from "../common/Footer";
 import Image from "next/image";
 import Avatar from "boring-avatars";
 import Head from "next/head";
+import Markdown from "react-markdown";
 
 const Projects = () => {
   const { session } = useContext(UserContext);
@@ -162,7 +163,7 @@ const Projects = () => {
                           </p>
                         </div>
                       </div>
-                      <p className="text-sm mt-2 line-clamp-4 ">{p.description}</p>
+                      <Markdown className="text-sm mt-2 line-clamp-4 ">{p.description}</Markdown>
                       <p className="dark:font-normal font-medium text-primary mt-auto">{`Team ${p.total_members}/${p.team_size}`}</p>
                       <div className="flex justify-between items-center pt-1 ">
                         <p className="dark:font-normal font-medium text-primary">

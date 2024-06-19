@@ -1,8 +1,7 @@
 import { supabase } from "@/utils/supabase";
 import { NextRequest, NextResponse } from "next/server";
-import { v4 as uuidv4 } from "uuid";
 
-export async function POST(req, res) {
+export async function GET(req, res) {
   try {
     // Authentication
     const access_token = req.headers.get("x-supabase-auth").split(" ")[0];
@@ -11,12 +10,13 @@ export async function POST(req, res) {
     const auth = await supabase.auth.setSession({ access_token, refresh_token });
     if (auth.error) throw auth.error;
 
-    const task = await req.json();
-    const taskId = uuidv4();
-    const { error } = await supabase.from("task").insert({ ...task, id: taskId });
+    const { projectId } = res.params;
+    const { data, error } = await supabase.rpc("get_resources", {
+      p_project_id: projectId,
+    });
     if (error) throw error;
 
-    return NextResponse.json({ message: "Task created successfully!", taskId }, { status: 201 });
+    return NextResponse.json({ resources: data }, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error }, { status: 500 });
