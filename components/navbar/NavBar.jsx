@@ -112,7 +112,7 @@ const NavBar = () => {
       className={`${
         isHomePage && !session?.data.session
           ? "text-white"
-          : "sticky top-0 bg-backgroundlight  dark:bg-backgrounddark border-b border-b-1 border-gray-400 drop-shadow z-50"
+          : "sticky top-0 bg-backgroundlight  dark:bg-backgrounddark border-b border-b-1 border-gray-400 drop-shadow z-40"
       } h-[67px] `}
     >
       <div

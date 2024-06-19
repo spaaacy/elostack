@@ -48,7 +48,7 @@ const UserNav = ({ signOut }) => {
       {showAccountDropdown && (
         <div
           ref={accountRef}
-          className="absolute top-12 right-0 dark:bg-backgrounddark border border-gray-400 text-sm rounded-lg py-2 flex flex-col items-end w-28"
+          className="absolute top-12 right-0 dark:bg-backgrounddark bg-backgroundlight border border-gray-400 text-sm rounded-lg py-2 flex flex-col items-end w-28 "
         >
           <Link
             href={"/account-settings"}

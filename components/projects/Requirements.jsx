@@ -21,6 +21,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
   const [roleTitle, setRoleTitle] = useState("");
   const [dataLoaded, setDataLoaded] = useState(false);
   const [currentPage, setCurrentPage] = useState("pending");
+  const [showSprints, setShowSprints] = useState(false);
   const roleRef = useRef();
   const buttonRef = useRef();
 
@@ -207,7 +208,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
 
   const createRole = async () => {
     if (!roleTitle) return;
-    const newRoleString = project.roles ? ", " + roleTitle : roleTitle;
+    const newRoleString = project.roles ? ", " + roleTitle.toLowerCase() : roleTitle.toLowerCase();
 
     setProject({
       ...project,
@@ -221,7 +222,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
           "X-Supabase-Auth": `${session.data.session.access_token} ${session.data.session.refresh_token}`,
         },
         body: JSON.stringify({
-          roles: project.roles ? project.roles + newRoleString.toLowerCase() : newRoleString.toLowerCase(),
+          roles: project.roles ? project.roles + newRoleString : newRoleString,
           projectId: project.id,
         }),
       });
@@ -405,42 +406,50 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
   };
 
   return (
-    <div className="flex relative">
-      <div className="flex flex-col gap-2 min-w-44">
-        <h3 className="font-semibold  ">Sprints</h3>
-        {sprints?.map((s, i) => {
-          return (
-            <button
-              onClick={() => setCurrentSprint(s.id)}
-              key={i}
-              className={`${
-                s.id === currentSprint ? "text-primary  font-semibold dark:font-medium " : ""
-              } text-left text-xs hover:underline rounded-full my-1`}
-            >
-              {s.title}
-            </button>
-          );
-        })}
-        {user?.admin && (
-          <div className="flex items-center gap-1">
-            <input
-              placeholder="Create sprint"
-              value={sprintTitle}
-              onChange={(e) => setSprintTitle(e.target.value)}
-              onKeyDown={sprintKeyDown}
-              type="text"
-              className="rounded text-sm px-2 py-1 focus:ring-0 focus:outline-none focus:bg-neutral-50 dark:focus:bg-neutral-800"
-            />
-            <button type="button" onClick={createSprint} className="text-primary text-lg">
-              <IoAddCircle />
-            </button>
-          </div>
-        )}
+    <div className="flex gap-4 max-md:flex-col md:flex relative">
+      <div className="flex flex-col gap-2 min-w-44 max-md:items-center">
+        <button
+          onClick={() => setShowSprints(!showSprints)}
+          className="font-semibold max-md:hover:bg-gray-200 max-md:w-full max-md:py-2 flex gap-1 max-md:items-center max-md:justify-center"
+        >
+          <IoIosArrowDown className={`max-md:block md:hidden`} />
+          Sprints
+        </button>
+        <div className={`${showSprints ? "block " : "max-md:hidden"}   md:flex md:flex-col`}>
+          {sprints?.map((s, i) => {
+            return (
+              <button
+                onClick={() => setCurrentSprint(s.id)}
+                key={i}
+                className={`${
+                  s.id === currentSprint ? "text-primary  font-semibold dark:font-medium " : ""
+                } max-md:text-center text-left text-xs hover:underline rounded-full my-1 w-full`}
+              >
+                {s.title}
+              </button>
+            );
+          })}
+          {user?.admin && (
+            <div className="flex items-center gap-1">
+              <input
+                placeholder="Create sprint"
+                value={sprintTitle}
+                onChange={(e) => setSprintTitle(e.target.value)}
+                onKeyDown={sprintKeyDown}
+                type="text"
+                className="rounded text-sm px-2 py-1 focus:ring-0 focus:outline-none focus:bg-neutral-50 dark:focus:bg-neutral-800"
+              />
+              <button type="button" onClick={createSprint} className="text-primary text-lg">
+                <IoAddCircle />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {project.roles ? (
-        <div className="flex flex-1 gap-2 flex-col px-8">
-          <div className="flex text-sm gap-2 items-center">
+        <div className="flex flex-1 gap-2 flex-col md:px-8  ">
+          <div className="flex text-sm gap-2 items-center flex-wrap">
             <button
               type="button"
               onClick={() => setCurrentPage("pending")}
@@ -484,7 +493,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
                     ?.filter((t) => !t.complete && t.role === currentRole && t.sprint_id === currentSprint)
                     .map((t, i) => {
                       return (
-                        <div key={i} className="flex items-start gap-2">
+                        <div key={i} className="flex items-start gap-2  flex-wrap">
                           <button
                             disabled={!role?.includes(currentRole) || t.assignee !== session.data.session.user.id}
                             onClick={() => completeTask(t)}
@@ -536,7 +545,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
                     ?.filter((t) => t.complete && t.role === currentRole && t.sprint_id === currentSprint)
                     .map((t, i) => {
                       return (
-                        <div key={i} className="flex items-start gap-2">
+                        <div key={i} className="flex items-start gap-2  flex-wrap">
                           <button
                             disabled={!role?.includes(currentRole)}
                             onClick={() => completeTask(t)}
@@ -600,10 +609,10 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
           )}
         </div>
       ) : (
-        <p className="flex-1 font-semibold  px-8">Create a role and sprint to begin</p>
+        <p className="flex-1 font-semibold  md:px-8 ">Create a role and sprint to begin</p>
       )}
 
-      <div className="text-xs relative">
+      <div className="text-xs relative max-md:order-first flex flex-col items-end">
         {project.roles && (
           <button
             ref={buttonRef}
@@ -631,7 +640,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
         {showRoles && (
           <div
             ref={roleRef}
-            className="absolute top-8 right-0 w-32 dark:bg-backgrounddark bg-gray-100 rounded border border-gray-400 "
+            className="absolute top-8 right-0 w-32 dark:bg-backgrounddark bg-gray-100 rounded border border-gray-400"
           >
             <div className="flex flex-col items-end justify-center gap-1 py-1 ">
               {user?.admin

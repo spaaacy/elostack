@@ -29,11 +29,7 @@ const ProjectPublic = ({ project, members }) => {
         if (!dataLoaded) {
           setDataLoaded(true);
           fetchRequest();
-          setBanned(
-            members.some(
-              (m) => m.banned && m.user_id === session.data.session?.user.id
-            )
-          );
+          setBanned(members.some((m) => m.banned && m.user_id === session.data.session?.user.id));
         }
       }
     }
@@ -46,10 +42,7 @@ const ProjectPublic = ({ project, members }) => {
       const response = await fetch("/api/request/user", {
         method: "POST",
         headers: {
-          "X-Supabase-Auth":
-            session.data.session.access_token +
-            " " +
-            session.data.session.refresh_token,
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
         },
         body: JSON.stringify({ userId, projectId: project.id }),
       });
@@ -120,7 +113,7 @@ const ProjectPublic = ({ project, members }) => {
             </div>
           </div>
           <hr className="border-0 h-[1px] bg-gray-400 my-4" />
-          <div className="flex gap-2 text-sm mb-4">
+          <div className="flex gap-2 text-sm mb-4 flex-wrap">
             <button
               type="button"
               onClick={() => setCurrentState("overview")}
@@ -147,12 +140,7 @@ const ProjectPublic = ({ project, members }) => {
           {currentState === "overview" ? (
             <ProjectOverview members={members} project={project} />
           ) : (
-            <Feed
-              posts={posts}
-              setPosts={setPosts}
-              project={project}
-              isMember={false}
-            />
+            <Feed posts={posts} setPosts={setPosts} project={project} isMember={false} />
           )}
         </main>
       )}
@@ -169,14 +157,9 @@ const ProjectPublic = ({ project, members }) => {
   );
 };
 
-const ProjectAgreement = ({
-  handleModalClose,
-  project,
-  setLoading,
-  setShowAgreement,
-}) => {
+const ProjectAgreement = ({ handleModalClose, project, setLoading, setShowAgreement }) => {
   const [isDisabled, setIsDisabled] = useState(true);
-  const {session} = useContext(UserContext)
+  const { session } = useContext(UserContext);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -195,10 +178,7 @@ const ProjectAgreement = ({
       const response = await fetch("/api/member/create", {
         method: "POST",
         headers: {
-          "X-Supabase-Auth":
-            session.data.session.access_token +
-            " " +
-            session.data.session.refresh_token,
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
         },
         body: JSON.stringify({
           userId: session.data.session.user.id,
@@ -226,26 +206,19 @@ const ProjectAgreement = ({
       <div className="gap-2 dark:border dark:border-gray-400 flex flex-col items-center justify-center fixed max-sm:w-full sm:w-[480px] bg-gray-200 dark:bg-backgrounddark rounded p-4 left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
         <h3 className="font-semibold">Please read before continuing</h3>
         <div className="flex flex-col">
-          <li className="text-sm">
-            By joining this project, you will not be able to join any other
-            projects.
+          <li className="text-sm">By joining this project, you will not be able to join any other projects.</li>
+          <li className="text-sm ">
+            The role you choose once you are in a project will be permanent and cannot be changed.
           </li>
           <li className="text-sm ">
-            The role you choose once you are in a project will be permanent and
-            cannot be changed.
-          </li>
-          <li className="text-sm ">
-            By pressing agree, you acknowledge that you will be able to
-            contribute the next{" "}
+            By pressing agree, you acknowledge that you will be able to contribute the next{" "}
             <span className="font-semibold text-primary">
               {formatDuration(project.duration_length, project.duration_type)}
             </span>
           </li>
           <li className="text-sm ">
             The roles available for the project are:{" "}
-            <span className="capitalize font-semibold text-primary">
-              {project.roles}
-            </span>
+            <span className="capitalize font-semibold text-primary">{project.roles}</span>
           </li>
         </div>
         <button
@@ -253,9 +226,7 @@ const ProjectAgreement = ({
           onClick={joinProject}
           type="button"
           className={`${
-            isDisabled
-              ? "hover:cursor-not-allowed bg-neutral-600 text-neutral-400"
-              : "bg-primary hover:bg-primarydark"
+            isDisabled ? "hover:cursor-not-allowed bg-neutral-600 text-neutral-400" : "bg-primary hover:bg-primarydark"
           }  px-2 py-1 rounded mt-2 text-md`}
         >
           I Agree

@@ -56,7 +56,7 @@ const ProjectView = ({ project, members, setProject }) => {
             <SettingsDropdown project={project} members={members} setLoading={setLoading} />
           </div>
           <hr className="border-0 h-[1px] bg-gray-400 my-4" />
-          <div className="flex gap-2 text-sm mb-4">
+          <div className="flex gap-2 text-sm mb-4 flex-wrap">
             <button
               type="button"
               onClick={() => setCurrentState("overview")}
@@ -81,14 +81,14 @@ const ProjectView = ({ project, members, setProject }) => {
             </button>
             <button
               type="button"
-              onClick={() => setCurrentState("requirements")}
+              onClick={() => setCurrentState("sprints")}
               className={`${
-                currentState === "requirements"
+                currentState === "sprints"
                   ? "bg-primary text-white"
                   : "bg-gray-200 dark:bg-backgrounddark hover:bg-gray-300 dark:hover:bg-neutral-800"
               } rounded dark:border px-2 py-1`}
             >
-              Requirements
+              Sprints
             </button>
           </div>
           {currentState === "overview" ? (
