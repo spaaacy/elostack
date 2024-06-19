@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import NavBar from "../navbar/NavBar";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { UserContext } from "@/context/UserContext";
 import Loader from "../common/Loader";
 import toast, { Toaster } from "react-hot-toast";
@@ -12,6 +12,7 @@ import Feed from "../feed/Feed";
 import Image from "next/image";
 import ProjectOverview from "./ProjectOverview";
 import Requirements from "./Requirements";
+import SetupModal from "./SetupModal";
 
 const ProjectView = ({ project, members, setProject }) => {
   const { id } = useParams();
@@ -19,6 +20,16 @@ const ProjectView = ({ project, members, setProject }) => {
   const [loading, setLoading] = useState(false);
   const [currentState, setCurrentState] = useState("overview");
   const [posts, setPosts] = useState();
+  const [showSetupModal, setShowSetupModal] = useState(false);
+
+  useEffect(() => {
+    if (session) {
+      const member = members.find(
+        (m) => m.user_id === session.data.session.user.id
+      );
+      if (member && !member.role) setShowSetupModal(true);
+    }
+  }, [session]);
 
   return (
     <div className="flex flex-col min-h-screen overflow-y-auto mb-10">
@@ -41,7 +52,11 @@ const ProjectView = ({ project, members, setProject }) => {
               <h1 className="font-bold text-2xl">{project.title}</h1>
               <p className="font-light ">{project.status}</p>
             </div>
-            <SettingsDropdown project={project} members={members} setLoading={setLoading} />
+            <SettingsDropdown
+              project={project}
+              members={members}
+              setLoading={setLoading}
+            />
           </div>
           <hr className="border-0 h-[1px] bg-gray-400 my-4" />
           <div className="flex gap-2 text-sm mb-4">
@@ -80,18 +95,39 @@ const ProjectView = ({ project, members, setProject }) => {
             </button>
           </div>
           {currentState === "overview" ? (
-            <ProjectOverview user={user} members={members} project={project} setLoading={setLoading} />
+            <ProjectOverview
+              user={user}
+              members={members}
+              project={project}
+              setLoading={setLoading}
+            />
           ) : currentState === "updates" ? (
-            <Feed posts={posts} setPosts={setPosts} project={project} isMember={true} />
+            <Feed
+              posts={posts}
+              setPosts={setPosts}
+              project={project}
+              isMember={true}
+            />
           ) : (
             <Requirements
-              role={members.find((m) => m.user_id === session.data.session.user.id)?.role}
+              role={
+                members.find((m) => m.user_id === session.data.session.user.id)
+                  ?.role
+              }
               project={project}
               setProject={setProject}
             />
           )}
-          <ChatBox session={session} project={project} id={id} members={members} />
+          <ChatBox
+            session={session}
+            project={project}
+            id={id}
+            members={members}
+          />
         </main>
+      )}
+      {showSetupModal && (
+        <SetupModal project={project} setShowModal={setShowSetupModal} />
       )}
       <Toaster />
     </div>

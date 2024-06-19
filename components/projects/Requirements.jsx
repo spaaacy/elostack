@@ -16,7 +16,7 @@ const Requirements = ({ role, project, setProject }) => {
   const [sprints, setSprints] = useState();
   const [currentSprint, setCurrentSprint] = useState(project.current_sprint);
   const [showRoles, setShowRoles] = useState(false);
-  const [currentRole, setCurrentRole] = useState(role ? role : project.roles.split(", ")[0]);
+  const [currentRole, setCurrentRole] = useState(role ? role.split(", ")[0] : project.roles.split(", ")[0]);
   const [sprintTitle, setSprintTitle] = useState("");
   const [taskTitle, setTaskTitle] = useState("");
   const [roleTitle, setRoleTitle] = useState("");
