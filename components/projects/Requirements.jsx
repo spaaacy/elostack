@@ -476,7 +476,7 @@ const Requirements = ({ role, project, setProject }) => {
                               t.username
                                 ? " dark:bg-sky-500 bg-sky-400"
                                 : "bg-neutral-600"
-                            } text-xs px-2 py-1 rounded-full text-white ml-auto`}
+                            } text-xs px-2 py-1 rounded-full text-white ml-auto flex-shrink-0`}
                           >
                             {t.username ? t.username : "None assigned"}
                           </p>
