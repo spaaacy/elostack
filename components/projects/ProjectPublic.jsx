@@ -15,20 +15,13 @@ import ProjectOverview from "./ProjectOverview";
 
 const ProjectPublic = ({ project, members }) => {
   const { session } = useContext(UserContext);
-  const [showMoreDescription, setShowMoreDescription] = useState(false);
   const [banned, setBanned] = useState(false);
   const [request, setRequest] = useState();
-  const [showRequest, setShowRequest] = useState(false);
+  const [showAgreement, setShowAgreement] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [posts, setPosts] = useState();
   const [currentState, setCurrentState] = useState("overview");
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
 
   useEffect(() => {
     if (session) {
@@ -36,7 +29,11 @@ const ProjectPublic = ({ project, members }) => {
         if (!dataLoaded) {
           setDataLoaded(true);
           fetchRequest();
-          setBanned(members.some((m) => m.banned && m.user_id === session.data.session?.user.id));
+          setBanned(
+            members.some(
+              (m) => m.banned && m.user_id === session.data.session?.user.id
+            )
+          );
         }
       }
     }
@@ -49,7 +46,10 @@ const ProjectPublic = ({ project, members }) => {
       const response = await fetch("/api/request/user", {
         method: "POST",
         headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+          "X-Supabase-Auth":
+            session.data.session.access_token +
+            " " +
+            session.data.session.refresh_token,
         },
         body: JSON.stringify({ userId, projectId: project.id }),
       });
@@ -62,53 +62,9 @@ const ProjectPublic = ({ project, members }) => {
     }
   };
 
-  const createRequest = async (message) => {
-    if (!session.data.session) return;
-    try {
-      setShowRequest(false);
-      setLoading(true);
-      const response = await fetch("/api/request/create", {
-        method: "POST",
-        headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
-        },
-        body: JSON.stringify({
-          userId: session.data.session.user.id,
-          projectId: project.id,
-          message,
-          projectLeader: project.leader,
-          projectTitle: project.title,
-        }),
-      });
-      if (response.status === 201) {
-        toast.success("Request has been made!");
-        setRequest({
-          user_id: session.data.session.user.id,
-          project_id: project.id,
-          message,
-          accepted: false,
-          rejected: false,
-        });
-      } else {
-        const { error } = await response.json();
-        throw error;
-      }
-    } catch (error) {
-      toast.error("Oops, something went wrong...");
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const onSubmit = async (data, e) => {
-    e.preventDefault();
-    await createRequest(data.request);
-  };
-
   const handleModalClose = (e) => {
     if (e.target === e.currentTarget) {
-      setShowRequest(false);
+      setShowAgreement(false);
     }
   };
 
@@ -138,13 +94,12 @@ const ProjectPublic = ({ project, members }) => {
             <div className="ml-auto">
               {session?.data.session ? (
                 project.is_open &&
-                !banned &&
-                !request && (
+                !banned && (
                   <button
-                    onClick={() => setShowRequest(true)}
+                    onClick={() => setShowAgreement(true)}
                     className="flex-shrink-0 bg-primary hover:bg-primarydark hover:text-gray-300 mt-auto self-end px-3 py-1  rounded-full text-sm  dark:shadow dark:shadow-neutral-800 text-gray-200"
                   >
-                    Request to Join
+                    Join Project
                   </button>
                 )
               ) : (
@@ -154,23 +109,13 @@ const ProjectPublic = ({ project, members }) => {
                     "flex-shrink-0 bg-primary hover:bg-primarydark hover:text-gray-300 mt-auto self-end px-3 py-1  rounded-full text-sm  dark:shadow dark:shadow-neutral-800 text-gray-200"
                   }
                 >
-                  Request to Join
+                  Join Project
                 </Link>
               )}
-              {banned ? (
+              {banned && (
                 <p className="bg-red-700 mt-auto self-end px-3 py-1  rounded-full text-sm  dark:shadow dark:shadow-neutral-800 flex-shrink-0 text-gray-200">
                   You were banned
                 </p>
-              ) : (
-                request && (
-                  <p
-                    className={`${
-                      request.rejected ? "bg-red-700" : "bg-green-600"
-                    }  mt-auto self-end px-3 py-1  rounded-full text-sm  dark:shadow dark:shadow-neutral-800 flex-shrink-0 text-gray-200`}
-                  >
-                    {request.rejected ? "Your were rejected" : "Request made"}
-                  </p>
-                )
               )}
             </div>
           </div>
@@ -202,43 +147,120 @@ const ProjectPublic = ({ project, members }) => {
           {currentState === "overview" ? (
             <ProjectOverview members={members} project={project} />
           ) : (
-            <Feed posts={posts} setPosts={setPosts} project={project} isMember={false} />
+            <Feed
+              posts={posts}
+              setPosts={setPosts}
+              project={project}
+              isMember={false}
+            />
           )}
         </main>
       )}
-      {showRequest && (
-        <div
-          onClick={handleModalClose}
-          className="bg-backgrounddark bg-opacity-50 h-screen w-screen fixed backdrop-blur-sm z-50"
-        >
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="gap-2 dark:border dark:border-gray-400 flex flex-col items-start justify-start fixed max-sm:w-full sm:w-[480px] bg-gray-200 dark:bg-backgrounddark rounded p-4 left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2"
-          >
-            <label>Create request</label>
-            <textarea
-              placeholder="Tell us about yourself!"
-              className="resize-none overflow-y-auto bg-white rounded-md dark:bg-backgrounddark dark:focus:bg-neutral-800 p-2 text-sm dark:border-[1px] dark:border-gray-400 focus:border-white focus:ring-0 focus:outline-none w-full"
-              id="scrollableDiv"
-              rows={10}
-              {...register("request", { required: "Request cannot be empty" })}
-              type="text"
-            />
-            {errors.request && (
-              <p role="alert" className="text-xs text-red-500">
-                {errors.request.message}
-              </p>
-            )}
-            <button
-              type="submit"
-              className="flex-shrink-0 bg-primary hover:bg-primarydark hover:text-gray-300 self-end px-3 py-1  rounded-full text-sm  dark:shadow dark:shadow-neutral-800 text-gray-200 mt-2"
-            >
-              Create
-            </button>
-          </form>
-        </div>
+      {showAgreement && (
+        <ProjectAgreement
+          handleModalClose={handleModalClose}
+          project={project}
+          setLoading={setLoading}
+          setShowAgreement={setShowAgreement}
+        />
       )}
       <Toaster />
+    </div>
+  );
+};
+
+const ProjectAgreement = ({
+  handleModalClose,
+  project,
+  setLoading,
+  setShowAgreement,
+}) => {
+  const [isDisabled, setIsDisabled] = useState(true);
+  const {session} = useContext(UserContext)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsDisabled(false);
+    }, 5000);
+
+    // Cleanup the timer on component unmount
+    return () => clearTimeout(timer);
+  }, []);
+
+  const joinProject = async (message) => {
+    if (!session.data.session) return;
+    try {
+      setShowAgreement(false);
+      setLoading(true);
+      const response = await fetch("/api/member/create", {
+        method: "POST",
+        headers: {
+          "X-Supabase-Auth":
+            session.data.session.access_token +
+            " " +
+            session.data.session.refresh_token,
+        },
+        body: JSON.stringify({
+          userId: session.data.session.user.id,
+          projectId: project.id,
+        }),
+      });
+      if (response.status === 201) {
+        window.location.reload();
+      } else {
+        const { error } = await response.json();
+        throw error;
+      }
+    } catch (error) {
+      setLoading(false);
+      toast.error("Oops, something went wrong...");
+      console.error(error);
+    }
+  };
+
+  return (
+    <div
+      onClick={handleModalClose}
+      className="bg-backgrounddark bg-opacity-50 h-screen w-screen fixed backdrop-blur-sm z-50"
+    >
+      <div className="gap-2 dark:border dark:border-gray-400 flex flex-col items-center justify-center fixed max-sm:w-full sm:w-[480px] bg-gray-200 dark:bg-backgrounddark rounded p-4 left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        <h3 className="font-semibold">Please read before continuing</h3>
+        <div className="flex flex-col">
+          <li className="text-sm">
+            By joining this project, you will not be able to join any other
+            projects.
+          </li>
+          <li className="text-sm ">
+            The role you choose once you are in a project will be permanent and
+            cannot be changed.
+          </li>
+          <li className="text-sm ">
+            By pressing agree, you acknowledge that you will be able to
+            contribute the next{" "}
+            <span className="font-semibold text-primary">
+              {formatDuration(project.duration_length, project.duration_type)}
+            </span>
+          </li>
+          <li className="text-sm ">
+            The roles available for the project are:{" "}
+            <span className="capitalize font-semibold text-primary">
+              {project.roles}
+            </span>
+          </li>
+        </div>
+        <button
+          disabled={isDisabled}
+          onClick={joinProject}
+          type="button"
+          className={`${
+            isDisabled
+              ? "hover:cursor-not-allowed bg-neutral-600 text-neutral-400"
+              : "bg-primary hover:bg-primarydark"
+          }  px-2 py-1 rounded mt-2 text-md`}
+        >
+          I Agree
+        </button>
+      </div>
     </div>
   );
 };

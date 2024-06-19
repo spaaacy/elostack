@@ -52,7 +52,7 @@ const SetupModal = ({ project, setShowModal }) => {
           Please choose carefully, roles cannot be changed afterwards.
         </p>
         <ul className="flex flex-col gap-2">
-          {[...new Set(project.roles.split(", "))].map((r, i) => (
+          {[...new Set(project.roles.toLowerCase().split(", "))].map((r, i) => (
             <button
             key={i}
               onClick={() => selectRole(r)}

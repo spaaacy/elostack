@@ -2,6 +2,7 @@
 
 import { useContext, useEffect, useRef, useState } from "react";
 import {
+  MdCompareArrows,
   MdOutlineCheckBox,
   MdOutlineCheckBoxOutlineBlank,
 } from "react-icons/md";
@@ -16,11 +17,14 @@ const Requirements = ({ role, project, setProject }) => {
   const [sprints, setSprints] = useState();
   const [currentSprint, setCurrentSprint] = useState(project.current_sprint);
   const [showRoles, setShowRoles] = useState(false);
-  const [currentRole, setCurrentRole] = useState(role ? role.split(", ")[0] : project.roles.split(", ")[0]);
+  const [currentRole, setCurrentRole] = useState(
+    role ? role.split(", ")[0] : project.roles.split(", ")[0]
+  );
   const [sprintTitle, setSprintTitle] = useState("");
   const [taskTitle, setTaskTitle] = useState("");
   const [roleTitle, setRoleTitle] = useState("");
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [showPending, setShowPending] = useState(true);
   const roleRef = useRef();
   const buttonRef = useRef();
 
@@ -122,7 +126,7 @@ const Requirements = ({ role, project, setProject }) => {
       ...prevTasks,
       {
         id: "0",
-        role: currentRole,
+        role: currentRole.toLowerCase(),
         title: taskTitle,
         sprint_id: currentSprint.id,
         complete: false,
@@ -137,7 +141,7 @@ const Requirements = ({ role, project, setProject }) => {
           "X-Supabase-Auth": `${session.data.session.access_token} ${session.data.session.refresh_token}`,
         },
         body: JSON.stringify({
-          role: currentRole,
+          role: currentRole.toLowerCase(),
           title: taskTitle,
           sprint_id: currentSprint,
           complete: false,
@@ -392,107 +396,135 @@ const Requirements = ({ role, project, setProject }) => {
       </div>
 
       <div className="flex flex-1 gap-2 flex-col px-8">
-        <div className="flex gap-4">
-          <div className="flex flex-col w-1/2">
-            <h3 className="font-semibold mb-2 capitalize">{`${currentRole} pending tasks`}</h3>
-            <ul className="flex flex-col gap-1">
-              {tasks
-                ?.filter(
-                  (t) =>
-                    !t.complete &&
-                    t.role === currentRole &&
-                    t.sprint_id === currentSprint
-                )
-                .map((t, i) => {
-                  return (
-                    <div key={i} className="flex items-center">
-                      <button
-                        disabled={
-                          !role?.includes(currentRole) ||
-                          t.assignee !== session.data.session.user.id
-                        }
-                        onClick={() => completeTask(t)}
-                        type="button"
-                        className={`${
-                          !role?.includes(currentRole) ||
-                          t.assignee !== session.data.session.user.id
-                            ? ""
-                            : "hover:text-neutral-600 dark:hover:text-neutral-300"
-                        } flex gap-2 items-center `}
-                      >
-                        <MdOutlineCheckBoxOutlineBlank className="text-xl" />
-                        <p className={`text-sm`}>{t.title}</p>
-                      </button>
-                      {!t.assignee && role?.includes(currentRole) ? (
-                        <button
-                          type="button"
-                          onClick={() =>
-                            assignYourself(t.id, session.data.session.user.id)
-                          }
-                          className="text-xs px-2 py-1 rounded-full bg-primary hover:bg-primarydark text-white hover:text-neutral-200 ml-auto"
-                        >
-                          Assign Yourself
-                        </button>
-                      ) : t.assignee === session.data.session.user.id ? (
-                        <button
-                          type="button"
-                          onClick={() => assignYourself(t.id, null)}
-                          className="text-xs px-2 py-1 rounded-full dark:bg-sky-500 bg-sky-400 text-white ml-auto hover:bg-red-500 dark:hover:hover:bg-red-600"
-                        >
-                          {t.username}
-                        </button>
-                      ) : (
-                        <p
-                          className={`${
-                            t.username
-                              ? " dark:bg-sky-500 bg-sky-400"
-                              : "bg-neutral-600"
-                          } text-xs px-2 py-1 rounded-full text-white ml-auto`}
-                        >
-                          {t.username ? t.username : "None assigned"}
-                        </p>
-                      )}
-                    </div>
-                  );
-                })}
-            </ul>
-          </div>
-          <div className="flex flex-col w-1/2">
-            <h3 className="font-semibold capitalize">{`${currentRole} completed tasks`}</h3>
-            <ul className="mt-2 flex flex-col gap-1">
-              {tasks
-                ?.filter(
-                  (t) =>
-                    t.complete &&
-                    t.role === currentRole &&
-                    t.sprint_id === currentSprint
-                )
-                .map((t, i) => {
-                  return (
-                    <div key={i} className="flex items-center">
-                      <button
-                        disabled={!role?.includes(currentRole)}
-                        onClick={() => completeTask(t)}
-                        type="button"
-                        className={`${
-                          !role?.includes(currentRole)
-                            ? ""
-                            : "hover:text-neutral-600 dark:hover:text-neutral-300"
-                        } flex gap-2 items-center `}
-                      >
-                        <MdOutlineCheckBox className="text-xl " />
-                        <p className={`"line-through text-sm`}>{t.title}</p>
-                      </button>
-                      <p className="text-xs px-2 py-1 rounded-full dark:bg-sky-500 bg-sky-400 text-white ml-auto">
-                        {t.username}
-                      </p>
-                    </div>
-                  );
-                })}
-            </ul>
-          </div>
+        <div className="flex text-sm gap-2 items-center">
+          <button
+            type="button"
+            onClick={() => setShowPending(true)}
+            className={`${
+              showPending
+                ? "bg-primary text-white"
+                : "bg-gray-300 dark:bg-neutral-800 hover:bg-gray-400 dark:hover:bg-neutral-700"
+            } px-2 py-1 rounded `}
+          >
+            Pending Tasks
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowPending(false)}
+            className={`${
+              !showPending
+                ? "bg-primary text-white"
+                : "bg-gray-300 dark:bg-neutral-800 hover:bg-gray-400 dark:hover:bg-neutral-700"
+            } px-2 py-1 rounded `}
+          >
+            Completed Tasks
+          </button>
         </div>
-
+        <div className="flex gap-4">
+          {showPending ? (
+            <div className="flex flex-col w-full">
+              <h3 className="font-semibold mb-2 capitalize">{`${currentRole} pending tasks`}</h3>
+              <ul className="flex flex-col gap-1">
+                {tasks
+                  ?.filter(
+                    (t) =>
+                      !t.complete &&
+                      t.role === currentRole &&
+                      t.sprint_id === currentSprint
+                  )
+                  .map((t, i) => {
+                    return (
+                      <div key={i} className="flex items-center gap-2">
+                        <button
+                          disabled={
+                            !role?.includes(currentRole) ||
+                            t.assignee !== session.data.session.user.id
+                          }
+                          onClick={() => completeTask(t)}
+                          type="button"
+                          className={`${
+                            !role?.includes(currentRole) ||
+                            t.assignee !== session.data.session.user.id
+                              ? ""
+                              : "hover:text-neutral-600 dark:hover:text-neutral-300"
+                          } flex gap-2 items-center `}
+                        >
+                          <MdOutlineCheckBoxOutlineBlank className="text-xl flex-shrink-0" />
+                          <p className={`text-sm text-left`}>{t.title}</p>
+                        </button>
+                        {!t.assignee && role?.includes(currentRole) ? (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              assignYourself(t.id, session.data.session.user.id)
+                            }
+                            className="text-xs px-2 py-1 rounded-full bg-primary hover:bg-primarydark text-white hover:text-neutral-200 flex-shrink-0 ml-auto"
+                          >
+                            Assign Yourself
+                          </button>
+                        ) : t.assignee === session.data.session.user.id ? (
+                          <button
+                            type="button"
+                            onClick={() => assignYourself(t.id, null)}
+                            className="text-xs px-2 py-1 rounded-full dark:bg-sky-500 bg-sky-400 text-white ml-auto hover:bg-red-500 dark:hover:hover:bg-red-600 flex-shrink-0"
+                          >
+                            {t.username}
+                          </button>
+                        ) : (
+                          <p
+                            className={`${
+                              t.username
+                                ? " dark:bg-sky-500 bg-sky-400"
+                                : "bg-neutral-600"
+                            } text-xs px-2 py-1 rounded-full text-white ml-auto`}
+                          >
+                            {t.username ? t.username : "None assigned"}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+              </ul>
+            </div>
+          ) : (
+            <div className="flex flex-col w-full">
+              <h3 className="font-semibold capitalize">{`${currentRole} completed tasks`}</h3>
+              <ul className="mt-2 flex flex-col gap-1">
+                {tasks
+                  ?.filter(
+                    (t) =>
+                      t.complete &&
+                      t.role === currentRole &&
+                      t.sprint_id === currentSprint
+                  )
+                  .map((t, i) => {
+                    return (
+                      <div key={i} className="flex items-center gap-2">
+                        <button
+                          disabled={!role?.includes(currentRole)}
+                          onClick={() => completeTask(t)}
+                          type="button"
+                          className={`${
+                            !role?.includes(currentRole)
+                              ? ""
+                              : "hover:text-neutral-600 dark:hover:text-neutral-300"
+                          } flex gap-2 items-center `}
+                        >
+                          <MdOutlineCheckBox className="text-xl flex-shrink-0" />
+                          <p className={`"line-through text-sm text-left`}>
+                            {t.title}
+                          </p>
+                        </button>
+                        <p className="text-xs px-2 py-1 rounded-full dark:bg-sky-500 bg-sky-400 text-white ml-auto  flex-shrink-0">
+                          {t.username}
+                        </p>
+                      </div>
+                    );
+                  })}
+              </ul>
+            </div>
+          )}
+        </div>
         {user?.admin && currentRole && currentSprint && (
           <div className="mt-8 flex items-center gap-1 ">
             <input
