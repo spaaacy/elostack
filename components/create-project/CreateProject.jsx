@@ -197,7 +197,7 @@ const CreateProject = () => {
               <button
                 type="button"
                 onClick={() => fileInputRef.current.click()}
-                className="text-gray-200 px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-sm hover:text-gray-300 dark:shadow dark:shadow-neutral-800 flex items-center flex-shrink-0"
+                className="text-white px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-sm hover:text-gray-200 dark:shadow dark:shadow-neutral-800 flex items-center flex-shrink-0"
               >
                 Select Image
               </button>

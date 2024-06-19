@@ -11,6 +11,7 @@ import ChatBox from "./ChatBox";
 import Feed from "../feed/Feed";
 import Image from "next/image";
 import ProjectOverview from "./ProjectOverview";
+import Requirements from "./Requirements";
 
 const ProjectView = ({ project, members }) => {
   const { id } = useParams();
@@ -20,7 +21,7 @@ const ProjectView = ({ project, members }) => {
   const [posts, setPosts] = useState();
 
   return (
-    <div className="flex flex-col min-h-screen overflow-y-auto">
+    <div className="flex flex-col min-h-screen overflow-y-auto mb-10">
       <NavBar />
       {loading ? (
         <Loader />
@@ -66,7 +67,7 @@ const ProjectView = ({ project, members }) => {
             >
               Updates
             </button>
-            {/* <button
+            <button
               type="button"
               onClick={() => setCurrentState("requirements")}
               className={`${
@@ -76,12 +77,17 @@ const ProjectView = ({ project, members }) => {
               } rounded dark:border px-2 py-1`}
             >
               Requirements
-            </button> */}
+            </button>
           </div>
           {currentState === "overview" ? (
             <ProjectOverview user={user} members={members} project={project} setLoading={setLoading} />
-          ) : (
+          ) : currentState === "updates" ? (
             <Feed posts={posts} setPosts={setPosts} project={project} isMember={true} />
+          ) : (
+            <Requirements
+              role={members.find((m) => m.user_id === session.data.session.user.id)?.role}
+              project={project}
+            />
           )}
           <ChatBox session={session} project={project} id={id} members={members} />
         </main>

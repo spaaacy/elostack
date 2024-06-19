@@ -3,7 +3,7 @@
 import NavBar from "../navbar/NavBar";
 import { formatDuration } from "@/utils/formatDuration";
 import { FaCircleInfo } from "react-icons/fa6";
-import { useContext, useEffect, useLayoutEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Loader from "../common/Loader";
 import { UserContext } from "@/context/UserContext";
 import { Toaster } from "react-hot-toast";
@@ -23,16 +23,6 @@ const Projects = () => {
   const [pages, setPages] = useState();
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState();
-  const [size, setSize] = useState([0, 0]);
-
-  useLayoutEffect(() => {
-    function updateSize() {
-      setSize([window.innerWidth, window.innerHeight]);
-    }
-    window.addEventListener("resize", updateSize);
-    updateSize();
-    return () => window.removeEventListener("resize", updateSize);
-  }, []);
 
   useEffect(() => {
     if (session && !dataLoaded) {
@@ -153,13 +143,7 @@ const Projects = () => {
                       />
                     ) : (
                       <div className="drop-shadow">
-                        <Avatar
-                          variant="sunset"
-                          square={true}
-                          name={p.title}
-                          className="rounded"
-                          size={size[0] < 640 ? 100 : 176}
-                        />
+                        <Avatar variant="sunset" square={true} name={p.title} className="rounded" size={176} />
                       </div>
                     )}
                     <div className="flex flex-col h-full">
