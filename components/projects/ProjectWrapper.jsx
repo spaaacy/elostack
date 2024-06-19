@@ -74,7 +74,7 @@ const ProjectWrapper = () => {
     );
 
   if (access) {
-    return <ProjectView project={project} members={members} />;
+    return <ProjectView project={project} members={members} setProject={setProject} />;
   } else return <ProjectPublic project={project} members={members} />;
 };
 

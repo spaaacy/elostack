@@ -7,15 +7,16 @@ import { IoAddCircle } from "react-icons/io5";
 import toast from "react-hot-toast";
 import { UserContext } from "@/context/UserContext";
 
-const Requirements = ({ role, project }) => {
-  const { session, user } = useContext(UserContext);
+const Requirements = ({ role, project, setProject }) => {
+  const { session, user, profile } = useContext(UserContext);
   const [tasks, setTasks] = useState();
   const [sprints, setSprints] = useState();
   const [currentSprint, setCurrentSprint] = useState(project.current_sprint);
   const [showRoles, setShowRoles] = useState(false);
-  const [currentRole, setCurrentRole] = useState("backend");
-  const [sprintTitle, setSprintTitle] = useState();
-  const [taskTitle, setTaskTitle] = useState();
+  const [currentRole, setCurrentRole] = useState(role);
+  const [sprintTitle, setSprintTitle] = useState("");
+  const [taskTitle, setTaskTitle] = useState("");
+  const [roleTitle, setRoleTitle] = useState("");
   const [dataLoaded, setDataLoaded] = useState(false);
   const roleRef = useRef();
   const buttonRef = useRef();
@@ -61,7 +62,8 @@ const Requirements = ({ role, project }) => {
     ]);
 
     try {
-      const response = await fetch("/api/sprint/create", {
+      let sprintId;
+      let response = await fetch("/api/sprint/create", {
         method: "POST",
         headers: {
           "X-Supabase-Auth": `${session.data.session.access_token} ${session.data.session.refresh_token}`,
@@ -72,13 +74,31 @@ const Requirements = ({ role, project }) => {
         }),
       });
       if (response.status === 201) {
-        const { sprintId } = await response.json();
+        const results = await response.json();
+        sprintId = results.sprintId;
         setSprints((prevSprint) =>
           prevSprint.map((sprint) => (sprint.id === "0" ? { ...sprint, id: sprintId } : sprint))
         );
+        setSprintTitle("");
       } else {
         const { error } = await response.json();
         throw error;
+      }
+      if (!project.current_sprint) {
+        response = await fetch("/api/project/change-sprint", {
+          method: "PATCH",
+          headers: {
+            "X-Supabase-Auth": `${session.data.session.access_token} ${session.data.session.refresh_token}`,
+          },
+          body: JSON.stringify({
+            sprintId,
+            projectId: project.id,
+          }),
+        });
+        if (response.status !== 200) {
+          const { error } = await response.json();
+          throw error;
+        }
       }
     } catch (error) {
       console.error(error);
@@ -99,6 +119,7 @@ const Requirements = ({ role, project }) => {
         title: taskTitle,
         sprint_id: currentSprint.id,
         complete: false,
+        assignee: null,
       },
     ]);
 
@@ -111,13 +132,15 @@ const Requirements = ({ role, project }) => {
         body: JSON.stringify({
           role: currentRole,
           title: taskTitle,
-          sprint_id: "6776de89-33ce-452b-9296-5676870e0e37",
+          sprint_id: currentSprint,
           complete: false,
+          assignee: null,
         }),
       });
       if (response.status === 201) {
         const { taskId } = await response.json();
         setTasks((prevTasks) => prevTasks.map((task) => (task.id === "0" ? { ...task, id: taskId } : task)));
+        setTaskTitle("");
       } else {
         const { error } = await response.json();
         throw error;
@@ -126,6 +149,39 @@ const Requirements = ({ role, project }) => {
       console.error(error);
       toast.error("Oops, something went wrong...");
       setTasks((prevTasks) => prevTasks.filter((task) => task.id !== "0"));
+    }
+  };
+
+  const createRole = async () => {
+    if (!roleTitle) return;
+    const newRoleString = project.roles ? ", " + roleTitle : roleTitle;
+
+    setProject({ ...project, roles: project.roles ? project.roles + newRoleString : newRoleString });
+
+    try {
+      const response = await fetch("/api/project/add-role", {
+        method: "PATCH",
+        headers: {
+          "X-Supabase-Auth": `${session.data.session.access_token} ${session.data.session.refresh_token}`,
+        },
+        body: JSON.stringify({
+          roles: project.roles ? project.roles + newRoleString.toLowerCase() : newRoleString.toLowerCase(),
+          projectId: project.id,
+        }),
+      });
+      if (response.status === 201) {
+        setCurrentRole(roleTitle.toLowerCase());
+        setRoleTitle("");
+      } else {
+        const { error } = await response.json();
+        throw error;
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Oops, something went wrong...");
+      setProject((p) => {
+        return { ...p, roles: p.roles.replace(newRoleString, "") };
+      });
     }
   };
 
@@ -169,10 +225,73 @@ const Requirements = ({ role, project }) => {
     }
   };
 
-  const changeComplete = (requirement) => {
-    setTasks((prevRequirements) =>
-      prevRequirements.map((r) => (r === requirement ? { ...requirement, complete: !requirement.complete } : r))
+  const assignYourself = async (taskId, userId) => {
+    if (!profile) return;
+
+    setTasks((prevTasks) =>
+      prevTasks.map((t) =>
+        t.id === taskId ? { ...t, assignee: userId, username: userId ? profile.username : undefined } : t
+      )
     );
+
+    try {
+      const response = await fetch("/api/task/assign", {
+        method: "POST",
+        headers: {
+          "X-Supabase-Auth": `${session.data.session.access_token} ${session.data.session.refresh_token}`,
+        },
+        body: JSON.stringify({
+          taskId,
+          userId,
+        }),
+      });
+      if (response.status !== 200) {
+        const { error } = await response.json();
+        throw error;
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Oops, something went wrong...");
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.id === taskId
+            ? {
+                ...task,
+                assignee: userId ? undefined : session.data.session.user.id,
+                username: userId ? undefined : profile.username,
+              }
+            : task
+        )
+      );
+    }
+  };
+
+  const completeTask = async (task) => {
+    const userId = session.data.session.user.id;
+    if (!userId) return;
+
+    setTasks((prevTasks) => prevTasks.map((t) => (t.id === task.id ? { ...t, complete: !t.complete } : t)));
+
+    try {
+      const response = await fetch("/api/task/change-complete", {
+        method: "POST",
+        headers: {
+          "X-Supabase-Auth": `${session.data.session.access_token} ${session.data.session.refresh_token}`,
+        },
+        body: JSON.stringify({
+          taskId: task.id,
+          complete: !task.complete,
+        }),
+      });
+      if (response.status !== 200) {
+        const { error } = await response.json();
+        throw error;
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Oops, something went wrong...");
+      setTasks((prevTasks) => prevTasks.map((t) => (t.id === task.id ? { ...t, complete: !t.complete } : t)));
+    }
   };
 
   const sprintKeyDown = (e) => {
@@ -189,9 +308,16 @@ const Requirements = ({ role, project }) => {
     }
   };
 
+  const roleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      createRole();
+    }
+  };
+
   return (
     <div className="flex relative">
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 min-w-44">
         <h3 className="font-semibold  ">Sprints</h3>
         {sprints?.map((s, i) => {
           return (
@@ -209,6 +335,8 @@ const Requirements = ({ role, project }) => {
         {user?.admin && (
           <div className="flex items-center gap-1">
             <input
+              placeholder="Create sprint"
+              value={sprintTitle}
               onChange={(e) => setSprintTitle(e.target.value)}
               onKeyDown={sprintKeyDown}
               type="text"
@@ -221,54 +349,82 @@ const Requirements = ({ role, project }) => {
         )}
       </div>
 
-      <div className="flex flex-1 gap-2 ml-12 flex-col">
-        <div className="flex">
-          <div className="flex flex-col">
-            <h3 className="font-semibold mb-2 capitalize">{`${
-              role === currentRole ? "Your" : currentRole
-            } pending tasks`}</h3>
+      <div className="flex flex-1 gap-2 flex-col px-8">
+        <div className="flex gap-4">
+          <div className="flex flex-col w-1/2">
+            <h3 className="font-semibold mb-2 capitalize">{`${currentRole} pending tasks`}</h3>
             <ul className="flex flex-col gap-1">
               {tasks
-                ?.filter((r) => !r.complete && r.role === currentRole)
-                .map((r, i) => {
+                ?.filter((t) => !t.complete && t.role === currentRole && t.sprint_id === currentSprint)
+                .map((t, i) => {
                   return (
-                    <button
-                      disabled={role === currentRole}
-                      onClick={() => changeComplete(r)}
-                      type="button"
-                      className={`${
-                        role === currentRole ? "" : "hover:text-neutral-600 dark:hover:text-neutral-300"
-                      } flex gap-2 items-center `}
-                      key={i}
-                    >
-                      <MdOutlineCheckBoxOutlineBlank className="text-xl" />
-                      <p className={`${r.complete ? "line-through" : ""} text-sm`}>{r.title}</p>
-                    </button>
+                    <div key={i} className="flex items-center">
+                      <button
+                        disabled={!role?.includes(currentRole) || t.assignee !== session.data.session.user.id}
+                        onClick={() => completeTask(t)}
+                        type="button"
+                        className={`${
+                          !role?.includes(currentRole) || t.assignee !== session.data.session.user.id
+                            ? ""
+                            : "hover:text-neutral-600 dark:hover:text-neutral-300"
+                        } flex gap-2 items-center `}
+                      >
+                        <MdOutlineCheckBoxOutlineBlank className="text-xl" />
+                        <p className={`text-sm`}>{t.title}</p>
+                      </button>
+                      {!t.assignee && role?.includes(currentRole) ? (
+                        <button
+                          type="button"
+                          onClick={() => assignYourself(t.id, session.data.session.user.id)}
+                          className="text-xs px-2 py-1 rounded-full bg-primary hover:bg-primarydark text-white hover:text-neutral-200 ml-auto"
+                        >
+                          Assign Yourself
+                        </button>
+                      ) : t.assignee === session.data.session.user.id ? (
+                        <button
+                          type="button"
+                          onClick={() => assignYourself(t.id, null)}
+                          className="text-xs px-2 py-1 rounded-full dark:bg-sky-500 bg-sky-400 text-white ml-auto hover:bg-red-500 dark:hover:hover:bg-red-600"
+                        >
+                          {t.username}
+                        </button>
+                      ) : (
+                        <p
+                          className={`${
+                            t.username ? " dark:bg-sky-500 bg-sky-400" : "bg-neutral-600"
+                          } text-xs px-2 py-1 rounded-full text-white ml-auto`}
+                        >
+                          {t.username ? t.username : "None assigned"}
+                        </p>
+                      )}
+                    </div>
                   );
                 })}
             </ul>
           </div>
-          <div className="flex flex-col ml-20">
-            <h3 className="font-semibold capitalize">{`${
-              role === currentRole ? "Your" : currentRole
-            } completed tasks`}</h3>
+          <div className="flex flex-col w-1/2">
+            <h3 className="font-semibold capitalize">{`${currentRole} completed tasks`}</h3>
             <ul className="mt-2 flex flex-col gap-1">
               {tasks
-                ?.filter((r) => r.complete && r.role === currentRole)
-                .map((r, i) => {
+                ?.filter((t) => t.complete && t.role === currentRole && t.sprint_id === currentSprint)
+                .map((t, i) => {
                   return (
-                    <button
-                      disabled={role === currentRole}
-                      onClick={() => changeComplete(r)}
-                      type="button"
-                      className={`${
-                        true ? "" : "hover:text-neutral-600 dark:hover:text-neutral-300"
-                      } flex gap-2 items-center `}
-                      key={i}
-                    >
-                      <MdOutlineCheckBox className="text-xl " />
-                      <p className={`${r.complete ? "line-through" : ""} text-sm`}>{r.title}</p>
-                    </button>
+                    <div key={i} className="flex items-center">
+                      <button
+                        disabled={!role?.includes(currentRole)}
+                        onClick={() => completeTask(t)}
+                        type="button"
+                        className={`${
+                          !role?.includes(currentRole) ? "" : "hover:text-neutral-600 dark:hover:text-neutral-300"
+                        } flex gap-2 items-center `}
+                      >
+                        <MdOutlineCheckBox className="text-xl " />
+                        <p className={`"line-through text-sm`}>{t.title}</p>
+                      </button>
+                      <p className="text-xs px-2 py-1 rounded-full dark:bg-sky-500 bg-sky-400 text-white ml-auto">
+                        {t.username}
+                      </p>
+                    </div>
                   );
                 })}
             </ul>
@@ -278,6 +434,8 @@ const Requirements = ({ role, project }) => {
         {user?.admin && (
           <div className="mt-8 flex items-center gap-1 ">
             <input
+              placeholder="Create task"
+              value={taskTitle}
               onChange={(e) => setTaskTitle(e.target.value)}
               onKeyDown={taskKeyDown}
               type="text"
@@ -291,20 +449,37 @@ const Requirements = ({ role, project }) => {
       </div>
 
       <div className="text-xs relative">
-        <button
-          ref={buttonRef}
-          className="ml-auto capitalize bg-primary hover:bg-primarydark text-sm px-2 py-1 rounded-full flex justify-between items-center gap-1 hover:text-gray-200 text-white w-24"
-        >
-          {currentRole}
-          <IoIosArrowDown />
-        </button>
+        {project.roles && (
+          <button
+            ref={buttonRef}
+            className="ml-auto capitalize bg-primary hover:bg-primarydark text-sm px-2 py-1 rounded-full flex justify-between items-center gap-1 hover:text-gray-200 text-white w-24"
+          >
+            {currentRole}
+            <IoIosArrowDown />
+          </button>
+        )}
+        {user?.admin && (
+          <div className="mt-8 max-w-40 flex items-center gap-1 ">
+            <input
+              placeholder="Add role"
+              value={roleTitle}
+              onChange={(e) => setRoleTitle(e.target.value)}
+              onKeyDown={roleKeyDown}
+              type="text"
+              className="rounded text-sm px-2 py-1 focus:ring-0 focus:outline-none focus:bg-neutral-50 dark:focus:bg-neutral-800 w-full"
+            />
+            <button type="button" onClick={createRole} className="text-primary text-lg">
+              <IoAddCircle />
+            </button>
+          </div>
+        )}
         {showRoles && (
           <div
             ref={roleRef}
             className="absolute top-8 right-1/2 translate-x-1/2 dark:bg-backgrounddark bg-gray-100 rounded border border-gray-400 "
           >
             <div className="flex flex-col items-end justify-center gap-1 py-1 ">
-              {["backend", "frontend"].map((r, i) => (
+              {project.roles.split(", ").map((r, i) => (
                 <button
                   key={i}
                   onClick={() => {

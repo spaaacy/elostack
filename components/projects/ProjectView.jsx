@@ -13,7 +13,7 @@ import Image from "next/image";
 import ProjectOverview from "./ProjectOverview";
 import Requirements from "./Requirements";
 
-const ProjectView = ({ project, members }) => {
+const ProjectView = ({ project, members, setProject }) => {
   const { id } = useParams();
   const { session, user } = useContext(UserContext);
   const [loading, setLoading] = useState(false);
@@ -87,6 +87,7 @@ const ProjectView = ({ project, members }) => {
             <Requirements
               role={members.find((m) => m.user_id === session.data.session.user.id)?.role}
               project={project}
+              setProject={setProject}
             />
           )}
           <ChatBox session={session} project={project} id={id} members={members} />
