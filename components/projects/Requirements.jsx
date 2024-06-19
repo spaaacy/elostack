@@ -1,7 +1,10 @@
 "use client";
 
 import { useContext, useEffect, useRef, useState } from "react";
-import { MdOutlineCheckBox, MdOutlineCheckBoxOutlineBlank } from "react-icons/md";
+import {
+  MdOutlineCheckBox,
+  MdOutlineCheckBoxOutlineBlank,
+} from "react-icons/md";
 import { IoIosArrowDown } from "react-icons/io";
 import { IoAddCircle } from "react-icons/io5";
 import toast from "react-hot-toast";
@@ -13,7 +16,7 @@ const Requirements = ({ role, project, setProject }) => {
   const [sprints, setSprints] = useState();
   const [currentSprint, setCurrentSprint] = useState(project.current_sprint);
   const [showRoles, setShowRoles] = useState(false);
-  const [currentRole, setCurrentRole] = useState(role);
+  const [currentRole, setCurrentRole] = useState(role ? role : project.roles.split(", ")[0]);
   const [sprintTitle, setSprintTitle] = useState("");
   const [taskTitle, setTaskTitle] = useState("");
   const [roleTitle, setRoleTitle] = useState("");
@@ -77,7 +80,9 @@ const Requirements = ({ role, project, setProject }) => {
         const results = await response.json();
         sprintId = results.sprintId;
         setSprints((prevSprint) =>
-          prevSprint.map((sprint) => (sprint.id === "0" ? { ...sprint, id: sprintId } : sprint))
+          prevSprint.map((sprint) =>
+            sprint.id === "0" ? { ...sprint, id: sprintId } : sprint
+          )
         );
         setSprintTitle("");
       } else {
@@ -103,7 +108,9 @@ const Requirements = ({ role, project, setProject }) => {
     } catch (error) {
       console.error(error);
       toast.error("Oops, something went wrong...");
-      setSprints((prevSprints) => prevSprints.filter((sprint) => sprint.id !== "0"));
+      setSprints((prevSprints) =>
+        prevSprints.filter((sprint) => sprint.id !== "0")
+      );
     }
   };
 
@@ -139,7 +146,11 @@ const Requirements = ({ role, project, setProject }) => {
       });
       if (response.status === 201) {
         const { taskId } = await response.json();
-        setTasks((prevTasks) => prevTasks.map((task) => (task.id === "0" ? { ...task, id: taskId } : task)));
+        setTasks((prevTasks) =>
+          prevTasks.map((task) =>
+            task.id === "0" ? { ...task, id: taskId } : task
+          )
+        );
         setTaskTitle("");
       } else {
         const { error } = await response.json();
@@ -156,7 +167,10 @@ const Requirements = ({ role, project, setProject }) => {
     if (!roleTitle) return;
     const newRoleString = project.roles ? ", " + roleTitle : roleTitle;
 
-    setProject({ ...project, roles: project.roles ? project.roles + newRoleString : newRoleString });
+    setProject({
+      ...project,
+      roles: project.roles ? project.roles + newRoleString : newRoleString,
+    });
 
     try {
       const response = await fetch("/api/project/add-role", {
@@ -165,7 +179,9 @@ const Requirements = ({ role, project, setProject }) => {
           "X-Supabase-Auth": `${session.data.session.access_token} ${session.data.session.refresh_token}`,
         },
         body: JSON.stringify({
-          roles: project.roles ? project.roles + newRoleString.toLowerCase() : newRoleString.toLowerCase(),
+          roles: project.roles
+            ? project.roles + newRoleString.toLowerCase()
+            : newRoleString.toLowerCase(),
           projectId: project.id,
         }),
       });
@@ -190,7 +206,10 @@ const Requirements = ({ role, project, setProject }) => {
       const response = await fetch(`/api/sprint/${project.id}`, {
         method: "GET",
         headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+          "X-Supabase-Auth":
+            session.data.session.access_token +
+            " " +
+            session.data.session.refresh_token,
         },
       });
       if (response.status === 200) {
@@ -210,7 +229,10 @@ const Requirements = ({ role, project, setProject }) => {
       const response = await fetch(`/api/task/${project.id}`, {
         method: "GET",
         headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+          "X-Supabase-Auth":
+            session.data.session.access_token +
+            " " +
+            session.data.session.refresh_token,
         },
       });
       if (response.status === 200) {
@@ -230,7 +252,13 @@ const Requirements = ({ role, project, setProject }) => {
 
     setTasks((prevTasks) =>
       prevTasks.map((t) =>
-        t.id === taskId ? { ...t, assignee: userId, username: userId ? profile.username : undefined } : t
+        t.id === taskId
+          ? {
+              ...t,
+              assignee: userId,
+              username: userId ? profile.username : undefined,
+            }
+          : t
       )
     );
 
@@ -270,7 +298,11 @@ const Requirements = ({ role, project, setProject }) => {
     const userId = session.data.session.user.id;
     if (!userId) return;
 
-    setTasks((prevTasks) => prevTasks.map((t) => (t.id === task.id ? { ...t, complete: !t.complete } : t)));
+    setTasks((prevTasks) =>
+      prevTasks.map((t) =>
+        t.id === task.id ? { ...t, complete: !t.complete } : t
+      )
+    );
 
     try {
       const response = await fetch("/api/task/change-complete", {
@@ -290,7 +322,11 @@ const Requirements = ({ role, project, setProject }) => {
     } catch (error) {
       console.error(error);
       toast.error("Oops, something went wrong...");
-      setTasks((prevTasks) => prevTasks.map((t) => (t.id === task.id ? { ...t, complete: !t.complete } : t)));
+      setTasks((prevTasks) =>
+        prevTasks.map((t) =>
+          t.id === task.id ? { ...t, complete: !t.complete } : t
+        )
+      );
     }
   };
 
@@ -325,7 +361,9 @@ const Requirements = ({ role, project, setProject }) => {
               onClick={() => setCurrentSprint(s.id)}
               key={i}
               className={`${
-                s.id === currentSprint ? "text-primary  font-semibold dark:font-medium " : ""
+                s.id === currentSprint
+                  ? "text-primary  font-semibold dark:font-medium "
+                  : ""
               } text-left text-xs hover:underline rounded-full my-1`}
             >
               {s.title}
@@ -342,7 +380,11 @@ const Requirements = ({ role, project, setProject }) => {
               type="text"
               className="rounded text-sm px-2 py-1 focus:ring-0 focus:outline-none focus:bg-neutral-50 dark:focus:bg-neutral-800"
             />
-            <button type="button" onClick={createSprint} className="text-primary text-lg">
+            <button
+              type="button"
+              onClick={createSprint}
+              className="text-primary text-lg"
+            >
               <IoAddCircle />
             </button>
           </div>
@@ -355,16 +397,25 @@ const Requirements = ({ role, project, setProject }) => {
             <h3 className="font-semibold mb-2 capitalize">{`${currentRole} pending tasks`}</h3>
             <ul className="flex flex-col gap-1">
               {tasks
-                ?.filter((t) => !t.complete && t.role === currentRole && t.sprint_id === currentSprint)
+                ?.filter(
+                  (t) =>
+                    !t.complete &&
+                    t.role === currentRole &&
+                    t.sprint_id === currentSprint
+                )
                 .map((t, i) => {
                   return (
                     <div key={i} className="flex items-center">
                       <button
-                        disabled={!role?.includes(currentRole) || t.assignee !== session.data.session.user.id}
+                        disabled={
+                          !role?.includes(currentRole) ||
+                          t.assignee !== session.data.session.user.id
+                        }
                         onClick={() => completeTask(t)}
                         type="button"
                         className={`${
-                          !role?.includes(currentRole) || t.assignee !== session.data.session.user.id
+                          !role?.includes(currentRole) ||
+                          t.assignee !== session.data.session.user.id
                             ? ""
                             : "hover:text-neutral-600 dark:hover:text-neutral-300"
                         } flex gap-2 items-center `}
@@ -375,7 +426,9 @@ const Requirements = ({ role, project, setProject }) => {
                       {!t.assignee && role?.includes(currentRole) ? (
                         <button
                           type="button"
-                          onClick={() => assignYourself(t.id, session.data.session.user.id)}
+                          onClick={() =>
+                            assignYourself(t.id, session.data.session.user.id)
+                          }
                           className="text-xs px-2 py-1 rounded-full bg-primary hover:bg-primarydark text-white hover:text-neutral-200 ml-auto"
                         >
                           Assign Yourself
@@ -391,7 +444,9 @@ const Requirements = ({ role, project, setProject }) => {
                       ) : (
                         <p
                           className={`${
-                            t.username ? " dark:bg-sky-500 bg-sky-400" : "bg-neutral-600"
+                            t.username
+                              ? " dark:bg-sky-500 bg-sky-400"
+                              : "bg-neutral-600"
                           } text-xs px-2 py-1 rounded-full text-white ml-auto`}
                         >
                           {t.username ? t.username : "None assigned"}
@@ -406,7 +461,12 @@ const Requirements = ({ role, project, setProject }) => {
             <h3 className="font-semibold capitalize">{`${currentRole} completed tasks`}</h3>
             <ul className="mt-2 flex flex-col gap-1">
               {tasks
-                ?.filter((t) => t.complete && t.role === currentRole && t.sprint_id === currentSprint)
+                ?.filter(
+                  (t) =>
+                    t.complete &&
+                    t.role === currentRole &&
+                    t.sprint_id === currentSprint
+                )
                 .map((t, i) => {
                   return (
                     <div key={i} className="flex items-center">
@@ -415,7 +475,9 @@ const Requirements = ({ role, project, setProject }) => {
                         onClick={() => completeTask(t)}
                         type="button"
                         className={`${
-                          !role?.includes(currentRole) ? "" : "hover:text-neutral-600 dark:hover:text-neutral-300"
+                          !role?.includes(currentRole)
+                            ? ""
+                            : "hover:text-neutral-600 dark:hover:text-neutral-300"
                         } flex gap-2 items-center `}
                       >
                         <MdOutlineCheckBox className="text-xl " />
@@ -431,7 +493,7 @@ const Requirements = ({ role, project, setProject }) => {
           </div>
         </div>
 
-        {user?.admin && (
+        {user?.admin && currentRole && currentSprint && (
           <div className="mt-8 flex items-center gap-1 ">
             <input
               placeholder="Create task"
@@ -441,7 +503,11 @@ const Requirements = ({ role, project, setProject }) => {
               type="text"
               className="rounded text-sm px-2 py-1 focus:ring-0 focus:outline-none focus:bg-neutral-50 dark:focus:bg-neutral-800 w-full"
             />
-            <button type="button" onClick={createTask} className="text-primary text-lg">
+            <button
+              type="button"
+              onClick={createTask}
+              className="text-primary text-lg"
+            >
               <IoAddCircle />
             </button>
           </div>
@@ -468,7 +534,11 @@ const Requirements = ({ role, project, setProject }) => {
               type="text"
               className="rounded text-sm px-2 py-1 focus:ring-0 focus:outline-none focus:bg-neutral-50 dark:focus:bg-neutral-800 w-full"
             />
-            <button type="button" onClick={createRole} className="text-primary text-lg">
+            <button
+              type="button"
+              onClick={createRole}
+              className="text-primary text-lg"
+            >
               <IoAddCircle />
             </button>
           </div>
@@ -476,22 +546,40 @@ const Requirements = ({ role, project, setProject }) => {
         {showRoles && (
           <div
             ref={roleRef}
-            className="absolute top-8 right-1/2 translate-x-1/2 dark:bg-backgrounddark bg-gray-100 rounded border border-gray-400 "
+            className="absolute top-8 right-0 w-32 dark:bg-backgrounddark bg-gray-100 rounded border border-gray-400 "
           >
             <div className="flex flex-col items-end justify-center gap-1 py-1 ">
-              {project.roles.split(", ").map((r, i) => (
-                <button
-                  key={i}
-                  onClick={() => {
-                    setShowRoles(false);
-                    setCurrentRole(r);
-                  }}
-                  type="button"
-                  className="capitalize text-left text-sm hover:bg-gray-300 dark:hover:bg-neutral-800 w-full py-1 px-2"
-                >
-                  {r}
-                </button>
-              ))}
+              {user?.admin
+                ? project.roles.split(", ").map((r, i) => {
+                    return (
+                      <button
+                        key={i}
+                        onClick={() => {
+                          setShowRoles(false);
+                          setCurrentRole(r);
+                        }}
+                        type="button"
+                        className="capitalize text-right text-sm hover:bg-gray-300 dark:hover:bg-neutral-800 w-full py-1 px-2"
+                      >
+                        {r}
+                      </button>
+                    );
+                  })
+                : [...new Set(project.roles.split(", "))].map((r, i) => {
+                    return (
+                      <button
+                        key={i}
+                        onClick={() => {
+                          setShowRoles(false);
+                          setCurrentRole(r);
+                        }}
+                        type="button"
+                        className="capitalize text-right text-sm hover:bg-gray-300 dark:hover:bg-neutral-800 w-full py-1 px-2"
+                      >
+                        {r}
+                      </button>
+                    );
+                  })}
             </div>
           </div>
         )}
