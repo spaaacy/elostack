@@ -22,10 +22,17 @@ const ProjectPublic = ({ project, members }) => {
   const [loading, setLoading] = useState(false);
   const [posts, setPosts] = useState();
   const [currentState, setCurrentState] = useState("overview");
-  const banned = members.some((m) => m.banned && m.user_id === session.data.session?.user.id);
-  const canJoin = projects.some(
-    (p) => p.status.toLowerCase() !== "in progress" && p.status.toLowerCase() !== "just created"
+  const banned = members.some(
+    (m) => m.banned && m.user_id === session.data.session?.user.id
   );
+  const canJoin =
+    projects?.length > 0
+      ? projects.some(
+          (p) =>
+            p.status.toLowerCase() !== "in progress" &&
+            p.status.toLowerCase() !== "just created"
+        )
+      : true;
 
   useEffect(() => {
     if (session) {
@@ -84,7 +91,14 @@ const ProjectPublic = ({ project, members }) => {
                     >
                       Join Project
                     </button>
-                    {!canJoin && <Tooltip id="join-tooltip" place="bottom" type="dark" effect="float" />}
+                    {!canJoin && (
+                      <Tooltip
+                        id="join-tooltip"
+                        place="bottom"
+                        type="dark"
+                        effect="float"
+                      />
+                    )}
                   </>
                 )
               ) : (
@@ -132,7 +146,12 @@ const ProjectPublic = ({ project, members }) => {
           {currentState === "overview" ? (
             <ProjectOverview members={members} project={project} />
           ) : (
-            <Feed posts={posts} setPosts={setPosts} project={project} isMember={false} />
+            <Feed
+              posts={posts}
+              setPosts={setPosts}
+              project={project}
+              isMember={false}
+            />
           )}
         </main>
       )}
@@ -150,9 +169,16 @@ const ProjectPublic = ({ project, members }) => {
   );
 };
 
-const ProjectAgreement = ({ handleModalClose, project, members, setLoading, setShowAgreement }) => {
+const ProjectAgreement = ({
+  handleModalClose,
+  project,
+  members,
+  setLoading,
+  setShowAgreement,
+}) => {
   const [isDisabled, setIsDisabled] = useState(true);
   const { session } = useContext(UserContext);
+  const rolesAvailable = availableRoles(members, project.roles);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -171,7 +197,10 @@ const ProjectAgreement = ({ handleModalClose, project, members, setLoading, setS
       const response = await fetch("/api/member/create", {
         method: "POST",
         headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+          "X-Supabase-Auth":
+            session.data.session.access_token +
+            " " +
+            session.data.session.refresh_token,
         },
         body: JSON.stringify({
           userId: session.data.session.user.id,
@@ -199,12 +228,17 @@ const ProjectAgreement = ({ handleModalClose, project, members, setLoading, setS
       <div className="gap-2 dark:border dark:border-gray-400 flex flex-col items-center justify-center fixed max-sm:w-full sm:w-[480px] bg-gray-200 dark:bg-backgrounddark rounded p-4 left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
         <h3 className="font-semibold">Please read before continuing</h3>
         <div className="flex flex-col">
-          <li className="text-sm">By joining this project, you will not be able to join any other projects.</li>
-          <li className="text-sm ">
-            The role you choose once you are in a project will be permanent and cannot be changed.
+          <li className="text-sm">
+            By joining this project, you will not be able to join any other
+            projects.
           </li>
           <li className="text-sm ">
-            By pressing agree, you acknowledge that you will be able to contribute the next{" "}
+            The role you choose once you are in a project will be permanent and
+            cannot be changed.
+          </li>
+          <li className="text-sm ">
+            By pressing agree, you acknowledge that you will be able to
+            contribute the next{" "}
             <span className="font-semibold text-primary">
               {formatDuration(project.duration_length, project.duration_type)}
             </span>{" "}
@@ -213,10 +247,17 @@ const ProjectAgreement = ({ handleModalClose, project, members, setLoading, setS
           <li className="text-sm ">
             The roles available for the project are:{" "}
             <span className="capitalize font-semibold text-primary">
-              {availableRoles(members, project.roles).join(", ")}.
+              {rolesAvailable.join(", ")}
+              {rolesAvailable.includes("frontend") &&
+              rolesAvailable.includes("backend")
+                ? ", full-stack."
+                : "."}
             </span>
           </li>
-          <li className="text-sm ">Please ensure you are able to fill one of these roles before continuing.</li>
+          <li className="text-sm ">
+            Please ensure you are able to fill one of these roles before
+            continuing.
+          </li>
         </div>
         <button
           disabled={isDisabled}

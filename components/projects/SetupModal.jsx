@@ -5,9 +5,10 @@ import availableRoles from "@/utils/availableRoles";
 import { useContext, useState } from "react";
 import toast from "react-hot-toast";
 
-const SetupModal = ({ project, members, setShowModal }) => {
+const SetupModal = ({ project, members, setMembers, setShowModal }) => {
   const { session } = useContext(UserContext);
   const [selectedRole, setSelectedRole] = useState();
+  const rolesAvailable = availableRoles(members, project.roles);
 
   const saveRoles = async () => {
     const userId = session.data.session.user.id;
@@ -27,6 +28,13 @@ const SetupModal = ({ project, members, setShowModal }) => {
       });
       if (response.status === 200) {
         setShowModal(false);
+        setMembers((prevMembers) =>
+          prevMembers.map((m) =>
+            m.user_id === userId
+              ? { ...m, role: selectedRole.toLowerCase() }
+              : m
+          )
+        );
       } else {
         const { error } = await response.json();
         throw error;
@@ -44,8 +52,8 @@ const SetupModal = ({ project, members, setShowModal }) => {
         <p className="mt-2 mb-4 text-center mx-auto font-light text-sm text-neutral-400">
           Please choose carefully, roles cannot be changed afterwards.
         </p>
-        <ul className="flex flex-col gap-2 ">
-          {availableRoles(members, project.roles).map((r, i) => (
+        <ul className="flex flex-col gap-2">
+          {rolesAvailable.map((r, i) => (
             <button
               key={i}
               onClick={() => setSelectedRole(r)}
@@ -54,11 +62,25 @@ const SetupModal = ({ project, members, setShowModal }) => {
                 selectedRole === r
                   ? "bg-primary text-white"
                   : "bg-gray-300 dark:bg-neutral-800 hover:bg-gray-400 dark:hover:bg-neutral-700"
-              } px-4 py-2 rounded capitalize mx-auto caplitalize`}
+              } px-4 py-2 rounded capitalize mx-auto caplitalize w-full`}
             >
               {r}
             </button>
           ))}
+          {rolesAvailable.includes("frontend") &&
+            rolesAvailable.includes("backend") && (
+              <button
+                onClick={() => setSelectedRole("frontend, backend")}
+                type="button"
+                className={`${
+                  selectedRole === "frontend, backend"
+                    ? "bg-primary text-white"
+                    : "bg-gray-300 dark:bg-neutral-800 hover:bg-gray-400 dark:hover:bg-neutral-700"
+                } px-4 py-2 rounded capitalize mx-auto caplitalize w-full`}
+              >
+                Full-Stack
+              </button>
+            )}
         </ul>
         <button
           onClick={saveRoles}
