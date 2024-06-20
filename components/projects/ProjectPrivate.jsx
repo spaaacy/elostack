@@ -15,7 +15,7 @@ import Requirements from "./Requirements";
 import SetupModal from "./SetupModal";
 import Meetings from "./Meetings";
 
-const ProjectView = ({ project, members, setMembers, setProject }) => {
+const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
   const { id } = useParams();
   const { session, user } = useContext(UserContext);
   const [loading, setLoading] = useState(false);
@@ -91,7 +91,7 @@ const ProjectView = ({ project, members, setMembers, setProject }) => {
             >
               Sprints
             </button>
-            {/* <button
+            <button
               type="button"
               onClick={() => setCurrentState("meetings")}
               className={`${
@@ -101,7 +101,7 @@ const ProjectView = ({ project, members, setMembers, setProject }) => {
               } rounded dark:border px-2 py-1`}
             >
               Meetings
-            </button> */}
+            </button>
           </div>
           {currentState === "overview" ? (
             <ProjectOverview user={user} members={members} project={project} setLoading={setLoading} />
@@ -131,4 +131,4 @@ const ProjectView = ({ project, members, setMembers, setProject }) => {
   );
 };
 
-export default ProjectView;
+export default ProjectPrivate;

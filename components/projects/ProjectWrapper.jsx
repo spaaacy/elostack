@@ -5,7 +5,7 @@ import NavBar from "../navbar/NavBar";
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "@/context/UserContext";
 import Loader from "../common/Loader";
-import ProjectView from "./ProjectView";
+import ProjectPrivate from "./ProjectPrivate";
 import ProjectPublic from "./ProjectPublic";
 
 const ProjectWrapper = () => {
@@ -74,7 +74,7 @@ const ProjectWrapper = () => {
     );
 
   if (access) {
-    return <ProjectView project={project} members={members} setMembers={setMembers} setProject={setProject} />;
+    return <ProjectPrivate project={project} members={members} setMembers={setMembers} setProject={setProject} />;
   } else return <ProjectPublic project={project} members={members} />;
 };
 
