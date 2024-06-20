@@ -26,7 +26,7 @@ const SignUp = () => {
 
   useEffect(() => {
     const handleSearchParams = async () => {
-      if (searchParams.has("complete_registration")) {
+      if (searchParams.has("google_oauth")) {
         const response = await fetch("api/user/create", {
           method: "POST",
           headers: {
@@ -71,7 +71,7 @@ const SignUp = () => {
     e.preventDefault();
     if (!session || session.data.session) return;
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data: authData, error } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
         options: {
@@ -79,6 +79,20 @@ const SignUp = () => {
         },
       });
       if (error) throw error;
+
+      const response = await fetch("/api/user/create", {
+        method: "POST",
+        body: JSON.stringify({
+          username: data.username,
+          email: data.email,
+          user_id: authData.user.id,
+        }),
+      });
+
+      if (response.status === 500) {
+        const { error } = await response.json();
+        throw error;
+      }
 
       toast.success("Please confirm your email");
       setTimeout(() => {
@@ -89,7 +103,6 @@ const SignUp = () => {
       console.error(error);
     }
   };
-
   return (
     <div className="flex flex-col min-h-screen">
       <Head>

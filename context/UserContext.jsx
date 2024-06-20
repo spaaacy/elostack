@@ -69,7 +69,7 @@ export const UserProvider = ({ children }) => {
         const { user } = await response.json();
         setUser(user);
       } else {
-        router.push("/signup?complete_registration=true");
+        router.push("/signup?google_oauth=true");
       }
     } catch (error) {
       console.error(error);
