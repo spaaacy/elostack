@@ -13,8 +13,9 @@ import Image from "next/image";
 import ProjectOverview from "./ProjectOverview";
 import Requirements from "./Requirements";
 import SetupModal from "./SetupModal";
+import Meetings from "./Meetings";
 
-const ProjectView = ({ project, members, setProject }) => {
+const ProjectView = ({ project, members, setMembers, setProject }) => {
   const { id } = useParams();
   const { session, user } = useContext(UserContext);
   const [loading, setLoading] = useState(false);
@@ -90,12 +91,23 @@ const ProjectView = ({ project, members, setProject }) => {
             >
               Sprints
             </button>
+            {/* <button
+              type="button"
+              onClick={() => setCurrentState("meetings")}
+              className={`${
+                currentState === "meetings"
+                  ? "bg-primary text-white"
+                  : "bg-gray-200 dark:bg-backgrounddark hover:bg-gray-300 dark:hover:bg-neutral-800"
+              } rounded dark:border px-2 py-1`}
+            >
+              Meetings
+            </button> */}
           </div>
           {currentState === "overview" ? (
             <ProjectOverview user={user} members={members} project={project} setLoading={setLoading} />
           ) : currentState === "updates" ? (
             <Feed posts={posts} setPosts={setPosts} project={project} isMember={true} />
-          ) : (
+          ) : currentState === "sprints" ? (
             <Requirements
               role={members.find((m) => m.user_id === session.data.session.user.id)?.role}
               project={project}
@@ -107,11 +119,13 @@ const ProjectView = ({ project, members, setProject }) => {
               resources={resources}
               setResources={setResources}
             />
+          ) : (
+            <Meetings />
           )}
           <ChatBox session={session} project={project} id={id} members={members} />
         </main>
       )}
-      {showSetupModal && <SetupModal project={project} setShowModal={setShowSetupModal} members={members} />}
+      {showSetupModal && <SetupModal project={project} setShowModal={setShowSetupModal} members={members} setMembers={setMembers} />}
       <Toaster />
     </div>
   );

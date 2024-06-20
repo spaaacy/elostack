@@ -618,7 +618,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
         {project.roles && (
           <button
             ref={buttonRef}
-            className="ml-auto capitalize bg-primary hover:bg-primarydark text-sm px-2 py-1 rounded-full flex justify-between items-center gap-1 hover:text-gray-200 text-white w-24"
+            className="flex-shrink-0 ml-auto capitalize bg-primary hover:bg-primarydark text-sm px-2 py-1 rounded-full flex justify-between items-center gap-1 hover:text-gray-200 text-white"
           >
             {currentRole}
             <IoIosArrowDown />
