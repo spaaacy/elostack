@@ -195,7 +195,7 @@ const Post = ({ post, setPosts, project }) => {
       {post.project_id && !project && (
         <Link
           className="text-xs font-light text-neutral-600 dark:text-neutral-400 hover:underline"
-          href={`/projects?id=${[post.project_id]}`}
+          href={`/projects/${[post.project_id]}`}
         >
           {post.project_title}
         </Link>
