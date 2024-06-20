@@ -9,6 +9,7 @@ export async function GET(req, res) {
     let members = [];
     for (let member of data) {
       const { data, error } = await supabase.from("profile").select().eq("user_id", member.user_id).single();
+      console.log({ member, data });
       if (error) throw error;
       member["profile"] = data;
       members.push(member);
