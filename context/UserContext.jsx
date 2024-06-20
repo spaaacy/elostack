@@ -12,12 +12,14 @@ export const UserProvider = ({ children }) => {
   const [dataLoaded, setDataLoaded] = useState(false);
   const [profile, setProfile] = useState();
   const [user, setUser] = useState();
+  const [projects, setProjects] = useState([]);
   const router = useRouter();
 
   useEffect(() => {
     const loadData = async () => {
       await fetchProfile();
       await fetchUser();
+      fetchProjects();
     };
 
     if (!session) {
@@ -74,10 +76,30 @@ export const UserProvider = ({ children }) => {
     }
   };
 
+  const fetchProjects = async () => {
+    const userId = session.data.session.user.id;
+    if (!userId) return;
+    try {
+      const response = await fetch("/api/project/my-projects", {
+        method: "POST",
+        body: JSON.stringify({
+          userId,
+          fetchAll: true,
+        }),
+      });
+      if (response.status === 200) {
+        const { projects } = await response.json();
+        setProjects(projects);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const fetchSession = async () => {
     const session = await supabase.auth.getSession();
     setSession(session);
   };
 
-  return <UserContext.Provider value={{ session, profile, user }}>{children}</UserContext.Provider>;
+  return <UserContext.Provider value={{ session, profile, user, projects }}>{children}</UserContext.Provider>;
 };

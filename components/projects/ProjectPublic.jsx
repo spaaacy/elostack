@@ -12,48 +12,30 @@ import Loader from "../common/Loader";
 import toast, { Toaster } from "react-hot-toast";
 import Image from "next/image";
 import ProjectOverview from "./ProjectOverview";
+import availableRoles from "@/utils/availableRoles";
+import { Tooltip } from "react-tooltip";
 
 const ProjectPublic = ({ project, members }) => {
-  const { session } = useContext(UserContext);
-  const [banned, setBanned] = useState(false);
-  const [request, setRequest] = useState();
+  const { session, projects } = useContext(UserContext);
   const [showAgreement, setShowAgreement] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [posts, setPosts] = useState();
   const [currentState, setCurrentState] = useState("overview");
+  const banned = members.some((m) => m.banned && m.user_id === session.data.session?.user.id);
+  const canJoin = projects.some(
+    (p) => p.status.toLowerCase() !== "in progress" && p.status.toLowerCase() !== "just created"
+  );
 
   useEffect(() => {
     if (session) {
       if (session.data.session) {
         if (!dataLoaded) {
           setDataLoaded(true);
-          fetchRequest();
-          setBanned(members.some((m) => m.banned && m.user_id === session.data.session?.user.id));
         }
       }
     }
   }, [session]);
-
-  const fetchRequest = async () => {
-    const userId = session.data.session?.user.id;
-    if (!userId) return;
-    try {
-      const response = await fetch("/api/request/user", {
-        method: "POST",
-        headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
-        },
-        body: JSON.stringify({ userId, projectId: project.id }),
-      });
-      if (response.status === 200) {
-        const { requests } = await response.json();
-        setRequest(requests);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   const handleModalClose = (e) => {
     if (e.target === e.currentTarget) {
@@ -88,12 +70,22 @@ const ProjectPublic = ({ project, members }) => {
               {session?.data.session ? (
                 project.is_open &&
                 !banned && (
-                  <button
-                    onClick={() => setShowAgreement(true)}
-                    className="flex-shrink-0 bg-primary hover:bg-primarydark hover:text-gray-300 mt-auto self-end px-3 py-1  rounded-full text-sm  dark:shadow dark:shadow-neutral-800 text-gray-200"
-                  >
-                    Join Project
-                  </button>
+                  <>
+                    <button
+                      data-tooltip-id="join-tooltip"
+                      data-tooltip-content="You are already in a project"
+                      disabled={!canJoin}
+                      onClick={() => setShowAgreement(true)}
+                      className={`${
+                        !canJoin
+                          ? "hover:cursor-not-allowed bg-neutral-600 text-neutral-400"
+                          : "bg-primary hover:bg-primarydark hover:text-gray-300  text-gray-200"
+                      } flex-shrink-0 mt-auto self-end px-3 py-1  rounded-full text-sm`}
+                    >
+                      Join Project
+                    </button>
+                    {!canJoin && <Tooltip id="join-tooltip" place="bottom" type="dark" effect="float" />}
+                  </>
                 )
               ) : (
                 <Link
@@ -148,6 +140,7 @@ const ProjectPublic = ({ project, members }) => {
         <ProjectAgreement
           handleModalClose={handleModalClose}
           project={project}
+          members={members}
           setLoading={setLoading}
           setShowAgreement={setShowAgreement}
         />
@@ -157,14 +150,14 @@ const ProjectPublic = ({ project, members }) => {
   );
 };
 
-const ProjectAgreement = ({ handleModalClose, project, setLoading, setShowAgreement }) => {
+const ProjectAgreement = ({ handleModalClose, project, members, setLoading, setShowAgreement }) => {
   const [isDisabled, setIsDisabled] = useState(true);
   const { session } = useContext(UserContext);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsDisabled(false);
-    }, 5000);
+    }, 15000);
 
     // Cleanup the timer on component unmount
     return () => clearTimeout(timer);
@@ -214,22 +207,28 @@ const ProjectAgreement = ({ handleModalClose, project, setLoading, setShowAgreem
             By pressing agree, you acknowledge that you will be able to contribute the next{" "}
             <span className="font-semibold text-primary">
               {formatDuration(project.duration_length, project.duration_type)}
-            </span>
+            </span>{" "}
+            to the project.
           </li>
           <li className="text-sm ">
             The roles available for the project are:{" "}
-            <span className="capitalize font-semibold text-primary">{project.roles}</span>
+            <span className="capitalize font-semibold text-primary">
+              {availableRoles(members, project.roles).join(", ")}.
+            </span>
           </li>
+          <li className="text-sm ">Please ensure you are able to fill one of these roles before continuing.</li>
         </div>
         <button
           disabled={isDisabled}
           onClick={joinProject}
           type="button"
           className={`${
-            isDisabled ? "hover:cursor-not-allowed bg-neutral-600 text-neutral-400" : "bg-primary hover:bg-primarydark"
+            isDisabled
+              ? "hover:cursor-not-allowed bg-neutral-600 text-neutral-400"
+              : "bg-primary hover:bg-primarydark hover:text-gray-300  text-gray-200"
           }  px-2 py-1 rounded mt-2 text-md`}
         >
-          I Agree
+          Accept
         </button>
       </div>
     </div>

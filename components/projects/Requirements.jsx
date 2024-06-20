@@ -408,14 +408,14 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
   return (
     <div className="flex gap-4 max-md:flex-col md:flex relative">
       <div className="flex flex-col gap-2 min-w-44 max-md:items-center">
-        <button
+        <h3
           onClick={() => setShowSprints(!showSprints)}
-          className="font-semibold max-md:hover:bg-gray-200 max-md:w-full max-md:py-2 flex gap-1 max-md:items-center max-md:justify-center"
+          className="max-md:cursor-pointer font-semibold max-md:hover:bg-gray-300 dark:max-md:hover:bg-neutral-600 max-md:w-full max-md:py-2 flex gap-1 max-md:items-center max-md:justify-center"
         >
           <IoIosArrowDown className={`max-md:block md:hidden`} />
           Sprints
-        </button>
-        <div className={`${showSprints ? "block " : "max-md:hidden"}   md:flex md:flex-col`}>
+        </h3>
+        <div className={`${showSprints ? "max-md:flex" : "max-md:hidden"} md:flex flex-col max-md:gap-2 items-center`}>
           {sprints?.map((s, i) => {
             return (
               <button
@@ -423,7 +423,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
                 key={i}
                 className={`${
                   s.id === currentSprint ? "text-primary  font-semibold dark:font-medium " : ""
-                } max-md:text-center text-left text-xs hover:underline rounded-full my-1 w-full`}
+                } max-md:text-center text-left text-xs hover:underline rounded-full my-1 w-full max-md:text-sm`}
               >
                 {s.title}
               </button>
@@ -569,19 +569,21 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
               <div className="flex flex-col w-full">
                 <h3 className="font-semibold capitalize">{`${currentRole} resource`}</h3>
                 <ul className="mt-2 flex flex-col gap-1">
-                  {resources.map((t, i) => {
-                    return (
-                      <Link
-                        key={i}
-                        href={t.url}
-                        className={
-                          "flex gap-2 items-start dark:text-blue-400 dark:hover:text-blue-500 text-blue-600 hover:text-blue-700 hover:underline"
-                        }
-                      >
-                        <p className={` text-sm text-left`}>{t.title}</p>
-                      </Link>
-                    );
-                  })}
+                  {resources
+                    .filter((r) => r.sprint_id === currentSprint && r.role === currentRole)
+                    .map((r, i) => {
+                      return (
+                        <Link
+                          key={i}
+                          href={r.url}
+                          className={
+                            "flex gap-2 items-start dark:text-blue-400 dark:hover:text-blue-500 text-blue-600 hover:text-blue-700 hover:underline"
+                          }
+                        >
+                          <p className={` text-sm text-left`}>{r.title}</p>
+                        </Link>
+                      );
+                    })}
                 </ul>
               </div>
             )}

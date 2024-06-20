@@ -310,7 +310,7 @@ const ChatBox = ({ project, id, members }) => {
                       >
                         <p>
                           <span className="font-semibold">
-                            {members.find((m) => m.user_id === message.user_id).profile.username}
+                            {members.find((m) => m.user_id === message.user_id)?.profile.username}
                           </span>
                           <br />
                           {message.message}

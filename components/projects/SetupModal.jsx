@@ -1,12 +1,13 @@
 "use client";
 
 import { UserContext } from "@/context/UserContext";
+import availableRoles from "@/utils/availableRoles";
 import { useContext, useState } from "react";
 import toast from "react-hot-toast";
 
-const SetupModal = ({ project, setShowModal }) => {
+const SetupModal = ({ project, members, setShowModal }) => {
   const { session } = useContext(UserContext);
-  const [selectedRoles, setSelectedRoles] = useState([]);
+  const [selectedRole, setSelectedRole] = useState();
 
   const saveRoles = async () => {
     const userId = session.data.session.user.id;
@@ -21,7 +22,7 @@ const SetupModal = ({ project, setShowModal }) => {
         body: JSON.stringify({
           userId,
           projectId: project.id,
-          role: selectedRoles.join(", ").toLowerCase(),
+          role: selectedRole.toLowerCase(),
         }),
       });
       if (response.status === 200) {
@@ -36,14 +37,6 @@ const SetupModal = ({ project, setShowModal }) => {
     }
   };
 
-  const selectRole = (r) => {
-    setSelectedRoles((prevRoles) =>
-      prevRoles.includes(r)
-        ? prevRoles.filter((role) => role !== r)
-        : [...prevRoles, r]
-    );
-  };
-
   return (
     <div className="bg-backgrounddark backdrop-blur bg-opacity-50 h-screen w-screen fixed z-50">
       <div className="flex flex-col max-sm:w-72 items-center dark:border dark:border-gray-400 justify-center fixed sm:w-96 bg-gray-200 dark:bg-neutral-900 rounded p-4 left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
@@ -51,25 +44,22 @@ const SetupModal = ({ project, setShowModal }) => {
         <p className="mt-2 mb-4 text-center mx-auto font-light text-sm text-neutral-400">
           Please choose carefully, roles cannot be changed afterwards.
         </p>
-        <ul className="flex flex-col gap-2">
-          {[...new Set(project.roles.toLowerCase().split(", "))].map((r, i) => (
+        <ul className="flex flex-col gap-2 ">
+          {availableRoles(members, project.roles).map((r, i) => (
             <button
-            key={i}
-              onClick={() => selectRole(r)}
+              key={i}
+              onClick={() => setSelectedRole(r)}
               type="button"
               className={`${
-                selectedRoles.includes(r)
+                selectedRole === r
                   ? "bg-primary text-white"
                   : "bg-gray-300 dark:bg-neutral-800 hover:bg-gray-400 dark:hover:bg-neutral-700"
-              } px-4 py-2 rounded capitalize mx-auto`}
+              } px-4 py-2 rounded capitalize mx-auto caplitalize`}
             >
               {r}
             </button>
           ))}
         </ul>
-        <p className="mt-4 text-center mx-auto font-light text-xs text-neutral-400">
-          * You can select multiple roles
-        </p>
         <button
           onClick={saveRoles}
           type="button"

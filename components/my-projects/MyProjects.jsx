@@ -12,6 +12,7 @@ import toast, { Toaster } from "react-hot-toast";
 import Link from "next/link";
 import Image from "next/image";
 import Avatar from "boring-avatars";
+import Markdown from "react-markdown";
 
 const MyProjects = () => {
   const { session } = useContext(UserContext);
@@ -57,6 +58,7 @@ const MyProjects = () => {
         body: JSON.stringify({
           userId,
           pageNumber: page ? page : 1,
+          fetchAll: false,
         }),
       });
       if (response.status === 200) {
@@ -164,7 +166,8 @@ const MyProjects = () => {
                           </p>
                         </div>
                       </div>
-                      <p className="text-sm mt-2 line-clamp-4 ">{p.description}</p>
+                      <Markdown className="text-sm mt-2 line-clamp-4 ">{p.description}</Markdown>
+
                       <p className="dark:font-normal font-medium text-primary mt-auto">{`Team ${p.total_members}/${p.team_size}`}</p>
                       <div className="flex justify-between items-center pt-1 ">
                         <p className="dark:font-normal font-medium text-primary">

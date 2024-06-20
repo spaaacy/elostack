@@ -111,7 +111,7 @@ const ProjectView = ({ project, members, setProject }) => {
           <ChatBox session={session} project={project} id={id} members={members} />
         </main>
       )}
-      {showSetupModal && <SetupModal project={project} setShowModal={setShowSetupModal} />}
+      {showSetupModal && <SetupModal project={project} setShowModal={setShowSetupModal} members={members} />}
       <Toaster />
     </div>
   );
