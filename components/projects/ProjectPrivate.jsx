@@ -94,7 +94,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
             >
               Sprints
             </button>
-            {/* <button
+            <button
               type="button"
               onClick={() => setCurrentState("meetings")}
               className={`${
@@ -104,7 +104,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
               } rounded dark:border px-2 py-1`}
             >
               Meetings
-            </button> */}
+            </button>
           </div>
           {currentState === "overview" ? (
             <ProjectOverview user={user} members={members} project={project} setLoading={setLoading} />
@@ -123,7 +123,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
               setResources={setResources}
             />
           ) : (
-            <Meetings />
+            <Meetings project={project} />
           )}
           <ChatBox session={session} project={project} id={id} members={members} />
         </main>
