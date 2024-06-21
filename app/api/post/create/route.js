@@ -27,7 +27,6 @@ export async function POST(req, res) {
       project_id: requestData.projectId,
       content: requestData.content,
       public: requestData.isPublic,
-      images: totalImages > 0,
     });
     if (results.error) throw results.error;
 

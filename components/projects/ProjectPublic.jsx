@@ -227,7 +227,7 @@ const ProjectAgreement = ({ handleModalClose, project, members, setLoading, setS
           type="button"
           className={`${
             isDisabled
-              ? "hover:cursor-not-allowed bg-neutral-600 text-neutral-400"
+              ? "hover:cursor-progress bg-neutral-600 text-neutral-400"
               : "bg-primary hover:bg-primarydark hover:text-gray-300  text-gray-200"
           }  px-2 py-1 rounded mt-2 text-md`}
         >

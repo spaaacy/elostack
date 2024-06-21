@@ -14,6 +14,7 @@ import ProjectOverview from "./ProjectOverview";
 import Requirements from "./Requirements";
 import SetupModal from "./SetupModal";
 import Meetings from "./Meetings";
+import TutorialModal from "./TutorialModal";
 
 const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
   const { id } = useParams();
@@ -25,11 +26,13 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
   const [resources, setResources] = useState([]);
   const [sprints, setSprints] = useState();
   const [showSetupModal, setShowSetupModal] = useState(false);
+  const [showTutorialModal, setShowTutorialModal] = useState(false);
 
   useEffect(() => {
     if (session) {
       const member = members.find((m) => m.user_id === session.data.session.user.id);
       if (member && !member.role) setShowSetupModal(true);
+      if (member && !member.tutorial_complete && member.role) setShowTutorialModal(true);
     }
   }, [session]);
 
@@ -91,7 +94,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
             >
               Sprints
             </button>
-            <button
+            {/* <button
               type="button"
               onClick={() => setCurrentState("meetings")}
               className={`${
@@ -101,7 +104,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
               } rounded dark:border px-2 py-1`}
             >
               Meetings
-            </button>
+            </button> */}
           </div>
           {currentState === "overview" ? (
             <ProjectOverview user={user} members={members} project={project} setLoading={setLoading} />
@@ -125,7 +128,15 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
           <ChatBox session={session} project={project} id={id} members={members} />
         </main>
       )}
-      {showSetupModal && <SetupModal project={project} setShowModal={setShowSetupModal} members={members} setMembers={setMembers} />}
+      {showSetupModal && (
+        <SetupModal project={project} setShowModal={setShowSetupModal} members={members} setMembers={setMembers} />
+      )}
+
+      {showTutorialModal && (
+        // {false
+        <TutorialModal setPosts={setPosts} project={project} setShowTutorialModal={setShowTutorialModal} />
+      )}
+
       <Toaster />
     </div>
   );

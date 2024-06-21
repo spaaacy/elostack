@@ -13,11 +13,14 @@ export async function PATCH(req, res) {
     });
     if (auth.error) throw auth.error;
 
-    const { userId, projectId, role } = await req.json();
-    const { error } = await supabase.from("member").update({ role }).match({ project_id: projectId, user_id: userId });
+    const { userId, projectId } = await req.json();
+    const { error } = await supabase
+      .from("member")
+      .update({ tutorial_complete: true })
+      .match({ project_id: projectId, user_id: userId });
     if (error) throw error;
 
-    return NextResponse.json({ message: "Role set successfully!" }, { status: 200 });
+    return NextResponse.json({ message: "Tutorial completed successfully!" }, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error }, { status: 500 });

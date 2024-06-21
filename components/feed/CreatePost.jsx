@@ -39,6 +39,7 @@ const CreatePost = ({ setPosts, project }) => {
       likes: [],
       comment: [],
       id: "0",
+      image_id: [],
     };
     setPosts((prevPosts) => [newPost, ...prevPosts]);
 
