@@ -1,4 +1,4 @@
-export const formatTime = (dateTimeString, onlyDate = false) => {
+export const formatTime = (dateTimeString, type = null) => {
   const dateTime = new Date(dateTimeString);
 
   const getOrdinalSuffix = (day) => {
@@ -15,13 +15,21 @@ export const formatTime = (dateTimeString, onlyDate = false) => {
     }
   };
 
-  if (onlyDate) {
+  if (type === "date") {
     const day = dateTime.getDate();
     const month = dateTime.toLocaleString("en-US", { month: "long" });
     const year = dateTime.getFullYear();
     const ordinalSuffix = getOrdinalSuffix(day);
 
     return `${month} ${day}${ordinalSuffix}, ${year}`;
+  } else if (type === "time") {
+    const options = {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+    };
+
+    return dateTime.toLocaleString("en-US", options);
   } else {
     const options = {
       weekday: "long",

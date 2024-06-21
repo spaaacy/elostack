@@ -13,7 +13,7 @@ module.exports = {
         // backgrounddark: "#291E2A",
         backgroundlight: "#EBEBEB",
         foregrounddark: "#EBEBEB",
-        backgrounddark: "#0c0c0c",
+        backgrounddark: "#0E1113",
         primary: "#E63D00",
         primarydark: "#CC3600",
       },

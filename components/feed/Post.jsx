@@ -213,8 +213,8 @@ const Post = ({ post, setPosts, project }) => {
           <UserAvatar size={36} username={post.username} />
         )}
         <p className="font-bold">{post.username}</p>
-        {post.project_id && post.public && <MdOutlinePublic/>}
-        <p className="ml-auto font-light text-xs">{formatTime(post.created_at, true)}</p>
+        {post.project_id && post.public && <MdOutlinePublic />}
+        <p className="ml-auto font-light text-xs">{formatTime(post.created_at, "date")}</p>
       </div>
       <p className="break-words">{post.content}</p>
 
