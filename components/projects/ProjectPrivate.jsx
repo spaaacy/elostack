@@ -122,11 +122,9 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
         const { meetings } = await response.json();
         setMeetings(meetings);
         meetings.some((m) => {
+          const meetingDatetime = new Date(m.datetime);
           const now = new Date();
-          const today = now.toISOString().split("T")[0];
-          const dateOnly = m.datetime.split("T")[0];
-
-          if (!m.user_id.includes(session.data.session.user.id)) {
+          if (!m.user_id.includes(session.data.session.user.id) && now < meetingDatetime) {
             setPendingMeetings((prevMeetings) => [...prevMeetings, m]);
           }
         });

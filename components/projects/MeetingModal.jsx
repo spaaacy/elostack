@@ -17,7 +17,6 @@ const MeetingModal = ({ pendingMeetings, setPendingMeetings }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    console.log("USE EFFECT");
     updateMinTime();
     setCurrentMeeting(pendingMeetings[0]);
   }, [currentMeeting, pendingMeetings]);

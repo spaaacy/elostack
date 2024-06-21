@@ -129,7 +129,7 @@ const Projects = () => {
           <ul className="flex flex-col gap-4 mt-4 mx-auto">
             {filteredProjects.map((p, i) => {
               return (
-                <li key={i}>
+                <li key={p.id}>
                   <Link
                     href={`/projects/${p.id}`}
                     className="drop-shadow bg-neutral-200 hover:bg-neutral-300 hover:cursor-pointer sm:h-56 p-4 flex max-sm:flex-col max-sm:items-center gap-8 items-start border dark:bg-backgrounddark  rounded dark:hover:bg-neutral-800 border-gray-400 text-xs font-light"
