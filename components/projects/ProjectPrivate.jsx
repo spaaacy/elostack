@@ -16,6 +16,7 @@ import SetupModal from "./SetupModal";
 import CreateMeeting from "./CreateMeeting";
 import TutorialModal from "./TutorialModal";
 import Meetings from "./Meetings";
+import MeetingModal from "./MeetingModal";
 
 const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
   const { id } = useParams();
@@ -30,6 +31,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
   const [showSetupModal, setShowSetupModal] = useState(false);
   const [showTutorialModal, setShowTutorialModal] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [pendingMeetings, setPendingMeetings] = useState([]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -119,7 +121,15 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
       if (response.status === 200) {
         const { meetings } = await response.json();
         setMeetings(meetings);
-        console.log(meetings);
+        meetings.some((m) => {
+          const now = new Date();
+          const today = now.toISOString().split("T")[0];
+          const dateOnly = m.datetime.split("T")[0];
+
+          if (!m.user_id.includes(session.data.session.user.id)) {
+            setPendingMeetings((prevMeetings) => [...prevMeetings, m]);
+          }
+        });
       } else {
         const { error } = await response.json();
         throw error;
@@ -234,6 +244,9 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
       {showTutorialModal && (
         // {false
         <TutorialModal setPosts={setPosts} project={project} setShowTutorialModal={setShowTutorialModal} />
+      )}
+      {pendingMeetings?.length > 0 && !showTutorialModal && !showSetupModal && (
+        <MeetingModal pendingMeetings={pendingMeetings} setPendingMeetings={setPendingMeetings} />
       )}
 
       <Toaster />

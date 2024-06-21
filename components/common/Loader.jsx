@@ -3,7 +3,7 @@ import { BounceLoader } from "react-spinners";
 
 const Loader = () => {
   return (
-    <div className="flex flex-1 ">
+    <div className="flex flex-1 m-auto">
       <div className="m-auto">
         <BounceLoader color={"var(--primary)"} />
       </div>
