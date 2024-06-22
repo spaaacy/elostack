@@ -75,7 +75,6 @@ const MyProjects = () => {
           }
           setCurrentPage(1);
           setPages(pagesArray);
-          console.log(pagesArray);
         }
       }
     } catch (error) {
@@ -132,7 +131,7 @@ const MyProjects = () => {
           <ul className="flex flex-col gap-4 mt-4 mx-auto">
             {filteredProjects.map((p, i) => {
               return (
-                <li key={i}>
+                <li key={p.id}>
                   <Link
                     href={`/projects/${p.id}`}
                     className="drop-shadow bg-neutral-200 hover:bg-neutral-300 hover:cursor-pointer h-56 p-4 flex gap-8 items-start border dark:bg-backgrounddark  rounded dark:hover:bg-neutral-800 border-gray-400 text-xs font-light"

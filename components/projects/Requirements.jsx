@@ -19,24 +19,12 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
   const [sprintTitle, setSprintTitle] = useState("");
   const [taskResourceTitle, setTaskResoruceTitle] = useState("");
   const [roleTitle, setRoleTitle] = useState("");
-  const [dataLoaded, setDataLoaded] = useState(false);
   const [currentPage, setCurrentPage] = useState("pending");
   const [showSprints, setShowSprints] = useState(false);
   const roleRef = useRef();
   const buttonRef = useRef();
 
   useEffect(() => {
-    const loadData = async () => {
-      setDataLoaded(true);
-      fetchSprints();
-      fetchTasks();
-      fetchResources();
-    };
-
-    if (session) {
-      if (!dataLoaded) loadData();
-    }
-
     const handleClickOutside = (event) => {
       if (buttonRef.current && buttonRef.current.contains(event.target)) {
         setShowRoles(true);
@@ -239,66 +227,6 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
       setProject((p) => {
         return { ...p, roles: p.roles.replace(newRoleString, "") };
       });
-    }
-  };
-
-  const fetchSprints = async () => {
-    try {
-      const response = await fetch(`/api/sprint/${project.id}`, {
-        method: "GET",
-        headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
-        },
-      });
-      if (response.status === 200) {
-        const { sprints } = await response.json();
-        setSprints(sprints);
-      } else {
-        const { error } = await response.json();
-        throw error;
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const fetchTasks = async () => {
-    try {
-      const response = await fetch(`/api/task/${project.id}`, {
-        method: "GET",
-        headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
-        },
-      });
-      if (response.status === 200) {
-        const { tasks } = await response.json();
-        setTasks(tasks);
-      } else {
-        const { error } = await response.json();
-        throw error;
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const fetchResources = async () => {
-    try {
-      const response = await fetch(`/api/resource/${project.id}`, {
-        method: "GET",
-        headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
-        },
-      });
-      if (response.status === 200) {
-        const { resources } = await response.json();
-        setResources(resources);
-      } else {
-        const { error } = await response.json();
-        throw error;
-      }
-    } catch (error) {
-      console.error(error);
     }
   };
 

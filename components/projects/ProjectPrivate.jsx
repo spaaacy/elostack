@@ -13,8 +13,10 @@ import Image from "next/image";
 import ProjectOverview from "./ProjectOverview";
 import Requirements from "./Requirements";
 import SetupModal from "./SetupModal";
-import Meetings from "./Meetings";
+import CreateMeeting from "./CreateMeeting";
 import TutorialModal from "./TutorialModal";
+import Meetings from "./Meetings";
+import MeetingModal from "./MeetingModal";
 
 const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
   const { id } = useParams();
@@ -24,17 +26,117 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
   const [posts, setPosts] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [resources, setResources] = useState([]);
+  const [meetings, setMeetings] = useState();
   const [sprints, setSprints] = useState();
   const [showSetupModal, setShowSetupModal] = useState(false);
   const [showTutorialModal, setShowTutorialModal] = useState(false);
+  const [dataLoaded, setDataLoaded] = useState(false);
+  const [pendingMeetings, setPendingMeetings] = useState([]);
 
   useEffect(() => {
+    const loadData = async () => {
+      setDataLoaded(true);
+      fetchSprints();
+      fetchTasks();
+      fetchResources();
+      fetchMeetings();
+    };
+
     if (session) {
+      if (!dataLoaded) loadData();
       const member = members.find((m) => m.user_id === session.data.session.user.id);
       if (member && !member.role) setShowSetupModal(true);
       if (member && !member.tutorial_complete && member.role) setShowTutorialModal(true);
     }
   }, [session]);
+
+  const fetchSprints = async () => {
+    try {
+      const response = await fetch(`/api/sprint/${project.id}`, {
+        method: "GET",
+        headers: {
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+        },
+      });
+      if (response.status === 200) {
+        const { sprints } = await response.json();
+        setSprints(sprints);
+      } else {
+        const { error } = await response.json();
+        throw error;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchTasks = async () => {
+    try {
+      const response = await fetch(`/api/task/${project.id}`, {
+        method: "GET",
+        headers: {
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+        },
+      });
+      if (response.status === 200) {
+        const { tasks } = await response.json();
+        setTasks(tasks);
+      } else {
+        const { error } = await response.json();
+        throw error;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchResources = async () => {
+    try {
+      const response = await fetch(`/api/resource/${project.id}`, {
+        method: "GET",
+        headers: {
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+        },
+      });
+      if (response.status === 200) {
+        const { resources } = await response.json();
+        setResources(resources);
+      } else {
+        const { error } = await response.json();
+        throw error;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchMeetings = async () => {
+    try {
+      const response = await fetch(`/api/meeting/${project.id}`, {
+        method: "GET",
+        headers: {
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+        },
+      });
+      if (response.status === 200) {
+        const { meetings } = await response.json();
+        setMeetings(meetings);
+        if (!user.admin)
+          meetings.some((m) => {
+            const meetingDatetime = new Date(m.datetime);
+            const now = new Date();
+            if (!m.user_id.includes(session.data.session.user.id) && now < meetingDatetime) {
+              setPendingMeetings((prevMeetings) => [...prevMeetings, m]);
+            }
+          });
+      } else {
+        const { error } = await response.json();
+        throw error;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen overflow-y-auto mb-10">
@@ -68,7 +170,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
                 currentState === "overview"
                   ? "bg-primary text-white"
                   : "bg-gray-200 dark:bg-backgrounddark hover:bg-gray-300 dark:hover:bg-neutral-800"
-              } rounded dark:border px-2 py-1`}
+              } rounded dark:border dark:border-gray-400 px-2 py-1`}
             >
               Overview
             </button>
@@ -79,7 +181,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
                 currentState === "updates"
                   ? "bg-primary text-white"
                   : "bg-gray-200 dark:bg-backgrounddark hover:bg-gray-300 dark:hover:bg-neutral-800"
-              } rounded dark:border px-2 py-1`}
+              } rounded dark:border dark:border-gray-400 px-2 py-1`}
             >
               Updates
             </button>
@@ -90,21 +192,21 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
                 currentState === "sprints"
                   ? "bg-primary text-white"
                   : "bg-gray-200 dark:bg-backgrounddark hover:bg-gray-300 dark:hover:bg-neutral-800"
-              } rounded dark:border px-2 py-1`}
+              } rounded dark:border dark:border-gray-400 px-2 py-1`}
             >
               Sprints
             </button>
-            {/* <button
+            <button
               type="button"
               onClick={() => setCurrentState("meetings")}
               className={`${
                 currentState === "meetings"
                   ? "bg-primary text-white"
                   : "bg-gray-200 dark:bg-backgrounddark hover:bg-gray-300 dark:hover:bg-neutral-800"
-              } rounded dark:border px-2 py-1`}
+              } rounded dark:border dark:border-gray-400 px-2 py-1`}
             >
               Meetings
-            </button> */}
+            </button>
           </div>
           {currentState === "overview" ? (
             <ProjectOverview user={user} members={members} project={project} setLoading={setLoading} />
@@ -123,18 +225,27 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
               setResources={setResources}
             />
           ) : (
-            <Meetings />
+            <Meetings project={project} meetings={meetings} setMeetings={setMeetings} />
           )}
           <ChatBox session={session} project={project} id={id} members={members} />
         </main>
       )}
       {showSetupModal && (
-        <SetupModal project={project} setShowModal={setShowSetupModal} members={members} setMembers={setMembers} />
+        <SetupModal
+          project={project}
+          setShowModal={setShowSetupModal}
+          members={members}
+          setMembers={setMembers}
+          setShowNextModal={setShowTutorialModal}
+        />
       )}
 
       {showTutorialModal && (
         // {false
         <TutorialModal setPosts={setPosts} project={project} setShowTutorialModal={setShowTutorialModal} />
+      )}
+      {pendingMeetings?.length > 0 && !showTutorialModal && !showSetupModal && (
+        <MeetingModal pendingMeetings={pendingMeetings} setPendingMeetings={setPendingMeetings} project={project} />
       )}
 
       <Toaster />

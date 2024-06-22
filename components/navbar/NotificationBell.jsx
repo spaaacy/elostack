@@ -6,6 +6,7 @@ import { FaBell } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
 import { UserContext } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
+import { formatTime } from "@/utils/formatTime";
 
 const NotificationBell = ({ notifications, setNotifications }) => {
   const { session } = useContext(UserContext);
@@ -102,6 +103,8 @@ const NotificationBell = ({ notifications, setNotifications }) => {
                     ? `Your post in ${n.payload?.projectTitle} received a comment!`
                     : n.type === "post"
                     ? `New post in ${n.payload?.projectTitle}`
+                    : n.type === "meeting"
+                    ? `Upcoming meeting for ${n.payload?.projectTitle} on ${formatTime(n.payload?.datetime)}`
                     : ""}
                 </button>
                 <button type="button" onClick={() => handleNotificationClick(n, false)}>

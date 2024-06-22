@@ -44,7 +44,7 @@ const ProjectOverview = ({ project, members, user, setLoading }) => {
 
   return (
     <div>
-      <div className="p-2 rounded dark:border bg-gray-300 dark:bg-backgrounddark  dark:border-gray-400 flex flex-col font-light text-sm ">
+      <div className="p-2 rounded dark:border bg-gray-200 dark:bg-backgrounddark  dark:border-gray-400 flex flex-col font-light text-sm ">
         <Markdown className="markdown">{project.description}</Markdown>
         <p className="mt-4 font-semibold">Members</p>
         <ul>

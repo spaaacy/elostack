@@ -23,7 +23,7 @@ const Comment = ({ comment }) => {
           <UserAvatar size={28} username={comment.username} />
         )}
         <p className="font-medium">{`${comment.username}`}</p>
-        <p className="ml-auto text-xs font-light">{formatTime(comment.created_at, true)}</p>
+        <p className="ml-auto text-xs font-light">{formatTime(comment.created_at, "date")}</p>
       </div>
       <p className="text-sm break-words">{comment.comment}</p>
     </>

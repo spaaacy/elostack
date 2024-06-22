@@ -1,91 +1,119 @@
 "use client";
 
-import { useState } from "react";
-import { IoAddCircle } from "react-icons/io5";
-import { IoIosRemoveCircle } from "react-icons/io";
+import { UserContext } from "@/context/UserContext";
+import { formatTime } from "@/utils/formatTime";
+import { useContext, useEffect, useState } from "react";
+import CreateMeeting from "./CreateMeeting";
 
-const Meetings = () => {
-  const [meetingDate, setMeetingDate] = useState();
-  const [startTime, setStartTime] = useState();
-  const [endTime, setEndTime] = useState();
-  const [slots, setSlots] = useState([{ startTime: "", endTime: "" }]);
+const Meetings = ({ meetings, setMeetings, project }) => {
+  const [selectedMeeting, setSelectedMeeting] = useState();
+  const [createMeeting, setCreateMeeting] = useState(false);
 
-  // Function to handle adding a new slot
-  const addSlot = (e) => {
-    e.preventDefault();
-    setSlots([...slots, { startTime: "", endTime: "" }]);
-  };
-
-  const removeSlot = (e, index) => {
-    e.preventDefault();
-    setSlots(slots.filter((_, i) => i !== index));
-  };
-
-  // Function to handle changes in the input fields
-  const handleSlotChange = (index, field, value) => {
-    const newSlots = [...slots];
-    newSlots[index][field] = value;
-    setSlots(newSlots);
-  };
-
-  return (
-    <div className="flex flex-col items-center">
-      <h3 className="text-lg">Create a meeting</h3>
-      <form className="mt-4 mx-auto px-8 py-6 rounded-lg bg-white dark:bg-backgrounddark flex flex-col gap-2 dark:border-gray-400 dark:border-[1px] items-start w-full md:w-1/2">
-        <p className="mt-2 font-semibold">Select a date</p>
-        <label className="text-sm font-light">Meeting Date</label>
-        <input
-          className="px-2 py-1 border border-gray-400 rounded w-full"
-          type="date"
-          value={meetingDate}
-          onChange={(e) => setMeetingDate(e.target.value)}
-        />
-        <p className="mt-2 font-semibold">What times are you free?</p>
-        {slots.map((slot, i) => (
-          <div key={i} className="flex w-full gap-2">
-            <div className="flex flex-col items-start w-full">
-              <label className="text-sm font-light">Start Time</label>
-              <input
-                className="px-2 py-1 border border-gray-400 rounded w-full"
-                type="time"
-                value={slot.startTime}
-                onChange={(e) =>
-                  handleSlotChange(i, "startTime", e.target.value)
-                }
-              />
+  if (createMeeting) {
+    return <CreateMeeting setCreateMeeting={setCreateMeeting} setMeetings={setMeetings} project={project} />;
+  } else {
+    return (
+      <div className="flex max-sm:flex-col gap-4 flex-1 items-start">
+        <div className="flex flex-col gap-2 max-sm:w-full">
+          <h3 className="font-semibold">Upcoming meetings</h3>
+          {meetings?.filter((m) => new Date(m.datetime) > new Date()).length > 0 ? (
+            <>
+              {meetings
+                ?.filter((m) => new Date(m.datetime) > new Date())
+                .map((m, i) => {
+                  return (
+                    <button
+                      onClick={() => setSelectedMeeting(m)}
+                      className={`${
+                        selectedMeeting?.id === m.id
+                          ? "bg-emerald-600 text-white"
+                          : "bg-gray-200 hover:bg-gray-300 dark:border dark:border-gray-400 dark:bg-backgrounddark dark:hover:bg-neutral-800"
+                      } px-4 py-2 rounded text-sm`}
+                      type="button"
+                      key={i}
+                    >
+                      {formatTime(m.datetime)}
+                    </button>
+                  );
+                })}
+            </>
+          ) : (
+            <p className="font-light text-sm">No upcoming meetings</p>
+          )}
+          {meetings?.filter((m) => new Date(m.datetime) < new Date()).length > 0 && (
+            <>
+              <h3 className="font-semibold">Previous meetings</h3>
+              {meetings
+                ?.filter((m) => new Date(m.datetime) < new Date())
+                .map((m, i) => {
+                  return (
+                    <button
+                      onClick={() => setSelectedMeeting(m)}
+                      className={`${
+                        selectedMeeting?.id === m.id
+                          ? "bg-emerald-600 text-white"
+                          : "bg-gray-200 hover:bg-gray-300 dark:border dark:border-gray-400 dark:bg-backgrounddark dark:hover:bg-neutral-800"
+                      } px-4 py-2 rounded text-sm`}
+                      type="button"
+                      key={i}
+                    >
+                      {formatTime(m.datetime)}
+                    </button>
+                  );
+                })}
+            </>
+          )}
+        </div>
+        {selectedMeeting && (
+          <div className=" rounded px-4 py-2 bg-gray-200 dark:bg-backgrounddark dark:border dark:border-gray-400 flex gap-8 max-sm:w-full text-sm  ">
+            <div className="flex flex-col gap-2">
+              <h4 className="font-semibold text-normal">Meeting Details</h4>
+              <p>
+                <span className="font-semibold">Date: </span>
+                {formatTime(selectedMeeting.datetime, "date")}
+                <br />
+                <span className="font-semibold">Time: </span>
+                {selectedMeeting.time_found
+                  ? formatTime(selectedMeeting.datetime, "time")
+                  : "TBD—Waiting on Member Availability"}
+              </p>
             </div>
-            <div className="flex flex-col items-start w-full">
-              <label className="text-sm font-light">End Time</label>
-              <input
-                className="px-2 py-1 border border-gray-400 rounded w-full"
-                type="time"
-                value={slot.endTime}
-                onChange={(e) => handleSlotChange(i, "endTime", e.target.value)}
-              />
+            <div className="flex flex-col gap-2">
+              {selectedMeeting?.username?.length > 0 && (
+                <>
+                  <p className="font-semibold text-normal">Availability</p>
+                  <div>
+                    {selectedMeeting.username.map((u, i) => (
+                      <p key={i}>
+                        {(i === 0 || selectedMeeting.username[i - 1] !== u) && (
+                          <span className="font-medium">
+                            {`${u}: `}
+                            <br />
+                          </span>
+                        )}
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        {`${formatTime(selectedMeeting.start_time[i], "time")} - ${formatTime(
+                          selectedMeeting.end_time[i],
+                          "time"
+                        )}`}
+                      </p>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
-            {i !== 0 && (
-              <button
-                className="self-end"
-                type="button"
-                onClick={(e) => removeSlot(e, i)}
-              >
-                <IoIosRemoveCircle className="text-primary text-lg" />
-              </button>
-            )}
           </div>
-        ))}
-
+        )}
         <button
-          onClick={addSlot}
-          className="font-light gap-2 flex items-center"
-          type="button "
+          type="button"
+          onClick={() => setCreateMeeting(true)}
+          className="ml-auto bg-primary hover:bg-primarydark rounded-full px-2 py-1 text-sm hover:text-gray-300 text-white"
         >
-          {"Add another slot"}
-          <IoAddCircle className="text-primary text-lg" />
+          Create meeting
         </button>
-      </form>
-    </div>
-  );
+      </div>
+    );
+  }
 };
 
 export default Meetings;
