@@ -245,7 +245,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
         <TutorialModal setPosts={setPosts} project={project} setShowTutorialModal={setShowTutorialModal} />
       )}
       {pendingMeetings?.length > 0 && !showTutorialModal && !showSetupModal && (
-        <MeetingModal pendingMeetings={pendingMeetings} setPendingMeetings={setPendingMeetings} />
+        <MeetingModal pendingMeetings={pendingMeetings} setPendingMeetings={setPendingMeetings} project={project} />
       )}
 
       <Toaster />

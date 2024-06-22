@@ -13,7 +13,7 @@ export async function POST(req, res) {
     const auth = await supabase.auth.setSession({ access_token, refresh_token });
     if (auth.error) throw auth.error;
 
-    const { userId, slots, meetingId } = await req.json();
+    const { userId, slots, meetingId, projectTitle, projectId } = await req.json();
     let results;
     for (let slot of slots) {
       const { data, error } = await supabase.rpc("create_meeting_availability", {
@@ -29,11 +29,17 @@ export async function POST(req, res) {
     if (results.length > 0) {
       const commonSlot = findCommonTime(results);
       if (commonSlot) {
-        const { error } = await supabase
+        let results = await supabase
           .from("meeting")
           .update({ datetime: commonSlot.start_time, time_found: true })
           .eq("id", meetingId);
-        if (error) throw error;
+        if (results.error) throw results.error;
+        results = await supabase.rpc("create_notifications", {
+          p_payload: { projectTitle, projectId, datetime: commonSlot.start_time },
+          p_user_id: null,
+          p_type: "meeting",
+        });
+        if (results.error) throw results.error;
       } else {
         const { error } = await supabase.from("meeting").update({ time_found: true }).eq("id", meetingId);
         if (error) throw error;

@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 import generateTimestamp from "@/utils/generateTimestamp";
 import Loader from "../common/Loader";
 
-const MeetingModal = ({ pendingMeetings, setPendingMeetings }) => {
+const MeetingModal = ({ pendingMeetings, setPendingMeetings, project }) => {
   const { session } = useContext(UserContext);
   const [currentMeeting, setCurrentMeeting] = useState(pendingMeetings[0]);
   const [slots, setSlots] = useState([{ startTime: "", endTime: "" }]);
@@ -56,6 +56,8 @@ const MeetingModal = ({ pendingMeetings, setPendingMeetings }) => {
           meetingId: currentMeeting.id,
           userId,
           slots: timestamptzSlots,
+          projectTitle: project.title,
+          projectId: project.id,
         }),
       });
       if (response.status === 201) {
@@ -143,7 +145,7 @@ const MeetingModal = ({ pendingMeetings, setPendingMeetings }) => {
               type="submit"
               className="ml-auto px-2 py-1 bg-primary hover:bg-primarydark rounded-full hover:text-gray-300 text-white mt-auto"
             >
-              Create meeting
+              Create
             </button>
           </>
         )}
