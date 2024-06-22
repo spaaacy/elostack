@@ -13,7 +13,6 @@ export async function POST(req, res) {
 
     const meeting = await req.json();
     const meetingId = uuidv4();
-    console.log(meeting.datetime);
     const { error } = await supabase.from("meeting").insert({ ...meeting, id: meetingId });
     if (error) throw error;
 

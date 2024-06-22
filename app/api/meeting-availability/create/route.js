@@ -1,3 +1,4 @@
+import findCommonTime from "@/utils/findCommonTime";
 import generateTimestamp from "@/utils/generateTimestamp";
 import { supabase } from "@/utils/supabase";
 import { NextRequest, NextResponse } from "next/server";
@@ -13,11 +14,30 @@ export async function POST(req, res) {
     if (auth.error) throw auth.error;
 
     const { userId, slots, meetingId } = await req.json();
+    let results;
     for (let slot of slots) {
-      const { error } = await supabase
-        .from("meeting_availability")
-        .insert({ user_id: userId, meeting_id: meetingId, start_time: slot.startTime, end_time: slot.endTime });
+      const { data, error } = await supabase.rpc("create_meeting_availability", {
+        p_user_id: userId,
+        p_meeting_id: meetingId,
+        p_start_time: slot.startTime,
+        p_end_time: slot.endTime,
+      });
       if (error) throw error;
+      results = data;
+    }
+
+    if (results.length > 0) {
+      const commonSlot = findCommonTime(results);
+      if (commonSlot) {
+        const { error } = await supabase
+          .from("meeting")
+          .update({ datetime: commonSlot.start_time, time_found: true })
+          .eq("id", meetingId);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("meeting").update({ time_found: true }).eq("id", meetingId);
+        if (error) throw error;
+      }
     }
 
     return NextResponse.json({ message: "Meeting availability created successfully!" }, { status: 201 });

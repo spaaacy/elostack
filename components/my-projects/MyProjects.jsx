@@ -75,7 +75,6 @@ const MyProjects = () => {
           }
           setCurrentPage(1);
           setPages(pagesArray);
-          console.log(pagesArray);
         }
       }
     } catch (error) {

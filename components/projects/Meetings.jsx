@@ -24,7 +24,11 @@ const Meetings = ({ meetings, setMeetings, project }) => {
                   return (
                     <button
                       onClick={() => setSelectedMeeting(m)}
-                      className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 dark:border dark:border-gray-400 dark:bg-backgrounddark dark:hover:bg-neutral-800"
+                      className={`${
+                        selectedMeeting?.id === m.id
+                          ? "bg-teal-600 text-white"
+                          : "bg-gray-200 hover:bg-gray-300 dark:border dark:border-gray-400 dark:bg-backgrounddark dark:hover:bg-neutral-800"
+                      } px-4 py-2 rounded `}
                       type="button"
                       key={i}
                     >
@@ -43,7 +47,11 @@ const Meetings = ({ meetings, setMeetings, project }) => {
                   return (
                     <button
                       onClick={() => setSelectedMeeting(m)}
-                      className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 dark:border dark:border-gray-400 dark:bg-backgrounddark dark:hover:bg-neutral-800"
+                      className={`${
+                        selectedMeeting?.id === m.id
+                          ? "bg-teal-600 text-white"
+                          : "bg-gray-200 hover:bg-gray-300 dark:border dark:border-gray-400 dark:bg-backgrounddark dark:hover:bg-neutral-800"
+                      } px-4 py-2 rounded `}
                       type="button"
                       key={i}
                     >
@@ -56,7 +64,7 @@ const Meetings = ({ meetings, setMeetings, project }) => {
         </div>
         {selectedMeeting && (
           <div className=" rounded px-4 py-2 bg-gray-200 dark:bg-backgrounddark dark:border dark:border-gray-400 flex-1 flex flex-col gap-2 max-sm:w-full">
-            <h4 className="font-semibold">Meeting Details</h4>
+            <h4 className="font-semibold text-lg">Meeting Details</h4>
             <p>
               <span className="font-semibold">Date: </span>
               {formatTime(selectedMeeting.datetime, "date")}
@@ -66,11 +74,17 @@ const Meetings = ({ meetings, setMeetings, project }) => {
             </p>
             {selectedMeeting?.username?.length > 0 && (
               <>
-                <p className="font-semibold">Availability</p>
+                <p className="font-semibold text-lg">Availability</p>
                 <div>
                   {selectedMeeting.username.map((u, i) => (
                     <p key={i}>
-                      <span className="font-medium">{`${u}: `}</span>
+                      {(i === 0 || selectedMeeting.username[i - 1] !== u) && (
+                        <span className="font-medium">
+                          {`${u}: `}
+                          <br />
+                        </span>
+                      )}
+                      &nbsp;&nbsp;&nbsp;&nbsp;
                       {`${formatTime(selectedMeeting.start_time[i], "time")} - ${formatTime(
                         selectedMeeting.end_time[i],
                         "time"

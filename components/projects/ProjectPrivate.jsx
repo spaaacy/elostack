@@ -121,13 +121,14 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
       if (response.status === 200) {
         const { meetings } = await response.json();
         setMeetings(meetings);
-        meetings.some((m) => {
-          const meetingDatetime = new Date(m.datetime);
-          const now = new Date();
-          if (!m.user_id.includes(session.data.session.user.id) && now < meetingDatetime) {
-            setPendingMeetings((prevMeetings) => [...prevMeetings, m]);
-          }
-        });
+        if (!user.admin)
+          meetings.some((m) => {
+            const meetingDatetime = new Date(m.datetime);
+            const now = new Date();
+            if (!m.user_id.includes(session.data.session.user.id) && now < meetingDatetime) {
+              setPendingMeetings((prevMeetings) => [...prevMeetings, m]);
+            }
+          });
       } else {
         const { error } = await response.json();
         throw error;
