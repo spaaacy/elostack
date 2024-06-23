@@ -9,7 +9,7 @@ import { FaRegImage } from "react-icons/fa6";
 import { IoIosRemoveCircle } from "react-icons/io";
 import { MdOutlinePublic, MdOutlinePublicOff } from "react-icons/md";
 
-const CreatePost = ({ setPosts, project }) => {
+const CreatePost = ({ setPosts, project, showBorder, onSuccess }) => {
   const { profile, session } = useContext(UserContext);
   const [publicPost, setPublicPost] = useState(false);
   const [images, setImages] = useState([]);
@@ -77,6 +77,8 @@ const CreatePost = ({ setPosts, project }) => {
         setPosts((prevPosts) =>
           prevPosts.map((post) => (post.id === "0" ? { ...post, id: postId, image_id: newImageIds } : post))
         );
+        console.log(onSuccess);
+        if (onSuccess) onSuccess();
       } else {
         const { error } = await response.json();
         throw error;
@@ -161,7 +163,7 @@ const CreatePost = ({ setPosts, project }) => {
           </button>
         </div>
       </form>
-      <hr className="border-0 h-[1px] bg-gray-400 my-8" />
+      {showBorder !== false && <hr className="border-0 h-[1px] bg-gray-400 my-8" />}
     </div>
   );
 };

@@ -11,10 +11,14 @@ export async function POST(req, res) {
     const auth = await supabase.auth.setSession({ access_token, refresh_token });
     if (auth.error) throw auth.error;
 
-    const sprint = await req.json();
+    const { title, projectId, previousSprintId } = await req.json();
     const sprintId = uuidv4();
-    const { error } = await supabase.from("sprint").insert({ ...sprint, id: sprintId });
-    if (error) throw error;
+    let results = await supabase
+      .from("sprint")
+      .insert({ title, project_id: projectId, id: sprintId, previous_sprint_id: previousSprintId });
+    if (results.error) throw results.error;
+    results = await supabase.from("sprint").update({ next_sprint_id: sprintId }).eq("id", previousSprintId);
+    if (results.error) throw results.error;
 
     return NextResponse.json({ message: "Sprint created successfully!", sprintId }, { status: 201 });
   } catch (error) {

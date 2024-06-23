@@ -17,6 +17,8 @@ import CreateMeeting from "./CreateMeeting";
 import TutorialModal from "./TutorialModal";
 import Meetings from "./Meetings";
 import MeetingModal from "./MeetingModal";
+import arrangeSprints from "@/utils/arrangeSprints";
+import PendingPostModal from "./PendingPostModal";
 
 const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
   const { id } = useParams();
@@ -60,7 +62,8 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
       });
       if (response.status === 200) {
         const { sprints } = await response.json();
-        setSprints(sprints);
+        const sortedSprints = arrangeSprints(sprints);
+        setSprints(sortedSprints);
       } else {
         const { error } = await response.json();
         throw error;
@@ -247,6 +250,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
       {pendingMeetings?.length > 0 && !showTutorialModal && !showSetupModal && (
         <MeetingModal pendingMeetings={pendingMeetings} setPendingMeetings={setPendingMeetings} project={project} />
       )}
+      {project.pending_post && <PendingPostModal project={project} setPosts={setPosts} setProject={setProject} />}
 
       <Toaster />
     </div>

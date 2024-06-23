@@ -12,6 +12,8 @@ import Link from "next/link";
 const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, setTasks, resources, setResources }) => {
   const { session, user, profile } = useContext(UserContext);
   const [currentSprint, setCurrentSprint] = useState(project.current_sprint);
+  const [currentSprintIndex, setCurrentSprintIndex] = useState();
+  const [projectSprintIndex, setProjectSprintIndex] = useState();
   const [showRoles, setShowRoles] = useState(false);
   const [currentRole, setCurrentRole] = useState(
     role ? role.split(", ")[0] : project.roles ? project.roles.split(", ")[0] : null
@@ -20,11 +22,17 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
   const [taskResourceTitle, setTaskResoruceTitle] = useState("");
   const [roleTitle, setRoleTitle] = useState("");
   const [currentPage, setCurrentPage] = useState("pending");
+
   const [showSprints, setShowSprints] = useState(false);
   const roleRef = useRef();
   const buttonRef = useRef();
 
   useEffect(() => {
+    if (sprints) {
+      setProjectSprintIndex(sprints.findIndex((sprint) => sprint.id === project.current_sprint));
+      if (currentSprint) setCurrentSprintIndex(sprints.findIndex((sprint) => sprint.id === currentSprint));
+    }
+
     const handleClickOutside = (event) => {
       if (buttonRef.current && buttonRef.current.contains(event.target)) {
         setShowRoles(true);
@@ -39,11 +47,12 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [roleRef, buttonRef]);
+  }, [roleRef, buttonRef, sprints, currentSprint]);
 
   const createSprint = async () => {
     const userId = session.data.session.user.id;
     if (!sprintTitle || !userId) return;
+    const previousSprintId = sprints[sprints.length - 1].id;
 
     setSprints((prevSprint) => [
       ...prevSprint,
@@ -51,6 +60,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
         id: "0",
         title: sprintTitle,
         project_id: project.id,
+        previous_sprint_id: previousSprintId,
       },
     ]);
 
@@ -63,14 +73,21 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
         },
         body: JSON.stringify({
           title: sprintTitle,
-          project_id: project.id,
+          projectId: project.id,
+          previousSprintId,
         }),
       });
       if (response.status === 201) {
         const results = await response.json();
         sprintId = results.sprintId;
         setSprints((prevSprint) =>
-          prevSprint.map((sprint) => (sprint.id === "0" ? { ...sprint, id: sprintId } : sprint))
+          prevSprint.map((sprint) =>
+            sprint.id === "0"
+              ? { ...sprint, id: sprintId }
+              : sprint.id === previousSprintId
+              ? { ...sprint, next_sprint_id: sprintId }
+              : sprint
+          )
         );
         setSprintTitle("");
       } else {
@@ -110,7 +127,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
         id: "0",
         role: currentRole.toLowerCase(),
         title: taskResourceTitle,
-        sprint_id: currentSprint.id,
+        sprint_id: currentSprint,
         complete: false,
         assignee: null,
       },
@@ -162,7 +179,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
         role: currentRole.toLowerCase(),
         title: linkObject.label,
         url: linkObject.url,
-        sprint_id: currentSprint.id,
+        sprint_id: currentSprint,
       },
     ]);
 
@@ -294,7 +311,34 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
           complete: !task.complete,
         }),
       });
-      if (response.status !== 200) {
+      if (response.status === 200) {
+        const sprintNotComplete = tasks.find(
+          (t) => t.sprint_id === project.current_sprint && !t.complete && t.id !== task.id
+        );
+        if (!sprintNotComplete && !task.complete) {
+          try {
+            const response = await fetch("/api/project/change-pending-post", {
+              method: "PATCH",
+              headers: {
+                "X-Supabase-Auth": `${session.data.session.access_token} ${session.data.session.refresh_token}`,
+              },
+              body: JSON.stringify({
+                projectId: project.id,
+                pendingPost: true,
+              }),
+            });
+            if (response.status === 200) {
+              setProject({ ...project, pending_post: true });
+            } else {
+              const { error } = await response.json();
+              throw error;
+            }
+          } catch (error) {
+            console.error(error);
+            toast.error("Oops, something went wrong...");
+          }
+        }
+      } else {
         const { error } = await response.json();
         throw error;
       }
@@ -334,24 +378,27 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
   };
 
   return (
-    <div className="flex gap-4 max-md:flex-col md:flex relative">
-      <div className="flex flex-col gap-2 min-w-44 max-md:items-center">
+    <div className="flex gap-4 max-lg:flex-col lg:flex relative">
+      <div className="flex flex-col gap-2 min-w-44 max-lg:items-center">
         <h3
           onClick={() => setShowSprints(!showSprints)}
-          className="max-md:cursor-pointer font-semibold max-md:hover:bg-gray-300 dark:max-md:hover:bg-neutral-600 max-md:w-full max-md:py-2 flex gap-1 max-md:items-center max-md:justify-center"
+          className="max-lg:cursor-pointer font-semibold max-lg:hover:bg-gray-300 dark:max-lg:hover:bg-neutral-600 max-lg:w-full max-lg:py-2 flex gap-1 max-lg:items-center max-lg:justify-center"
         >
-          <IoIosArrowDown className={`max-md:block md:hidden`} />
+          <IoIosArrowDown className={`max-lg:block lg:hidden`} />
           Sprints
         </h3>
-        <div className={`${showSprints ? "max-md:flex" : "max-md:hidden"} md:flex flex-col max-md:gap-2 items-center`}>
+        <div className={`${showSprints ? "max-lg:flex" : "max-lg:hidden"} lg:flex flex-col max-lg:gap-2 items-center`}>
           {sprints?.map((s, i) => {
             return (
               <button
-                onClick={() => setCurrentSprint(s.id)}
+                onClick={() => {
+                  setCurrentSprint(s.id);
+                  setCurrentPage("pending");
+                }}
                 key={i}
                 className={`${
                   s.id === currentSprint ? "text-primary  font-semibold dark:font-medium " : ""
-                } max-md:text-center text-left text-xs hover:underline rounded-full my-1 w-full max-md:text-sm`}
+                } max-lg:text-center text-left text-xs hover:underline rounded-full my-1 w-full max-lg:text-sm`}
               >
                 {s.title}
               </button>
@@ -376,42 +423,44 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
       </div>
 
       {project.roles ? (
-        <div className="flex flex-1 gap-2 flex-col md:px-8  ">
-          <div className="flex text-sm gap-2 items-center flex-wrap">
-            <button
-              type="button"
-              onClick={() => setCurrentPage("pending")}
-              className={`${
-                currentPage === "pending"
-                  ? "bg-primary text-white"
-                  : "bg-gray-300 dark:bg-neutral-800 hover:bg-gray-400 dark:hover:bg-neutral-700"
-              } px-2 py-1 rounded `}
-            >
-              Pending Tasks
-            </button>
-            <button
-              type="button"
-              onClick={() => setCurrentPage("completed")}
-              className={`${
-                currentPage === "completed"
-                  ? "bg-primary text-white"
-                  : "bg-gray-300 dark:bg-neutral-800 hover:bg-gray-400 dark:hover:bg-neutral-700"
-              } px-2 py-1 rounded `}
-            >
-              Completed Tasks
-            </button>
-            <button
-              type="button"
-              onClick={() => setCurrentPage("resources")}
-              className={`${
-                currentPage === "resources"
-                  ? "bg-primary text-white"
-                  : "bg-gray-300 dark:bg-neutral-800 hover:bg-gray-400 dark:hover:bg-neutral-700"
-              } px-2 py-1 rounded `}
-            >
-              Resources
-            </button>
-          </div>
+        <div className="flex flex-1 gap-2 flex-col lg:px-8  ">
+          {currentSprintIndex <= projectSprintIndex && (
+            <div className="flex text-sm gap-2 items-center flex-wrap">
+              <button
+                type="button"
+                onClick={() => setCurrentPage("pending")}
+                className={`${
+                  currentPage === "pending"
+                    ? "bg-primary text-white"
+                    : "bg-gray-300 dark:bg-neutral-800 hover:bg-gray-400 dark:hover:bg-neutral-700"
+                } px-2 py-1 rounded `}
+              >
+                Pending Tasks
+              </button>
+              <button
+                type="button"
+                onClick={() => setCurrentPage("completed")}
+                className={`${
+                  currentPage === "completed"
+                    ? "bg-primary text-white"
+                    : "bg-gray-300 dark:bg-neutral-800 hover:bg-gray-400 dark:hover:bg-neutral-700"
+                } px-2 py-1 rounded `}
+              >
+                Completed Tasks
+              </button>
+              <button
+                type="button"
+                onClick={() => setCurrentPage("resources")}
+                className={`${
+                  currentPage === "resources"
+                    ? "bg-primary text-white"
+                    : "bg-gray-300 dark:bg-neutral-800 hover:bg-gray-400 dark:hover:bg-neutral-700"
+                } px-2 py-1 rounded `}
+              >
+                Resources
+              </button>
+            </div>
+          )}
           <div className="flex gap-4">
             {currentPage === "pending" ? (
               <div className="flex flex-col w-full">
@@ -420,46 +469,62 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
                   {tasks
                     ?.filter((t) => !t.complete && t.role === currentRole && t.sprint_id === currentSprint)
                     .map((t, i) => {
+                      console.log({ currentSprintIndex, projectSprintIndex });
                       return (
                         <div key={i} className="flex items-start gap-2  flex-wrap">
                           <button
-                            disabled={!role?.includes(currentRole) || t.assignee !== session.data.session.user.id}
+                            // disabled={
+                            //   !role?.includes(currentRole) ||
+                            //   t.assignee !== session.data.session.user.id ||
+                            //   currentSprintIndex > projectSprintIndex
+                            // }
                             onClick={() => completeTask(t)}
                             type="button"
                             className={`${
-                              !role?.includes(currentRole) || t.assignee !== session.data.session.user.id
+                              !role?.includes(currentRole) ||
+                              t.assignee !== session.data.session.user.id ||
+                              currentSprintIndex > projectSprintIndex
                                 ? ""
                                 : "hover:text-neutral-600 dark:hover:text-neutral-300"
                             } flex gap-2 items-start `}
                           >
-                            <MdOutlineCheckBoxOutlineBlank className="text-xl flex-shrink-0" />
-                            <p className={`text-sm text-left`}>{t.title}</p>
-                          </button>
-                          {!t.assignee && role?.includes(currentRole) ? (
-                            <button
-                              type="button"
-                              onClick={() => assignYourself(t.id, session.data.session.user.id)}
-                              className="text-xs px-2 py-1 rounded-full bg-primary hover:bg-primarydark text-white hover:text-neutral-200 flex-shrink-0 ml-auto"
-                            >
-                              Assign Yourself
-                            </button>
-                          ) : t.assignee === session.data.session.user.id ? (
-                            <button
-                              type="button"
-                              onClick={() => assignYourself(t.id, null)}
-                              className="text-xs px-2 py-1 rounded-full dark:bg-sky-500 bg-sky-400 text-white ml-auto hover:bg-red-500 dark:hover:hover:bg-red-600 flex-shrink-0"
-                            >
-                              {t.username}
-                            </button>
-                          ) : (
+                            {currentSprintIndex <= projectSprintIndex && (
+                              <MdOutlineCheckBoxOutlineBlank className="text-xl flex-shrink-0" />
+                            )}
                             <p
-                              className={`${
-                                t.username ? " dark:bg-sky-500 bg-sky-400" : "bg-neutral-600"
-                              } text-xs px-2 py-1 rounded-full text-white ml-auto flex-shrink-0`}
+                              className={`text-sm text-left ${
+                                currentSprintIndex > projectSprintIndex ? "text-neutral-500" : ""
+                              }`}
                             >
-                              {t.username ? t.username : "None assigned"}
+                              {t.title}
                             </p>
-                          )}
+                          </button>
+                          {currentSprintIndex <= projectSprintIndex &&
+                            (!t.assignee && role?.includes(currentRole) ? (
+                              <button
+                                type="button"
+                                onClick={() => assignYourself(t.id, session.data.session.user.id)}
+                                className="text-xs px-2 py-1 rounded-full bg-primary hover:bg-primarydark text-white hover:text-neutral-200 flex-shrink-0 ml-auto"
+                              >
+                                Assign Yourself
+                              </button>
+                            ) : t.assignee === session.data.session.user.id ? (
+                              <button
+                                type="button"
+                                onClick={() => assignYourself(t.id, null)}
+                                className="text-xs px-2 py-1 rounded-full dark:bg-sky-500 bg-sky-400 text-white ml-auto hover:bg-red-500 dark:hover:hover:bg-red-600 flex-shrink-0"
+                              >
+                                {t.username}
+                              </button>
+                            ) : (
+                              <p
+                                className={`${
+                                  t.username ? " dark:bg-sky-500 bg-sky-400" : "bg-neutral-600"
+                                } text-xs px-2 py-1 rounded-full text-white ml-auto flex-shrink-0`}
+                              >
+                                {t.username ? t.username : "None assigned"}
+                              </p>
+                            ))}
                         </div>
                       );
                     })}
@@ -475,7 +540,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
                       return (
                         <div key={i} className="flex items-start gap-2  flex-wrap">
                           <button
-                            disabled={!role?.includes(currentRole)}
+                            // disabled={!role?.includes(currentRole)}
                             onClick={() => completeTask(t)}
                             type="button"
                             className={`${
@@ -539,10 +604,10 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
           )}
         </div>
       ) : (
-        <p className="flex-1 font-semibold  md:px-8 ">Create a role and sprint to begin</p>
+        <p className="flex-1 font-semibold  lg:px-8 ">Create a role and sprint to begin</p>
       )}
 
-      <div className="text-xs relative max-md:order-first flex flex-col items-end">
+      <div className="text-xs relative max-lg:order-first flex flex-col items-end">
         {project.roles && (
           <button
             ref={buttonRef}
