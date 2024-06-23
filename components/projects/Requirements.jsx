@@ -473,11 +473,11 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
                       return (
                         <div key={i} className="flex items-start gap-2  flex-wrap">
                           <button
-                            // disabled={
-                            //   !role?.includes(currentRole) ||
-                            //   t.assignee !== session.data.session.user.id ||
-                            //   currentSprintIndex > projectSprintIndex
-                            // }
+                            disabled={
+                              !role?.includes(currentRole) ||
+                              t.assignee !== session.data.session.user.id ||
+                              currentSprintIndex > projectSprintIndex
+                            }
                             onClick={() => completeTask(t)}
                             type="button"
                             className={`${
@@ -540,7 +540,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
                       return (
                         <div key={i} className="flex items-start gap-2  flex-wrap">
                           <button
-                            // disabled={!role?.includes(currentRole)}
+                            disabled={!role?.includes(currentRole)}
                             onClick={() => completeTask(t)}
                             type="button"
                             className={`${
