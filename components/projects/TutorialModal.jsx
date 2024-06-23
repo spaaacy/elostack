@@ -5,10 +5,12 @@ import Image from "next/image";
 import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import Loader from "../common/Loader";
 
 const TutorialModal = ({ setPosts, project, setShowTutorialModal }) => {
   const { session, profile } = useContext(UserContext);
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState();
   const {
     register,
     formState: { errors },
@@ -17,6 +19,7 @@ const TutorialModal = ({ setPosts, project, setShowTutorialModal }) => {
 
   const createPost = async (data, e) => {
     e?.preventDefault();
+    setLoading(true);
     const userId = session?.data.session.user.id;
     if (!userId) return;
 
@@ -86,12 +89,15 @@ const TutorialModal = ({ setPosts, project, setShowTutorialModal }) => {
       toast.error("Oops, something went wrong...");
       console.error(error);
     }
+    setLoading(false);
   };
 
   return (
     <div className="bg-backgrounddark backdrop-blur bg-opacity-50 h-screen w-screen fixed z-50">
-      <div className="md:w-[40rem] min-w-96 flex flex-col max-sm:w-72 items-center dark:border dark:border-gray-400 fixed  bg-gray-200 dark:bg-neutral-900 rounded p-4 left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
-        {currentPage === 1 ? (
+      <div className="md:w-[40rem] md:min-w-96 flex flex-col max-sm:w-full items-center dark:border dark:border-gray-400 fixed  bg-gray-200 dark:bg-neutral-900 rounded p-4 left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        {loading ? (
+          <Loader />
+        ) : currentPage === 1 ? (
           <div className="flex flex-col gap-4 items-center">
             <h3 className="font-semibold">Welcome to the project!</h3>
 
@@ -112,7 +118,9 @@ const TutorialModal = ({ setPosts, project, setShowTutorialModal }) => {
               Use the updates section to post regular updates on the project. You can make a post either public or
               private, to specify whether users outside your project can view your posts.
             </p>
-            <Image src={"/tutorial/updates.png"} alt="updates" width={768} height={500} unoptimized />
+            <div className="h-52 w-full overflow-hidden relative">
+              <Image src={"/tutorial/updates.png"} alt="updates" className="object-contain" fill={true} unoptimized />
+            </div>
             <div className="flex items-center justify-between w-full">
               <button
                 onClick={() => setCurrentPage(1)}
@@ -137,7 +145,9 @@ const TutorialModal = ({ setPosts, project, setShowTutorialModal }) => {
               <span className="font-bold text-primary">Assign Yourself</span> button to get started so others know which
               tasks you are working on.
             </p>
-            <Image src={"/tutorial/sprints.png"} alt="sprints" width={768} height={100} unoptimized />
+            <div className="h-52 w-full overflow-hidden relative">
+              <Image src={"/tutorial/sprints.png"} alt="updates" className="object-contain" fill={true} unoptimized />
+            </div>
             <div className="flex items-center justify-between w-full">
               <button
                 onClick={() => setCurrentPage(2)}
@@ -160,7 +170,9 @@ const TutorialModal = ({ setPosts, project, setShowTutorialModal }) => {
               You can message your team members using the <span className="font-bold text-primary">Messages</span> tab
               on the bottom right of the screen.
             </p>
-            <Image src={"/tutorial/chat.png"} alt="chat" width={273} height={434} unoptimized />
+            <div className="h-96 w-full overflow-hidden relative">
+              <Image src={"/tutorial/chat.png"} alt="updates" className="object-contain" fill={true} unoptimized />
+            </div>
             <div className="flex items-center justify-between w-full">
               <button
                 onClick={() => setCurrentPage(3)}
@@ -170,6 +182,31 @@ const TutorialModal = ({ setPosts, project, setShowTutorialModal }) => {
               </button>
               <button
                 onClick={() => setCurrentPage(5)}
+                className="bg-primary hover:bg-primarydark px-2 py-1 hover:text-neutral-200 text-white rounded mt-4"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        ) : currentPage === 5 ? (
+          <div className="flex flex-col gap-4 items-center ">
+            <h3 className="font-semibold">Meetings</h3>
+            <p className="text-sm text-center my-auto">
+              Schedule meetings with your teammates easily using the create meetings tab. To find a common time for all
+              members, just enter your availability and a common time will automatically be found.
+            </p>
+            <div className="h-80 w-full overflow-hidden relative">
+              <Image src={"/tutorial/meetings.png"} alt="updates" className="object-contain" fill={true} unoptimized />
+            </div>
+            <div className="flex items-center justify-between w-full">
+              <button
+                onClick={() => setCurrentPage(4)}
+                className="bg-primary hover:bg-primarydark px-2 py-1 hover:text-neutral-200 text-white rounded mt-4"
+              >
+                Back
+              </button>
+              <button
+                onClick={() => setCurrentPage(6)}
                 className="bg-primary hover:bg-primarydark px-2 py-1 hover:text-neutral-200 text-white rounded mt-4"
               >
                 Next

@@ -7,7 +7,7 @@ import { supabase } from "@/utils/supabase";
 import toast from "react-hot-toast";
 import { UserContext } from "@/context/UserContext";
 
-const ChatBox = ({ project, id, members }) => {
+const ChatBox = ({ project, id }) => {
   const { session, user } = useContext(UserContext);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [showRequests, setShowRequests] = useState(false);
@@ -309,9 +309,7 @@ const ChatBox = ({ project, id, members }) => {
                         }`}
                       >
                         <p>
-                          <span className="font-semibold">
-                            {members.find((m) => m.user_id === message.user_id)?.profile.username}
-                          </span>
+                          <span className="font-semibold">{message.username}</span>
                           <br />
                           {message.message}
                           <br />

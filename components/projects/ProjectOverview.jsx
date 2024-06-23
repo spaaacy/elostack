@@ -43,7 +43,12 @@ const ProjectOverview = ({ project, members, user, setLoading }) => {
   };
 
   return (
-    <div>
+    <div className="relative">
+      {project.github && (
+        <Link className="ml-auto absolute top-4 right-4" href={project.github} target="_blank">
+          <FaGithub className=" text-2xl dark:hover:text-gray-300 hover:text-gray-700" />
+        </Link>
+      )}
       <div className="p-2 rounded dark:border bg-gray-200 dark:bg-backgrounddark  dark:border-gray-400 flex flex-col font-light text-sm ">
         <Markdown className="markdown">{project.description}</Markdown>
         <p className="mt-4 font-semibold">Members</p>
@@ -53,23 +58,23 @@ const ProjectOverview = ({ project, members, user, setLoading }) => {
             .map((member, i) => {
               return (
                 <li key={i}>
-                  <p className=" ">{member.profile.username}</p>
+                  <p className=" ">
+                    {member.profile.username}
+                    {member.role && (
+                      <span className="font-medium capitalize">{`: ${
+                        member.role === "frontend, backend" ? "full-stack" : member.role
+                      }`}</span>
+                    )}
+                  </p>
                 </li>
               );
             })}
         </ul>
         <p className="mt-4 font-semibold">Technologies</p>
         <p>{project.technologies}</p>
-        <div className="flex items-end">
-          <p className="text-primary mt-4 dark:font-normal font-medium">
-            {`Duration: ${formatDuration(project.duration_length, project.duration_type)}`}
-          </p>
-          {project.github && (
-            <Link className="ml-auto" href={project.github} target="_blank">
-              <FaGithub className=" text-2xl dark:hover:text-gray-300 hover:text-gray-500" />
-            </Link>
-          )}
-        </div>
+        <p className="text-primary mt-4 dark:font-normal font-medium">
+          {`Duration: ${formatDuration(project.duration_length, project.duration_type)}`}
+        </p>
       </div>
       {user?.admin && (
         <button

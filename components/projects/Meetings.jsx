@@ -84,19 +84,22 @@ const Meetings = ({ meetings, setMeetings, project }) => {
                   <p className="font-semibold text-normal">Availability</p>
                   <div>
                     {selectedMeeting.username.map((u, i) => (
-                      <p key={i}>
-                        {(i === 0 || selectedMeeting.username[i - 1] !== u) && (
-                          <span className="font-medium">
-                            {`${u}: `}
-                            <br />
-                          </span>
-                        )}
-                        &nbsp;&nbsp;&nbsp;&nbsp;
-                        {`${formatTime(selectedMeeting.start_time[i], "time")} - ${formatTime(
-                          selectedMeeting.end_time[i],
-                          "time"
-                        )}`}
-                      </p>
+                      <div key={i}>
+                        <p>
+                          {(i === 0 || selectedMeeting.username[i - 1] !== u) && (
+                            <span className="font-medium">
+                              {`${u}: `}
+                              <br />
+                            </span>
+                          )}
+                        </p>
+                        <li>
+                          {`${formatTime(selectedMeeting.start_time[i], "time")} - ${formatTime(
+                            selectedMeeting.end_time[i],
+                            "time"
+                          )}`}
+                        </li>
+                      </div>
                     ))}
                   </div>
                 </>

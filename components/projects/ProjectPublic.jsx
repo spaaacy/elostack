@@ -52,14 +52,14 @@ const ProjectPublic = ({ project, members }) => {
         <Loader />
       ) : (
         <main>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-wrap">
             {project.image_id && (
               <Image
                 src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}${process.env.NEXT_PUBLIC_STORAGE_PATH}/project-image/${project.id}/${project.image_id}`}
                 alt="project image"
                 width={64}
                 height={64}
-                className="object-cover w-16 h-16 rounded-full"
+                className="object-cover w-16 h-16 rounded-full "
               />
             )}
             <div className="flex flex-col justify-start items-start">
@@ -67,7 +67,7 @@ const ProjectPublic = ({ project, members }) => {
               <p className="font-light ">{project.status}</p>
             </div>
 
-            <div className="ml-auto">
+            <div className="ml-auto flex-shrink-0">
               {session?.data.session ? (
                 project.is_open &&
                 !banned && (

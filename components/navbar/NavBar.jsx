@@ -70,7 +70,6 @@ const NavBar = () => {
       });
       if (response.status === 200) {
         const { notifications } = await response.json();
-        console.log(notifications);
         const reversed = notifications.reverse();
         setNotifications(reversed);
       }

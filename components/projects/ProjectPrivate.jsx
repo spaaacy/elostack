@@ -121,7 +121,8 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
       if (response.status === 200) {
         const { meetings } = await response.json();
         setMeetings(meetings);
-        if (!user.admin)
+        // if (!user.admin)
+        if (true)
           meetings.some((m) => {
             const meetingDatetime = new Date(m.datetime);
             const now = new Date();
@@ -227,7 +228,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
           ) : (
             <Meetings project={project} meetings={meetings} setMeetings={setMeetings} />
           )}
-          <ChatBox session={session} project={project} id={id} members={members} />
+          <ChatBox session={session} project={project} id={id} />
         </main>
       )}
       {showSetupModal && (
@@ -241,7 +242,6 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
       )}
 
       {showTutorialModal && (
-        // {false
         <TutorialModal setPosts={setPosts} project={project} setShowTutorialModal={setShowTutorialModal} />
       )}
       {pendingMeetings?.length > 0 && !showTutorialModal && !showSetupModal && (
