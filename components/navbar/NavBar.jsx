@@ -224,12 +224,12 @@ const DesktopNav = ({
       )}
       <Link
         target="_blank"
-        href={"https://discord.gg/PPbGuu3u43"}
+        href={"https://elostack.slack.com"}
         className={`p-2 border-b-2 border-transparent  ${
           isHomePage && !session?.data.session ? " hover:text-gray-300" : "hover:text-gray-500 dark:hover:text-gray-300"
         }`}
       >
-        Discord
+        Slack
       </Link>
 
       <div className="flex justify-center items-center ml-auto relative">
@@ -320,10 +320,10 @@ const MobileDropdown = ({ isHomePage, showSignIn, session, user, signOut }) => {
       )}
       <Link
         target="_blank"
-        href={"https://discord.gg/PPbGuu3u43"}
+        href={"https://elostack.slack.com"}
         className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center"
       >
-        Discord
+        Slack
       </Link>
       <hr className="border-0 h-[1px] bg-gray-400 my-2 w-full" />
       {session?.data.session && (
