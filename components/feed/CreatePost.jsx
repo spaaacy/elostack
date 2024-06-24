@@ -9,9 +9,9 @@ import { FaRegImage } from "react-icons/fa6";
 import { IoIosRemoveCircle } from "react-icons/io";
 import { MdOutlinePublic, MdOutlinePublicOff } from "react-icons/md";
 
-const CreatePost = ({ setPosts, project, showBorder, onSuccess }) => {
+const CreatePost = ({ setPosts, project, showBorder, onSuccess, isPublic }) => {
   const { profile, session } = useContext(UserContext);
-  const [publicPost, setPublicPost] = useState(false);
+  const [publicPost, setPublicPost] = useState(isPublic ? isPublic : false);
   const [images, setImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
   const fileInputRef = useRef();
@@ -119,7 +119,7 @@ const CreatePost = ({ setPosts, project, showBorder, onSuccess }) => {
       >
         <div className="flex items-center">
           <p className="text-base font-semibold ">Post an update</p>
-          {project && (
+          {project && !isPublic && (
             <button
               type="button"
               className="ml-auto flex items-center gap-2 rounded-full px-2 py-1 bg-sky-600 text-white text-sm"

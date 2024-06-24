@@ -39,17 +39,13 @@ const CreateMeeting = ({ project, setMeetings, setCreateMeeting }) => {
     if (!userId || !meetingDate || !slots[0].startTime || !slots[0].endTime) return;
 
     try {
-      let earliest = "23:59";
-      for (let slot of slots) {
-        if (slot.startTime < earliest) earliest = slot.startTime;
-      }
       let response = await fetch("/api/meeting/create", {
         method: "POST",
         headers: {
           "X-Supabase-Auth": `${session.data.session.access_token} ${session.data.session.refresh_token}`,
         },
         body: JSON.stringify({
-          datetime: generateTimestamp(meetingDate, earliest),
+          datetime: generateTimestamp(meetingDate, "12:00", false),
           project_id: project.id,
         }),
       });

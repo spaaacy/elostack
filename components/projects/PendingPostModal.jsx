@@ -57,7 +57,13 @@ const PendingPostModal = ({ setPosts, project, setProject }) => {
               Congrats on finishing your sprint! Post an update to continue.
             </h3>
             <div className="w-full">
-              <CreatePost project={project} setPosts={setPosts} showBorder={false} onSuccess={onCreatePost} />
+              <CreatePost
+                project={project}
+                setPosts={setPosts}
+                showBorder={false}
+                onSuccess={onCreatePost}
+                isPublic={true}
+              />
             </div>
           </>
         )}
