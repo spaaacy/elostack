@@ -69,35 +69,6 @@ const SettingsDropdown = ({ project, members, setLoading }) => {
     }
   };
 
-  const changeOpen = async (isOpen) => {
-    if (!session.data.session) return;
-    try {
-      setLoading(true);
-      const response = await fetch("/api/project/change-open", {
-        method: "PATCH",
-        headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
-        },
-        body: JSON.stringify({
-          isOpen,
-          projectId: project.id,
-        }),
-      });
-      if (response.status === 200) {
-        toast.success(isOpen ? "New members allowed" : "New members can't join");
-        setTimeout(() => window.location.reload(), 1000);
-      } else {
-        const { error } = await response.json();
-        throw error;
-      }
-    } catch (error) {
-      toast.error("Oops, something went wrong...");
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const changeGithub = async (data, e) => {
     e?.preventDefault();
     if (!session.data.session) return;
@@ -267,15 +238,6 @@ const SettingsDropdown = ({ project, members, setLoading }) => {
             >
               Edit Project
             </Link>
-          )}
-          {user?.admin && (
-            <button
-              type="button"
-              onClick={() => changeOpen(!project.is_open)}
-              className="hover:bg-gray-200 dark:hover:bg-neutral-800 px-2 py-1 rounded  dark:hover:text-gray-200  w-full text-right"
-            >
-              {project.is_open ? "Close project to new members" : "Open project to new members"}
-            </button>
           )}
           {user?.admin && (
             <button

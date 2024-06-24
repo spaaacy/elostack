@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 import { UserContext } from "@/context/UserContext";
 
 const ChatBox = ({ project, id }) => {
-  const { session, user } = useContext(UserContext);
+  const { session, user, profile } = useContext(UserContext);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [showRequests, setShowRequests] = useState(false);
   const [chat, setChat] = useState();
@@ -66,7 +66,10 @@ const ChatBox = ({ project, id }) => {
       project_id: project.id,
     };
     setLoadMoreMessages(false);
-    setChat([...chat, { ...newMessage, created_at: new Date().toISOString(), id: randomId }]);
+    setChat([
+      ...chat,
+      { ...newMessage, created_at: new Date().toISOString(), id: randomId, username: profile.username },
+    ]);
 
     try {
       const response = await fetch("/api/chat/create", {

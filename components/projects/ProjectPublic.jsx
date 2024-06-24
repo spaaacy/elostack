@@ -69,7 +69,7 @@ const ProjectPublic = ({ project, members }) => {
 
             <div className="ml-auto flex-shrink-0">
               {session?.data.session ? (
-                project.is_open &&
+                project.total_members < project.team_size &&
                 !banned && (
                   <>
                     <button
@@ -92,7 +92,7 @@ const ProjectPublic = ({ project, members }) => {
                 <Link
                   href={"/signin"}
                   className={
-                    "flex-shrink-0 bg-primary hover:bg-primarydark hover:text-gray-300 mt-auto self-end px-3 py-1  rounded-full text-sm  dark:shadow dark:shadow-neutral-800 text-gray-200"
+                    "flex-shrink-0 bg-primary hover:bg-primarydark hover:text-gray-300 mt-auto self-end px-3 py-1 rounded-full text-sm  dark:shadow dark:shadow-neutral-800 text-gray-200"
                   }
                 >
                   Join Project

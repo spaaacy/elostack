@@ -30,11 +30,11 @@ const PendingPostModal = ({ setPosts, project, setProject }) => {
         },
         body: JSON.stringify({
           projectId: project.id,
-          sprintId: project.sprint.next_sprint_id,
+          sprintId: project.next_sprint,
         }),
       });
       if (response.status === 200) {
-        setProject({ ...project, pending_post: false, current_sprint: project.sprint.next_sprint_id });
+        setProject({ ...project, pending_post: false, current_sprint: project.next_sprint });
       } else {
         const { error } = await response.json();
         throw error;

@@ -44,7 +44,7 @@ const SetupModal = ({ project, members, setMembers, setShowModal, setShowNextMod
 
   return (
     <div className="bg-backgrounddark backdrop-blur bg-opacity-50 h-screen w-screen fixed z-50">
-      <div className="flex flex-col max-sm:w-72 items-center dark:border dark:border-gray-400 justify-center fixed sm:w-96 bg-gray-200 dark:bg-neutral-900 rounded p-4 left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
+      <div className="text-sm flex flex-col max-sm:w-72 items-center dark:border dark:border-gray-400 justify-center fixed sm:w-96 bg-gray-200 dark:bg-neutral-900 rounded p-4 left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
         <h3 className="text-lg">Select a role</h3>
         <p className="mt-2 mb-4 text-center mx-auto font-light text-sm text-neutral-400">
           Please choose carefully, roles cannot be changed afterwards.

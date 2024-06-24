@@ -63,7 +63,6 @@ const CreateProject = () => {
           duration_type: data.durationType,
           team_size: data.teamSize,
           status: "Just created",
-          is_open: true,
           deleted: false,
         })
       );

@@ -76,25 +76,13 @@ const ProjectOverview = ({ project, members, user, setLoading }) => {
           {`Duration: ${formatDuration(project.duration_length, project.duration_type)}`}
         </p>
       </div>
-      {user?.admin && (
+      {user?.admin && project.status.toLowerCase() === "in progress" && (
         <button
-          onClick={() =>
-            changeStatus(
-              project.status.toLowerCase() === "just created"
-                ? "In progress"
-                : project.status.toLowerCase() === "in progress"
-                ? "Complete"
-                : "In progress"
-            )
-          }
+          onClick={() => changeStatus("Complete")}
           type="button"
           className="text-gray-200 bg-primary text-xs px-2 py-1 mt-2 rounded-full dark:shadow dark:shadow-neutral-800 hover:bg-primarydark hover:text-gray-300"
         >
-          {project.status.toLowerCase() === "just created"
-            ? "Start project"
-            : project.status.toLowerCase() === "in progress"
-            ? "Mark completed"
-            : "Resume project"}
+          Mark completed
         </button>
       )}
     </div>
