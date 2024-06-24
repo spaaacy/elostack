@@ -28,6 +28,7 @@ export async function POST(req, res) {
 
     if (results.length > 0) {
       const commonSlot = findCommonTime(results);
+      console.log(commonSlot);
       if (commonSlot) {
         let results = await supabase
           .from("meeting")
@@ -41,7 +42,7 @@ export async function POST(req, res) {
         });
         if (results.error) throw results.error;
       } else {
-        const { error } = await supabase.from("meeting").update({ time_found: true }).eq("id", meetingId);
+        const { error } = await supabase.from("meeting").update({ time_found: false }).eq("id", meetingId);
         if (error) throw error;
       }
     }

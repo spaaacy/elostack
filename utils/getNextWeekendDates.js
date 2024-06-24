@@ -15,7 +15,7 @@ export default function () {
 
   // Function to format the date to 'YYYY-MM-DDT12:00:00Z'
   const formatTimestamptz = (date) => {
-    date.setUTCHours(12, 0, 0, 0); // Set time to 12:00:00 UTC
+    date.setUTCHours(0, 0, 0, 0); // Set time to 12:00:00 UTC
     return date.toISOString().replace(".000", ""); // Remove milliseconds
   };
   return {

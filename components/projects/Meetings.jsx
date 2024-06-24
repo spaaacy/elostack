@@ -32,7 +32,7 @@ const Meetings = ({ meetings, setMeetings, project }) => {
                       type="button"
                       key={i}
                     >
-                      {formatTime(m.datetime)}
+                      {formatTime(m.datetime, "date")}
                     </button>
                   );
                 })}
@@ -57,7 +57,7 @@ const Meetings = ({ meetings, setMeetings, project }) => {
                       type="button"
                       key={i}
                     >
-                      {formatTime(m.datetime)}
+                      {formatTime(m.datetime, "date")}
                     </button>
                   );
                 })}
@@ -74,7 +74,9 @@ const Meetings = ({ meetings, setMeetings, project }) => {
                 <br />
                 <span className="font-semibold">Time: </span>
                 {selectedMeeting.time_found
-                  ? formatTime(selectedMeeting.datetime, "time")
+                  ? selectedMeeting.time_found === true
+                    ? formatTime(selectedMeeting.datetime, "time")
+                    : "No common time found"
                   : "TBD—Waiting on Member Availability"}
               </p>
             </div>

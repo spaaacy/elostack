@@ -22,12 +22,7 @@ export async function POST(req, res) {
     if (auth.error) throw auth.error;
 
     const nextWeekendDates = getNextWeekendDates();
-    console.log(nextWeekendDates);
     let results = await supabase.rpc("create_meeting_for_in_progress_projects", {
-      p_datetime: nextWeekendDates.nextSaturday,
-    });
-    if (results.error) throw results.error;
-    results = await supabase.rpc("create_meeting_for_in_progress_projects", {
       p_datetime: nextWeekendDates.nextSunday,
     });
     if (results.error) throw results.error;

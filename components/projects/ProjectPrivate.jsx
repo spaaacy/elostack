@@ -247,6 +247,12 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
       {showTutorialModal && (
         <TutorialModal setPosts={setPosts} project={project} setShowTutorialModal={setShowTutorialModal} />
       )}
+      {/* 
+      {true && (
+        <MeetingModal pendingMeetings={pendingMeetings} setPendingMeetings={setPendingMeetings} project={project} />
+      )}
+ */}
+
       {!user?.admin && pendingMeetings?.length > 0 && !showTutorialModal && !showSetupModal && (
         <MeetingModal pendingMeetings={pendingMeetings} setPendingMeetings={setPendingMeetings} project={project} />
       )}
