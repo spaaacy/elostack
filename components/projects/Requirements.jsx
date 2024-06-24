@@ -501,33 +501,32 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
                               {t.title}
                             </p>
                           </button>
-                          {currentSprintIndex <= projectSprintIndex ||
-                            (user?.admin &&
-                              (!t.assignee && role?.includes(currentRole) ? (
-                                <button
-                                  type="button"
-                                  onClick={() => assignYourself(t.id, session.data.session.user.id)}
-                                  className="text-xs px-2 py-1 rounded-full bg-primary hover:bg-primarydark text-white hover:text-neutral-200 flex-shrink-0 ml-auto"
-                                >
-                                  Assign Yourself
-                                </button>
-                              ) : t.assignee === session.data.session.user.id || user?.admin ? (
-                                <button
-                                  type="button"
-                                  onClick={() => assignYourself(t.id, null)}
-                                  className="text-xs px-2 py-1 rounded-full dark:bg-sky-500 bg-sky-400 text-white ml-auto hover:bg-red-500 dark:hover:hover:bg-red-600 flex-shrink-0"
-                                >
-                                  {t.username}
-                                </button>
-                              ) : (
-                                <p
-                                  className={`${
-                                    t.username ? " dark:bg-sky-500 bg-sky-400" : "bg-neutral-600"
-                                  } text-xs px-2 py-1 rounded-full text-white ml-auto flex-shrink-0`}
-                                >
-                                  {t.username ? t.username : "None assigned"}
-                                </p>
-                              )))}
+                          {(currentSprintIndex <= projectSprintIndex || user?.admin) &&
+                            (!t.assignee && role?.includes(currentRole) ? (
+                              <button
+                                type="button"
+                                onClick={() => assignYourself(t.id, session.data.session.user.id)}
+                                className="text-xs px-2 py-1 rounded-full bg-primary hover:bg-primarydark text-white hover:text-neutral-200 flex-shrink-0 ml-auto"
+                              >
+                                Assign Yourself
+                              </button>
+                            ) : t.assignee === session.data.session.user.id || user?.admin ? (
+                              <button
+                                type="button"
+                                onClick={() => assignYourself(t.id, null)}
+                                className="text-xs px-2 py-1 rounded-full dark:bg-sky-500 bg-sky-400 text-white ml-auto hover:bg-red-500 dark:hover:hover:bg-red-600 flex-shrink-0"
+                              >
+                                {t.username}
+                              </button>
+                            ) : (
+                              <p
+                                className={`${
+                                  t.username ? " dark:bg-sky-500 bg-sky-400" : "bg-neutral-600"
+                                } text-xs px-2 py-1 rounded-full text-white ml-auto flex-shrink-0`}
+                              >
+                                {t.username ? t.username : "None assigned"}
+                              </p>
+                            ))}
                         </div>
                       );
                     })}
