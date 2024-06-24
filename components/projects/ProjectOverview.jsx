@@ -62,7 +62,7 @@ const ProjectOverview = ({ project, members, user, setLoading }) => {
                     {member.profile.username}
                     {member.role && (
                       <span className="font-medium capitalize">{`: ${
-                        member.role === "frontend, backend" ? "full-stack" : member.role
+                        member.role.includes("frontend") && member.role.includes("backend") ? "full-stack" : member.role
                       }`}</span>
                     )}
                   </p>

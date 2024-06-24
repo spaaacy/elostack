@@ -25,7 +25,9 @@ const ProjectPublic = ({ project, members }) => {
   const banned = members.some((m) => m.banned && m.user_id === session.data.session?.user.id);
   const canJoin =
     projects?.length > 0
-      ? projects.some((p) => p.status.toLowerCase() !== "in progress" && p.status.toLowerCase() !== "just created")
+      ? !projects.some(
+          (p) => (p.status.toLowerCase() === "in progress" || p.status.toLowerCase() === "just created") && !p.deleted
+        )
       : true;
 
   useEffect(() => {
