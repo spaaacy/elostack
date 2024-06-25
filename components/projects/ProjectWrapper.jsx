@@ -39,7 +39,6 @@ const ProjectWrapper = () => {
         const { project } = await response.json();
         if (project.deleted) router.push("/projects");
         setProject(project);
-        console.log(project);
       } else {
         router.push("/projects");
       }

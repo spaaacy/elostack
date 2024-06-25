@@ -96,10 +96,7 @@ const Meetings = ({ meetings, setMeetings, project }) => {
                           )}
                         </p>
                         <li>
-                          {`${formatTime(selectedMeeting.start_time[i], "time")} - ${formatTime(
-                            selectedMeeting.end_time[i],
-                            "time"
-                          )}`}
+                          {`${formatTime(selectedMeeting.start_time[i])} - ${formatTime(selectedMeeting.end_time[i])}`}
                         </li>
                       </div>
                     ))}

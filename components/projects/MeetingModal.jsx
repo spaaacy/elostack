@@ -39,7 +39,6 @@ const MeetingModal = ({ pendingMeetings, setPendingMeetings, project }) => {
 
   const createAvailability = async (e) => {
     e.preventDefault();
-    setLoading(true);
     const userId = session.data.session.user.id;
     if (
       !userId ||
@@ -49,12 +48,17 @@ const MeetingModal = ({ pendingMeetings, setPendingMeetings, project }) => {
     )
       return;
 
+    setLoading(true);
     try {
-      const meetingDate = currentMeeting.datetime.split("T")[0];
+      let meetingDate;
+      if (currentMeeting.weekly_meeting) {
+        meetingDate = getPreviousDay(currentMeeting.datetime);
+      } else meetingDate = currentMeeting.datetime.split("T")[0];
       const timestamptzSlots = slots.map((slot) => ({
         startTime: generateTimestamp(meetingDate, slot.startTime),
         endTime: generateTimestamp(meetingDate, slot.endTime),
       }));
+      console.log(timestamptzSlots);
       let response = await fetch("/api/meeting-availability/create", {
         method: "POST",
         headers: {
@@ -75,12 +79,12 @@ const MeetingModal = ({ pendingMeetings, setPendingMeetings, project }) => {
         throw error;
       }
       if (currentMeeting.weekly_meeting) {
-        const secondMeetingDate = getPreviousDay(currentMeeting.datetime);
-        console.log(secondMeetingDate);
+        const secondMeetingDate = currentMeeting.datetime.split("T")[0];
         const secondTimestamptzSlots = secondSlots.map((slot) => ({
           startTime: generateTimestamp(secondMeetingDate, slot.startTime),
           endTime: generateTimestamp(secondMeetingDate, slot.endTime),
         }));
+        console.log(secondTimestamptzSlots);
         response = await fetch("/api/meeting-availability/create", {
           method: "POST",
           headers: {
@@ -169,7 +173,7 @@ const MeetingModal = ({ pendingMeetings, setPendingMeetings, project }) => {
             )}
 
             {currentMeeting.weekly_meeting && (
-              <h4 className="font-light self-start text-xs text-neutral-400">Saturday</h4>
+              <h4 className="font-light self-start text-xs text-neutral-400 -mb-2">Saturday</h4>
             )}
             {slots.map((slot, i) => (
               <div key={i} className="flex w-full gap-2 max-sm:flex-wrap">
@@ -206,7 +210,7 @@ const MeetingModal = ({ pendingMeetings, setPendingMeetings, project }) => {
               <IoAddCircle className="text-primary text-lg" />
             </button>
             {currentMeeting.weekly_meeting && (
-              <h4 className="font-light self-start text-xs text-neutral-400">Sunday</h4>
+              <h4 className="font-light self-start text-xs text-neutral-400 -mb-2">Sunday</h4>
             )}
             {currentMeeting.weekly_meeting &&
               secondSlots.map((slot, i) => (
