@@ -4,15 +4,11 @@ const { GoogleAuth } = require("google-auth-library");
 export async function POST(req, res) {
   const data = await req.json();
   try {
-    // Cloud Functions uses your function's url as the `targetAudience` value
-    const targetAudience = "https://us-central1-elostack-418417.cloudfunctions.net/create-meeting";
+    const url = "https://us-central1-elostack-418417.cloudfunctions.net/create-meeting";
 
-    // For Cloud Functions, endpoint(`url`) and `targetAudience` should be equal
-    const url = targetAudience;
-
-    const auth = new GoogleAuth();
-
-    const client = await auth.getIdTokenClient(targetAudience);
+    const cred = JSON.parse(process.env.GOOGLE_CLOUD_INVOKER_CREDENTIALS);
+    const auth = new GoogleAuth(cred);
+    const client = await auth.getIdTokenClient(url);
     const res = await client.request({ url: `${url}/create-meeting`, method: "POST", data });
 
     return NextResponse.json(res.data, { status: 201 });
