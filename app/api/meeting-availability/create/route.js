@@ -3,6 +3,8 @@ import generateTimestamp from "@/utils/generateTimestamp";
 import { supabase } from "@/utils/supabase";
 import { NextRequest, NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
+import getGCPCredentials from "@/utils/getGCPCredentials";
+const { GoogleAuth } = require("google-auth-library");
 
 export async function POST(req, res) {
   try {
@@ -26,13 +28,26 @@ export async function POST(req, res) {
       results = data;
     }
 
+    const attendees = results.map((item) => ({ email: item.email }));
     if (results.length > 0) {
       const commonSlot = findCommonTime(results);
-      console.log(commonSlot);
       if (commonSlot) {
+        const url = "https://us-central1-elostack-418417.cloudfunctions.net/create-meeting";
+
+        const data = {
+          projectTitle,
+          attendees: attendees,
+          startTime: commonSlot.start_time,
+          endTime: commonSlot.end_time,
+        };
+
+        const auth = new GoogleAuth(getGCPCredentials());
+        const client = await auth.getIdTokenClient(url);
+        const res = await client.request({ url: `${url}/create-meeting`, method: "POST", data });
+
         let results = await supabase
           .from("meeting")
-          .update({ datetime: commonSlot.start_time, time_found: true })
+          .update({ datetime: commonSlot.start_time, time_found: true, url: res.data.uri })
           .eq("id", meetingId);
         if (results.error) throw results.error;
         results = await supabase.rpc("create_notifications", {

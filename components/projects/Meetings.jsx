@@ -4,6 +4,7 @@ import { UserContext } from "@/context/UserContext";
 import { formatTime } from "@/utils/formatTime";
 import { useContext, useEffect, useState } from "react";
 import CreateMeeting from "./CreateMeeting";
+import Link from "next/link";
 
 const Meetings = ({ meetings, setMeetings, project }) => {
   const [selectedMeeting, setSelectedMeeting] = useState();
@@ -79,6 +80,15 @@ const Meetings = ({ meetings, setMeetings, project }) => {
                     : "No common time found"
                   : "TBD—Waiting on Member Availability"}
               </p>
+              {selectedMeeting.url && (
+                <Link
+                  target="_blank"
+                  className="dark:text-blue-400 dark:hover:text-blue-500 text-blue-600 hover:text-blue-700 hover:underline"
+                  href={selectedMeeting.url}
+                >
+                  Meeting Link
+                </Link>
+              )}
             </div>
             <div className="flex flex-col gap-2">
               {selectedMeeting?.username?.length > 0 && (
