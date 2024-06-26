@@ -19,10 +19,13 @@ import Meetings from "./Meetings";
 import MeetingModal from "./MeetingModal";
 import arrangeSprints from "@/utils/arrangeSprints";
 import PendingPostModal from "./PendingPostModal";
+import { FaGithubAlt } from "react-icons/fa6";
+import Link from "next/link";
+import generateRandomString from "@/utils/generateRandomString";
 
 const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
   const { id } = useParams();
-  const { session, user } = useContext(UserContext);
+  const { session, user, profile } = useContext(UserContext);
   const [loading, setLoading] = useState(false);
   const [currentState, setCurrentState] = useState("overview");
   const [posts, setPosts] = useState([]);
@@ -247,16 +250,35 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
       {showTutorialModal && (
         <TutorialModal setPosts={setPosts} project={project} setShowTutorialModal={setShowTutorialModal} />
       )}
-      {/* 
-      {true && (
-        <MeetingModal pendingMeetings={pendingMeetings} setPendingMeetings={setPendingMeetings} project={project} />
-      )}
- */}
 
       {!user?.admin && pendingMeetings?.length > 0 && !showTutorialModal && !showSetupModal && (
         <MeetingModal pendingMeetings={pendingMeetings} setPendingMeetings={setPendingMeetings} project={project} />
       )}
       {project.pending_post && <PendingPostModal project={project} setPosts={setPosts} setProject={setProject} />}
+
+      {!profile?.github_username && (
+        <div className="bg-backgrounddark backdrop-blur bg-opacity-50 h-screen w-screen fixed z-50">
+          <div className="max-sm:w-full sm:w-80 flex flex-col gap-4 items-center dark:border dark:border-gray-400 fixed bg-gray-200 dark:bg-neutral-900 rounded p-4 left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <h3 className="font-semibold text-center">Please connect to GitHub to continue</h3>
+            <Link
+              target="_blank"
+              href={{
+                pathname: "https://github.com/login/oauth/authorize",
+                query: {
+                  client_id: process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID,
+                  state: generateRandomString(),
+                  redirect_uri: `${window.location.origin}/account-settings?github_oauth=true`,
+                  allow_signup: true,
+                },
+              }}
+              className="bg-neutral-800 px-3 py-1 rounded-full text-white flex items-center gap-2 hover:bg-neutral-700 text-sm"
+            >
+              <FaGithubAlt />
+              <p>Connect to GitHub</p>
+            </Link>
+          </div>
+        </div>
+      )}
 
       <Toaster />
     </div>

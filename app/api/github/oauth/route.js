@@ -21,7 +21,7 @@ export async function PATCH(req, res) {
           client_id: process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID,
           client_secret: process.env.GITHUB_CLIENT_SECRET,
           code,
-          redirect_uri: "http://localhost:3000/account-settings?github_oauth=true",
+          redirect_uri: "https://www.elostack.com/account-settings?github_oauth=true",
         }),
       {
         method: "POST",
