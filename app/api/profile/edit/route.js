@@ -1,4 +1,5 @@
 import { supabase } from "@/utils/supabase";
+import { preloadFont } from "next/dist/server/app-render/entry-base";
 import { NextRequest, NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
 
@@ -13,20 +14,25 @@ export async function PATCH(req, res) {
 
     const formData = await req.formData();
     const profilePicture = formData.get("profilePicture");
+    const oldImageId = formData.get("oldImageId");
     const userId = formData.get("userId");
-    const oldImageId = formData.get("imageId");
+    const username = formData.get("username");
 
-    let results = await supabase.storage.from("profile-picture").remove([`${userId}/${oldImageId}`]);
-    if (results.error) throw results.error;
+    const newProfile = { username };
 
-    const imageId = uuidv4();
-    results = await supabase.from("profile").update({ image_id: imageId }).eq("user_id", userId);
-    if (results.error) throw results.error;
+    if (oldImageId && profilePicture) {
+      newProfile["image_id"] = uuidv4();
+      let results = await supabase.storage.from("profile-picture").remove([`${userId}/${oldImageId}`]);
+      if (results.error) throw results.error;
+      results = await supabase.storage
+        .from("profile-picture")
+        .upload(`${userId}/${newProfile.image_id}`, profilePicture, { cacheControl: 3600, upsert: true });
+      if (results.error) throw results.error;
+    }
 
-    results = await supabase.storage
-      .from("profile-picture")
-      .upload(`${userId}/${imageId}`, profilePicture, { cacheControl: 3600, upsert: true });
-    if (results.error) throw results.error;
+    console.log(newProfile);
+    const { error } = await supabase.from("profile").update(newProfile).eq("user_id", userId);
+    if (error) throw error;
 
     return NextResponse.json({ message: "Profile has been edited!" }, { status: 200 });
   } catch (error) {
