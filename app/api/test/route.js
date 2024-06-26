@@ -6,8 +6,7 @@ export async function POST(req, res) {
   try {
     const url = "https://us-central1-elostack-418417.cloudfunctions.net/create-meeting";
 
-    const cred = JSON.parse(process.env.GOOGLE_CLOUD_INVOKER_CREDENTIALS);
-    const auth = new GoogleAuth(cred);
+    const auth = new GoogleAuth();
     const client = await auth.getIdTokenClient(url);
     const res = await client.request({ url: `${url}/create-meeting`, method: "POST", data });
 
