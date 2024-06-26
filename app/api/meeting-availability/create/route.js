@@ -43,7 +43,7 @@ export async function POST(req, res) {
 
         const auth = new GoogleAuth(getGCPCredentials());
         const client = await auth.getIdTokenClient(url);
-        const res = await client.request({ url: `${url}/create-meeting`, method: "POST", data });
+        const res = await client.request({ url: url, method: "POST", data });
 
         let results = await supabase
           .from("meeting")
