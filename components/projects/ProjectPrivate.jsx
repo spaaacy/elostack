@@ -201,7 +201,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
                   : "bg-gray-200 dark:bg-backgrounddark hover:bg-gray-300 dark:hover:bg-neutral-800"
               } rounded dark:border dark:border-gray-400 px-2 py-1`}
             >
-              Sprints
+              Schedule
             </button>
             <button
               type="button"

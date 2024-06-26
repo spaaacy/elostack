@@ -388,7 +388,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
           className="max-lg:cursor-pointer font-semibold max-lg:hover:bg-gray-300 dark:max-lg:hover:bg-neutral-600 max-lg:w-full max-lg:py-2 flex gap-1 max-lg:items-center max-lg:justify-center"
         >
           <IoIosArrowDown className={`max-lg:block lg:hidden`} />
-          Sprints
+          Schedule
         </h3>
         <div className={`${showSprints ? "max-lg:flex" : "max-lg:hidden"} lg:flex flex-col max-lg:gap-2 items-center`}>
           {sprints?.map((s, i) => {
