@@ -12,23 +12,10 @@ export async function POST(req, res) {
 
     const auth = new GoogleAuth();
 
-    async function request() {
-      console.info(`request ${url} with target audience ${targetAudience}`);
+    const client = await auth.getIdTokenClient(targetAudience);
+    const res = await client.request({ url: `${url}/create-meeting`, method: "POST", data });
 
-      // this call retrieves the ID token for the impersonated service account
-      const client = await auth.getIdTokenClient(targetAudience);
-      console.log(targetAudience);
-
-      const res = await client.request({ url: `${url}/create-meeting`, method: "POST", data });
-      console.info(res.data);
-    }
-
-    request().catch((err) => {
-      console.error(err.message);
-      process.exitCode = 1;
-    });
-
-    return NextResponse.json({ message: "Meeting availability created successfully!" }, { status: 201 });
+    return NextResponse.json(res.data, { status: 201 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error }, { status: 500 });
