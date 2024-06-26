@@ -63,6 +63,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
         previous_sprint_id: previousSprintId,
       },
     ]);
+    setProject({ ...project, current_sprint: project.current_sprint ? project.current_sprint : "0" });
 
     try {
       let sprintId;
@@ -89,31 +90,33 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
               : sprint
           )
         );
+        setProject({ ...project, current_sprint: project.current_sprint ? project.current_sprint : sprintId });
         setSprintTitle("");
+        if (!project.current_sprint) {
+          response = await fetch("/api/project/change-sprint", {
+            method: "PATCH",
+            headers: {
+              "X-Supabase-Auth": `${session.data.session.access_token} ${session.data.session.refresh_token}`,
+            },
+            body: JSON.stringify({
+              sprintId,
+              projectId: project.id,
+            }),
+          });
+          if (response.status !== 200) {
+            const { error } = await response.json();
+            throw error;
+          }
+        }
       } else {
         const { error } = await response.json();
         throw error;
-      }
-      if (!project.current_sprint) {
-        response = await fetch("/api/project/change-sprint", {
-          method: "PATCH",
-          headers: {
-            "X-Supabase-Auth": `${session.data.session.access_token} ${session.data.session.refresh_token}`,
-          },
-          body: JSON.stringify({
-            sprintId,
-            projectId: project.id,
-          }),
-        });
-        if (response.status !== 200) {
-          const { error } = await response.json();
-          throw error;
-        }
       }
     } catch (error) {
       console.error(error);
       toast.error("Oops, something went wrong...");
       setSprints((prevSprints) => prevSprints.filter((sprint) => sprint.id !== "0"));
+      setProject({ ...project, current_sprint: project.current_sprint ? project.current_sprint : null });
     }
   };
 
