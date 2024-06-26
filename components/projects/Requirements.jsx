@@ -52,7 +52,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
   const createSprint = async () => {
     const userId = session.data.session.user.id;
     if (!sprintTitle || !userId) return;
-    const previousSprintId = sprints[sprints.length - 1].id;
+    const previousSprintId = sprints.length > 0 ? sprints[sprints.length - 1].id : null;
 
     setSprints((prevSprint) => [
       ...prevSprint,
@@ -469,7 +469,6 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
                   {tasks
                     ?.filter((t) => !t.complete && t.role === currentRole && t.sprint_id === currentSprint)
                     .map((t, i) => {
-                      console.log({ currentSprintIndex, projectSprintIndex });
                       return (
                         <div key={i} className="flex items-start gap-2  flex-wrap">
                           <button

@@ -17,9 +17,10 @@ export async function POST(req, res) {
       .from("sprint")
       .insert({ title, project_id: projectId, id: sprintId, previous_sprint_id: previousSprintId });
     if (results.error) throw results.error;
-    results = await supabase.from("sprint").update({ next_sprint_id: sprintId }).eq("id", previousSprintId);
-    if (results.error) throw results.error;
-
+    if (previousSprintId) {
+      results = await supabase.from("sprint").update({ next_sprint_id: sprintId }).eq("id", previousSprintId);
+      if (results.error) throw results.error;
+    }
     return NextResponse.json({ message: "Sprint created successfully!", sprintId }, { status: 201 });
   } catch (error) {
     console.error(error);
