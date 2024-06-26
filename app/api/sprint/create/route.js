@@ -21,6 +21,7 @@ export async function POST(req, res) {
       results = await supabase.from("sprint").update({ next_sprint_id: sprintId }).eq("id", previousSprintId);
       if (results.error) throw results.error;
     }
+
     return NextResponse.json({ message: "Sprint created successfully!", sprintId }, { status: 201 });
   } catch (error) {
     console.error(error);
