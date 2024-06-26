@@ -1,3 +1,4 @@
+import getGCPCredentials from "@/utils/getGcpCredentials";
 import { NextRequest, NextResponse } from "next/server";
 const { GoogleAuth } = require("google-auth-library");
 
@@ -6,7 +7,7 @@ export async function POST(req, res) {
   try {
     const url = "https://us-central1-elostack-418417.cloudfunctions.net/create-meeting";
 
-    const auth = new GoogleAuth();
+    const auth = new GoogleAuth(getGCPCredentials());
     const client = await auth.getIdTokenClient(url);
     const res = await client.request({ url: `${url}/create-meeting`, method: "POST", data });
 
