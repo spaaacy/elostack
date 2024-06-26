@@ -1,4 +1,4 @@
-import getGCPCredentials from "@/utils/getGcpCredentials";
+import getGCPCredentials from "@/utils/getGCPCredentials";
 import { NextRequest, NextResponse } from "next/server";
 const { GoogleAuth } = require("google-auth-library");
 
