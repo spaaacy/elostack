@@ -7,7 +7,6 @@ import { UserContext } from "@/context/UserContext";
 import Loader from "../common/Loader";
 import toast, { Toaster } from "react-hot-toast";
 import SettingsDropdown from "./SettingsDropdown";
-import ChatBox from "./ChatBox";
 import Feed from "../feed/Feed";
 import Image from "next/image";
 import ProjectOverview from "./ProjectOverview";
@@ -234,7 +233,6 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
           ) : (
             <Meetings project={project} meetings={meetings} setMeetings={setMeetings} />
           )}
-          <ChatBox session={session} project={project} id={id} />
         </main>
       )}
       {showSetupModal && (

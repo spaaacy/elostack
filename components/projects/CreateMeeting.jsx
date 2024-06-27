@@ -121,7 +121,7 @@ const CreateMeeting = ({ project, setMeetings, setCreateMeeting }) => {
               className="px-2 py-1 border border-gray-400 rounded w-full"
               type="date"
               value={meetingDate}
-              min={new Date().toISOString().split("T")[0]}
+              min={new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0]}
               onChange={(e) => setMeetingDate(e.target.value)}
             />
             <p className="mt-2 font-semibold">What times are you available?</p>

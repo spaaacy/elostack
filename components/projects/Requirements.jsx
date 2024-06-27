@@ -90,7 +90,12 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
               : sprint
           )
         );
-        setProject({ ...project, current_sprint: project.current_sprint ? project.current_sprint : sprintId });
+        setProject((prevProject) => {
+          return {
+            ...prevProject,
+            current_sprint: prevProject.current_sprint === "0" ? sprintId : prevProject.current_sprint,
+          };
+        });
         setSprintTitle("");
         if (!project.current_sprint) {
           response = await fetch("/api/project/change-sprint", {
@@ -116,7 +121,12 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
       console.error(error);
       toast.error("Oops, something went wrong...");
       setSprints((prevSprints) => prevSprints.filter((sprint) => sprint.id !== "0"));
-      setProject({ ...project, current_sprint: project.current_sprint ? project.current_sprint : null });
+      setProject((prevProject) => {
+        return {
+          ...prevProject,
+          current_sprint: prevProject.current_sprint === "0" ? null : prevProject.current_sprint,
+        };
+      });
     }
   };
 
@@ -382,6 +392,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
 
   return (
     <div className="flex gap-4 max-lg:flex-col lg:flex relative">
+      {console.log(project)}
       <div className="flex flex-col gap-2 min-w-44 max-lg:items-center">
         <h3
           onClick={() => setShowSprints(!showSprints)}

@@ -163,7 +163,8 @@ const SettingsDropdown = ({ project, members, setLoading }) => {
   };
 
   const deleteProject = async () => {
-    if (!session.data.session) return;
+    const userId = session.data.session.user.id;
+    if (!userId) return;
     try {
       setShowDeleteProject(false);
       setLoading(true);
@@ -173,6 +174,7 @@ const SettingsDropdown = ({ project, members, setLoading }) => {
           "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
         },
         body: JSON.stringify({
+          userId,
           project: project,
         }),
       });

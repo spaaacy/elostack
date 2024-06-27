@@ -105,6 +105,16 @@ const Post = ({ post, setPosts, project }) => {
     } catch (error) {
       toast.error("Oops, something went wrong...");
       console.error(error);
+      setPosts((prevPosts) =>
+        prevPosts.map((prev) =>
+          prev.id === post.id
+            ? {
+                ...prev,
+                likes: prev.likes.filter((like) => like !== userId),
+              }
+            : prev
+        )
+      );
     }
   };
 
@@ -122,7 +132,7 @@ const Post = ({ post, setPosts, project }) => {
             : post
         )
       );
-      const response = await fetch("/api/like/delete", {
+      const response = await fetch("/api/like/deletee", {
         method: "DELETE",
         headers: {
           "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
@@ -139,6 +149,16 @@ const Post = ({ post, setPosts, project }) => {
     } catch (error) {
       toast.error("Oops, something went wrong...");
       console.error(error);
+      setPosts((prevPosts) =>
+        prevPosts.map((prev) =>
+          prev.id === post.id
+            ? {
+                ...prev,
+                likes: [...prev.likes, userId],
+              }
+            : prev
+        )
+      );
     }
   };
 

@@ -10,9 +10,9 @@ export async function DELETE(req, res) {
     const auth = await supabase.auth.setSession({ access_token, refresh_token });
     if (auth.error) throw auth.error;
 
-    const { project } = await req.json();
+    const { project, userId } = await req.json();
 
-    let results = await supabase.from("member").delete().match({ project_id: project.id, user_id: project.leader });
+    let results = await supabase.from("member").delete().match({ project_id: project.id, user_id: userId });
     if (results.error) throw results.error;
 
     results = await supabase.from("project").update({ deleted: true }).eq("id", project.id);
