@@ -236,7 +236,7 @@ const Post = ({ post, setPosts, project }) => {
         {post.project_id && post.public && <MdOutlinePublic />}
         <p className="ml-auto font-light text-xs">{formatTime(post.created_at, "date")}</p>
       </div>
-      <p className="break-words">{post.content}</p>
+      <p className="break-words whitespace-pre-line">{post.content}</p>
 
       {post.id !== "0" && post.image_id.length > 0 && (
         <ul className="gap-2 flex items-end flex-wrap">

@@ -43,13 +43,13 @@ const ProjectOverview = ({ project, members, user, setLoading }) => {
   };
 
   return (
-    <div className="relative">
-      {project.github && (
-        <Link className="ml-auto absolute top-4 right-4" href={project.github} target="_blank">
-          <FaGithub className=" text-2xl dark:hover:text-gray-300 hover:text-gray-700" />
-        </Link>
-      )}
-      <div className="p-2 rounded dark:border bg-gray-200 dark:bg-backgrounddark  dark:border-gray-400 flex flex-col font-light text-sm ">
+    <div>
+      <div className="relative p-2 rounded dark:border bg-gray-200 dark:bg-backgrounddark  dark:border-gray-400 flex flex-col font-light text-sm ">
+        {project.github && (
+          <Link className="ml-auto absolute max-sm:bottom-4 sm:top-4 right-4" href={project.github} target="_blank">
+            <FaGithub className=" text-2xl dark:hover:text-gray-300 hover:text-gray-700" />
+          </Link>
+        )}
         <Markdown className="markdown">{project.description}</Markdown>
         <p className="mt-4 font-semibold">Members</p>
         <ul>
