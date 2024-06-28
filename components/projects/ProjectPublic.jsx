@@ -33,23 +33,20 @@ const ProjectPublic = ({ project, members }) => {
   useEffect(() => {
     const loadData = async () => {
       setDataLoaded(true);
-      await fetchPosts();
+      fetchPosts();
       setLoading(false);
     };
 
     if (session) {
-      if (session.data.session) {
-        if (!dataLoaded) loadData();
-      }
+      if (!dataLoaded) loadData();
     }
   }, [session]);
 
   const fetchPosts = async () => {
     try {
-      setShowLoadMorePosts(false);
       const response = await fetch(`/api/post/${project.id}/public`, {
         method: "POST",
-        body: JSON.stringify({ pageNumber: nextPostsPage }),
+        body: JSON.stringify({ pageNumber: 1 }),
       });
       if (response.status === 200) {
         const { posts } = await response.json();

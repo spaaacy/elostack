@@ -16,6 +16,7 @@ import { formatTime } from "@/utils/formatTime";
 import Link from "next/link";
 import UserAvatar from "../common/UserAvatar";
 import { MdOutlinePublic } from "react-icons/md";
+import Markdown from "react-markdown";
 
 const Post = ({ post, setPosts, project }) => {
   const { profile, session } = useContext(UserContext);
@@ -236,7 +237,7 @@ const Post = ({ post, setPosts, project }) => {
         {post.project_id && post.public && <MdOutlinePublic />}
         <p className="ml-auto font-light text-xs">{formatTime(post.created_at, "date")}</p>
       </div>
-      <p className="break-words whitespace-pre-line">{post.content}</p>
+      <Markdown className="markdown">{post.content}</Markdown>
 
       {post.id !== "0" && post.image_id.length > 0 && (
         <ul className="gap-2 flex items-end flex-wrap">

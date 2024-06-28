@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import NavBar from "../navbar/NavBar";
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "@/context/UserContext";
@@ -21,6 +21,7 @@ import PendingPostModal from "./PendingPostModal";
 import { FaGithubAlt } from "react-icons/fa6";
 import Link from "next/link";
 import generateRandomString from "@/utils/generateRandomString";
+import { useRouter } from "next/navigation";
 
 const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
   const { id } = useParams();
@@ -36,8 +37,17 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
   const [showTutorialModal, setShowTutorialModal] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [pendingMeetings, setPendingMeetings] = useState([]);
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
   useEffect(() => {
+    const loadSearchParams = () => {
+      if (searchParams.get("meetings") === "true") setCurrentState("meetings");
+      if (searchParams.get("sprints") === "true") setCurrentState("sprints");
+      if (searchParams.get("updates") === "true") setCurrentState("updates");
+      router.replace(`/projects/${id}`, undefined, { shallow: true });
+    };
+
     const loadData = async () => {
       setDataLoaded(true);
       await fetchSprints();
@@ -50,6 +60,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
 
     if (session) {
       if (!dataLoaded) loadData();
+      loadSearchParams();
       const member = members.find((m) => m.user_id === session.data.session.user.id);
       if (member && !member.role) setShowSetupModal(true);
       if (member && !member.tutorial_complete && member.role) setShowTutorialModal(true);

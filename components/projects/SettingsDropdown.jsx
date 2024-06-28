@@ -213,7 +213,7 @@ const SettingsDropdown = ({ project, members, setLoading }) => {
   };
 
   return (
-    <div className="ml-auto z-40">
+    <div className="ml-auto z-30">
       <button
         type="button"
         disabled={
