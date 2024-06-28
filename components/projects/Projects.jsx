@@ -159,7 +159,7 @@ const Projects = () => {
                               p.total_members < p.team_size ? "bg-green-600" : "bg-red-700"
                             }  mt-1 px-2 py-1 rounded-full dark:shadow shadow-neutral-800  flex-shrink-0`}
                           >
-                            {p.total_members < p.team_size ? "Open" : "Closed"}
+                            {p.total_members < p.team_size ? "Open" : "Full"}
                           </p>
                         </div>
                       </div>
