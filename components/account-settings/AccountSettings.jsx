@@ -16,7 +16,7 @@ import { FaGithubAlt } from "react-icons/fa6";
 import { useForm } from "react-hook-form";
 
 const AccountSettings = () => {
-  const { session, profile } = useContext(UserContext);
+  const { user, session, profile } = useContext(UserContext);
   const [loading, setLoading] = useState(true);
   const fileInputRef = useRef(null);
   const [avatar, setAvatar] = useState();
@@ -173,21 +173,23 @@ const AccountSettings = () => {
                 </button>
               </div>
             </div>
-            <Link
-              href={{
-                pathname: "https://github.com/login/oauth/authorize",
-                query: {
-                  client_id: process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID,
-                  state: generateRandomString(),
-                  redirect_uri: `${window.location.origin}/account-settings?github_oauth=true`,
-                  allow_signup: true,
-                },
-              }}
-              className="bg-neutral-800 px-3 py-1 rounded-full text-white flex items-center gap-2 hover:bg-neutral-700 text-sm absolute top-0 right-0"
-            >
-              <FaGithubAlt />
-              <p>Connect to GitHub</p>
-            </Link>
+            {!user?.github_access_token && (
+              <Link
+                href={{
+                  pathname: "https://github.com/login/oauth/authorize",
+                  query: {
+                    client_id: process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID,
+                    state: generateRandomString(),
+                    redirect_uri: `${window.location.origin}/account-settings?github_oauth=true`,
+                    allow_signup: true,
+                  },
+                }}
+                className="bg-neutral-800 px-3 py-1 rounded-full text-white flex items-center gap-2 hover:bg-neutral-700 text-sm absolute top-0 right-0"
+              >
+                <FaGithubAlt />
+                <p>Connect to GitHub</p>
+              </Link>
+            )}
           </form>
         </main>
       )}

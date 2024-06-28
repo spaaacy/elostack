@@ -22,7 +22,8 @@ const NavBar = () => {
   const [currentTheme, setCurrentTheme] = useState();
   const pathname = usePathname();
   const showSignIn = pathname !== "/signin" && pathname !== "/signup";
-  const isHomePage = pathname === "/";
+  const isRootPage = pathname === "/";
+  const isHomePage = pathname === "/home";
   const [notifications, setNotifications] = useState([]);
   const [dataLoaded, setDataLoaded] = useState(false);
 
@@ -110,20 +111,24 @@ const NavBar = () => {
   return (
     <nav
       className={`${
-        isHomePage && !session?.data.session
+        (isRootPage && !session?.data.session) || isHomePage
           ? "text-white"
           : "sticky top-0 bg-backgroundlight  dark:bg-backgrounddark border-b border-b-1 border-gray-400 drop-shadow z-40"
       } h-[67px] `}
     >
       <div
         className={`px-8 lg:px-16 py-2 flex items-center justify-start ${
-          isHomePage && !session?.data.session ? "max-lg:bg-black" : ""
+          (isRootPage && !session?.data.session) || isHomePage ? "max-lg:bg-black" : ""
         }`}
       >
         <Link href={"/"} className={`${kanit.className} flex justify-center items-center text-2xl flex-shrink-0`}>
           {currentTheme && (
             <Image
-              src={(isHomePage && !session?.data.session) || currentTheme === "dark" ? "/logo.png" : "/logo_black.png"}
+              src={
+                (isRootPage && !session?.data.session) || isHomePage || currentTheme === "dark"
+                  ? "/logo.png"
+                  : "/logo_black.png"
+              }
               alt={"logo"}
               width={50}
               height={50}
@@ -132,6 +137,7 @@ const NavBar = () => {
           <span className="max-lg:hidden">EloStack</span>
         </Link>
         <DesktopNav
+          isRootPage={isRootPage}
           isHomePage={isHomePage}
           notifications={notifications}
           setNotifications={setNotifications}
@@ -154,6 +160,7 @@ const NavBar = () => {
       </div>
       {showMobileDropdown && (
         <MobileDropdown
+          isRootPage={isRootPage}
           isHomePage={isHomePage}
           showSignIn={showSignIn}
           session={session}
@@ -167,6 +174,7 @@ const NavBar = () => {
 
 const DesktopNav = ({
   isHomePage,
+  isRootPage,
   notifications,
   setNotifications,
   showSignIn,
@@ -178,22 +186,35 @@ const DesktopNav = ({
 }) => {
   return (
     <div className="ml-12 flex justify-start items-center gap-4 max-lg:hidden w-full">
-      {!session?.data.session && (
+      {!session?.data.session ? (
         <Link
           href={"/feed"}
           className={`p-2  border-b-2 border-transparent  ${
-            isHomePage && !session?.data.session
+            (isRootPage && !session?.data.session) || isHomePage
               ? " hover:text-gray-300"
               : "hover:text-gray-500 dark:hover:text-gray-300"
           }`}
         >
           Feed
         </Link>
+      ) : (
+        <Link
+          href={"/home"}
+          className={`p-2  border-b-2 border-transparent  ${
+            (isRootPage && !session?.data.session) || isHomePage
+              ? " hover:text-gray-300"
+              : "hover:text-gray-500 dark:hover:text-gray-300"
+          }`}
+        >
+          Home
+        </Link>
       )}
       <Link
         href={"/projects"}
         className={`p-2  border-b-2 border-transparent  ${
-          isHomePage && !session?.data.session ? " hover:text-gray-300" : "hover:text-gray-500 dark:hover:text-gray-300"
+          (isRootPage && !session?.data.session) || isHomePage
+            ? " hover:text-gray-300"
+            : "hover:text-gray-500 dark:hover:text-gray-300"
         }`}
       >
         Find Projects
@@ -202,7 +223,7 @@ const DesktopNav = ({
         <Link
           href={"/create-project"}
           className={`p-2  border-b-2 border-transparent  ${
-            isHomePage && !session?.data.session
+            (isRootPage && !session?.data.session) || isHomePage
               ? " hover:text-gray-300"
               : "hover:text-gray-500 dark:hover:text-gray-300"
           }`}
@@ -210,23 +231,13 @@ const DesktopNav = ({
           Create Project
         </Link>
       )}
-      {session?.data.session && (
-        <Link
-          href={"/my-projects"}
-          className={`p-2 border-b-2 border-transparent  ${
-            isHomePage && !session?.data.session
-              ? " hover:text-gray-300"
-              : "hover:text-gray-500 dark:hover:text-gray-300"
-          }`}
-        >
-          My Projects
-        </Link>
-      )}
       <Link
         target="_blank"
         href={"https://elostack.slack.com"}
         className={`p-2 border-b-2 border-transparent  ${
-          isHomePage && !session?.data.session ? " hover:text-gray-300" : "hover:text-gray-500 dark:hover:text-gray-300"
+          (isRootPage && !session?.data.session) || isHomePage
+            ? " hover:text-gray-300"
+            : "hover:text-gray-500 dark:hover:text-gray-300"
         }`}
       >
         Slack
@@ -252,7 +263,7 @@ const DesktopNav = ({
             <Link
               href={"/signin"}
               className={`${
-                isHomePage && !session?.data.session
+                (isRootPage && !session?.data.session) || isHomePage
                   ? "hover:bg-neutral-600 "
                   : "hover:bg-gray-300 dark:hover:bg-neutral-600 "
               } ml-4  px-3 py-1 rounded-full text-sm`}
@@ -293,16 +304,20 @@ const MobileNav = ({
   );
 };
 
-const MobileDropdown = ({ isHomePage, showSignIn, session, user, signOut }) => {
+const MobileDropdown = ({ isHomePage, isRootPage, showSignIn, session, user, signOut }) => {
   return (
     <div
       className={`${
-        isHomePage && !session?.data.session ? "bg-black" : "bg-backgroundlight dark:bg-backgrounddark"
+        (isRootPage && !session?.data.session) || isHomePage ? "bg-black" : "bg-backgroundlight dark:bg-backgrounddark"
       } flex flex-col justify-center items-center lg:hidden py-2`}
     >
-      {!session?.data.session && (
+      {!session?.data.session ? (
         <Link href={"/feed"} className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center">
           Feed
+        </Link>
+      ) : (
+        <Link href={"/home"} className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center">
+          Home
         </Link>
       )}
       <Link href={"/projects"} className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center">
@@ -311,11 +326,6 @@ const MobileDropdown = ({ isHomePage, showSignIn, session, user, signOut }) => {
       {user?.admin && (
         <Link href={"/create-project"} className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center">
           Create Project
-        </Link>
-      )}
-      {session?.data.session && (
-        <Link href={"/my-projects"} className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center">
-          My Projects
         </Link>
       )}
       <Link

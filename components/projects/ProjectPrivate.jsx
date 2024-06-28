@@ -38,14 +38,13 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
   const [dataLoaded, setDataLoaded] = useState(false);
   const [pendingMeetings, setPendingMeetings] = useState([]);
   const searchParams = useSearchParams();
-  const router = useRouter();
 
   useEffect(() => {
     const loadSearchParams = () => {
+      if (searchParams.get("overview") === "true") setCurrentState("overview");
       if (searchParams.get("meetings") === "true") setCurrentState("meetings");
       if (searchParams.get("sprints") === "true") setCurrentState("sprints");
       if (searchParams.get("updates") === "true") setCurrentState("updates");
-      router.replace(`/projects/${id}`, undefined, { shallow: true });
     };
 
     const loadData = async () => {
@@ -201,8 +200,8 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
           </div>
           <hr className="border-0 h-[1px] bg-gray-400 my-4" />
           <div className="flex gap-2 text-sm mb-4 flex-wrap">
-            <button
-              type="button"
+            <Link
+              href={`/projects/${id}?overview=true`}
               onClick={() => setCurrentState("overview")}
               className={`${
                 currentState === "overview"
@@ -211,9 +210,9 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
               } rounded dark:border dark:border-gray-400 px-2 py-1`}
             >
               Overview
-            </button>
-            <button
-              type="button"
+            </Link>
+            <Link
+              href={`/projects/${id}?updates=true`}
               onClick={() => setCurrentState("updates")}
               className={`${
                 currentState === "updates"
@@ -222,9 +221,9 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
               } rounded dark:border dark:border-gray-400 px-2 py-1`}
             >
               Updates
-            </button>
-            <button
-              type="button"
+            </Link>
+            <Link
+              href={`/projects/${id}?sprints=true`}
               onClick={() => setCurrentState("sprints")}
               className={`${
                 currentState === "sprints"
@@ -233,9 +232,9 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
               } rounded dark:border dark:border-gray-400 px-2 py-1`}
             >
               Schedule
-            </button>
-            <button
-              type="button"
+            </Link>
+            <Link
+              href={`/projects/${id}?meetings=true`}
               onClick={() => setCurrentState("meetings")}
               className={`${
                 currentState === "meetings"
@@ -244,7 +243,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
               } rounded dark:border dark:border-gray-400 px-2 py-1`}
             >
               Meetings
-            </button>
+            </Link>
           </div>
           {currentState === "overview" ? (
             <ProjectOverview user={user} members={members} project={project} setLoading={setLoading} />
