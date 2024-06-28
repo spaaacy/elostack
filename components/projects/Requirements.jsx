@@ -392,7 +392,6 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
 
   return (
     <div className="flex gap-4 max-lg:flex-col lg:flex relative">
-      {console.log(project)}
       <div className="flex flex-col gap-2 min-w-44 max-lg:items-center">
         <h3
           onClick={() => setShowSprints(!showSprints)}

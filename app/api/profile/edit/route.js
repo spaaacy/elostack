@@ -30,7 +30,6 @@ export async function PATCH(req, res) {
       if (results.error) throw results.error;
     }
 
-    console.log(newProfile);
     const { error } = await supabase.from("profile").update(newProfile).eq("user_id", userId);
     if (error) throw error;
 

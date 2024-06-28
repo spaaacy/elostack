@@ -5,20 +5,8 @@ import CreatePost from "./CreatePost";
 
 const Feed = ({ posts, setPosts, project, isMember }) => {
   const { session } = useContext(UserContext);
-  const [dataLoaded, setDataLoaded] = useState(false);
-  const [nextPostsPage, setNextPostsPage] = useState(1);
+  const [nextPostsPage, setNextPostsPage] = useState(2);
   const [showLoadMorePosts, setShowLoadMorePosts] = useState(false);
-
-  useEffect(() => {
-    const loadData = async () => {
-      if (!dataLoaded) {
-        setDataLoaded(true);
-        fetchPosts();
-      }
-    };
-
-    loadData();
-  }, [session]);
 
   const fetchPosts = async () => {
     try {
@@ -52,10 +40,7 @@ const Feed = ({ posts, setPosts, project, isMember }) => {
         if (posts.length === 5) {
           setShowLoadMorePosts(true);
         } else setShowLoadMorePosts(false);
-
-        if (nextPostsPage > 1) {
-          setPosts((prevPosts) => [...prevPosts, ...posts]);
-        } else setPosts(posts);
+        setPosts((prevPosts) => [...prevPosts, ...posts]);
       }
     } catch (error) {
       console.error(error);

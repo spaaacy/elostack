@@ -24,8 +24,8 @@ import generateRandomString from "@/utils/generateRandomString";
 
 const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
   const { id } = useParams();
+  const [loading, setLoading] = useState(true);
   const { session, user, profile } = useContext(UserContext);
-  const [loading, setLoading] = useState(false);
   const [currentState, setCurrentState] = useState("overview");
   const [posts, setPosts] = useState([]);
   const [tasks, setTasks] = useState([]);
@@ -40,10 +40,12 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
   useEffect(() => {
     const loadData = async () => {
       setDataLoaded(true);
-      fetchSprints();
-      fetchTasks();
-      fetchResources();
-      fetchMeetings();
+      await fetchSprints();
+      await fetchTasks();
+      await fetchResources();
+      await fetchMeetings();
+      await fetchPosts();
+      setLoading(false);
     };
 
     if (session) {
@@ -53,6 +55,24 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
       if (member && !member.tutorial_complete && member.role) setShowTutorialModal(true);
     }
   }, [session]);
+
+  const fetchPosts = async () => {
+    try {
+      const response = await fetch(`/api/post/${project.id}`, {
+        method: "POST",
+        headers: {
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+        },
+        body: JSON.stringify({ pageNumber: 1 }),
+      });
+      if (response.status === 200) {
+        const { posts } = await response.json();
+        setPosts(posts);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const fetchSprints = async () => {
     try {
@@ -126,12 +146,13 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
       if (response.status === 200) {
         const { meetings } = await response.json();
         setMeetings(meetings);
-        // if (!user.admin)
-        if (true)
+        if (!user.admin)
           meetings.some((m) => {
-            const meetingDatetime = new Date(m.datetime);
-            const now = new Date();
-            if (!m.user_id.includes(session.data.session.user.id) && now < meetingDatetime) {
+            let date1 = new Date(m.datetime);
+            let date2 = new Date();
+            date1.setHours(0, 0, 0, 0);
+            date2.setHours(0, 0, 0, 0);
+            if (!m.user_id.includes(session.data.session.user.id) && date1 >= date2) {
               setPendingMeetings((prevMeetings) => [...prevMeetings, m]);
             }
           });
@@ -235,26 +256,8 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
           )}
         </main>
       )}
-      {showSetupModal && (
-        <SetupModal
-          project={project}
-          setShowModal={setShowSetupModal}
-          members={members}
-          setMembers={setMembers}
-          setShowNextModal={setShowTutorialModal}
-        />
-      )}
 
-      {showTutorialModal && (
-        <TutorialModal setPosts={setPosts} project={project} setShowTutorialModal={setShowTutorialModal} />
-      )}
-
-      {!user?.admin && pendingMeetings?.length > 0 && !showTutorialModal && !showSetupModal && (
-        <MeetingModal pendingMeetings={pendingMeetings} setPendingMeetings={setPendingMeetings} project={project} />
-      )}
-      {project.pending_post && <PendingPostModal project={project} setPosts={setPosts} setProject={setProject} />}
-
-      {!profile?.github_username && (
+      {!profile?.github_username ? (
         <div className="bg-backgrounddark backdrop-blur bg-opacity-50 h-screen w-screen fixed z-50">
           <div className="max-sm:w-full sm:w-80 flex flex-col gap-4 items-center dark:border dark:border-gray-400 fixed bg-gray-200 dark:bg-neutral-900 rounded p-4 left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
             <h3 className="font-semibold text-center">Please connect to GitHub to continue</h3>
@@ -276,6 +279,25 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
             </Link>
           </div>
         </div>
+      ) : showSetupModal ? (
+        <SetupModal
+          project={project}
+          setShowModal={setShowSetupModal}
+          members={members}
+          setMembers={setMembers}
+          setShowNextModal={setShowTutorialModal}
+        />
+      ) : showTutorialModal && (
+          <TutorialModal setPosts={setPosts} project={project} setShowTutorialModal={setShowTutorialModal} />
+        ) ? (
+        !user?.admin &&
+        pendingMeetings?.length > 0 && (
+          <MeetingModal pendingMeetings={pendingMeetings} setPendingMeetings={setPendingMeetings} project={project} />
+        )
+      ) : project.pending_post ? (
+        <PendingPostModal project={project} setPosts={setPosts} setProject={setProject} />
+      ) : (
+        <></>
       )}
 
       <Toaster />

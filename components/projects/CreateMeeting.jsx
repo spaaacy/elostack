@@ -45,7 +45,7 @@ const CreateMeeting = ({ project, setMeetings, setCreateMeeting }) => {
           "X-Supabase-Auth": `${session.data.session.access_token} ${session.data.session.refresh_token}`,
         },
         body: JSON.stringify({
-          datetime: generateTimestamp(meetingDate, "12:00", false),
+          datetime: generateTimestamp(meetingDate, slots[0].startTime),
           project_id: project.id,
         }),
       });

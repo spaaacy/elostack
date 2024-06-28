@@ -164,31 +164,6 @@ const TutorialModal = ({ setPosts, project, setShowTutorialModal }) => {
             </div>
           </div>
         ) : currentPage === 4 ? (
-          <div className="flex flex-col gap-4 items-center">
-            <h3 className="font-semibold">Project Sprints</h3>
-            <p className="text-sm text-center my-auto">
-              You can message your team members using the <span className="font-bold text-primary">Messages</span> tab
-              on the bottom right of the screen.
-            </p>
-            <div className="h-96 w-full overflow-hidden relative">
-              <Image src={"/tutorial/chat.png"} alt="updates" className="object-contain" fill={true} unoptimized />
-            </div>
-            <div className="flex items-center justify-between w-full">
-              <button
-                onClick={() => setCurrentPage(3)}
-                className="bg-primary hover:bg-primarydark px-2 py-1 hover:text-neutral-200 text-white rounded mt-4"
-              >
-                Back
-              </button>
-              <button
-                onClick={() => setCurrentPage(5)}
-                className="bg-primary hover:bg-primarydark px-2 py-1 hover:text-neutral-200 text-white rounded mt-4"
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        ) : currentPage === 5 ? (
           <div className="flex flex-col gap-4 items-center ">
             <h3 className="font-semibold">Meetings</h3>
             <p className="text-sm text-center my-auto">

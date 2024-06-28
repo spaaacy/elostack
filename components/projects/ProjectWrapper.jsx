@@ -23,6 +23,7 @@ const ProjectWrapper = () => {
       setDataLoaded(true);
       await fetchProject();
       await fetchMembers();
+      setLoading(false);
     };
 
     if (session) {
@@ -58,7 +59,6 @@ const ProjectWrapper = () => {
         const userId = session.data.session?.user.id;
         const access = members.some((m) => m.user_id === userId && !m.banned);
         if (access || user?.admin) setAccess(true);
-        setLoading(false);
       }
     } catch (error) {
       console.error(error);

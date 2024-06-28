@@ -58,7 +58,6 @@ const MeetingModal = ({ pendingMeetings, setPendingMeetings, project }) => {
         startTime: generateTimestamp(meetingDate, slot.startTime),
         endTime: generateTimestamp(meetingDate, slot.endTime),
       }));
-      console.log(timestamptzSlots);
       let response = await fetch("/api/meeting-availability/create", {
         method: "POST",
         headers: {
@@ -84,7 +83,6 @@ const MeetingModal = ({ pendingMeetings, setPendingMeetings, project }) => {
           startTime: generateTimestamp(secondMeetingDate, slot.startTime),
           endTime: generateTimestamp(secondMeetingDate, slot.endTime),
         }));
-        console.log(secondTimestamptzSlots);
         response = await fetch("/api/meeting-availability/create", {
           method: "POST",
           headers: {

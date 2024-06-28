@@ -58,7 +58,6 @@ const CreateProject = () => {
           title: data.title,
           description: data.description,
           technologies: technologies.join(", "),
-          leader: session.data.session.user.id,
           duration_length: data.durationLength,
           duration_type: data.durationType,
           team_size: data.teamSize,

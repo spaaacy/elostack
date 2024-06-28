@@ -17,10 +17,22 @@ const Meetings = ({ meetings, setMeetings, project }) => {
       <div className="flex max-sm:flex-col gap-4 flex-1 items-start">
         <div className="flex flex-col gap-2 max-sm:w-full">
           <h3 className="font-semibold">Upcoming meetings</h3>
-          {meetings?.filter((m) => new Date(m.datetime) > new Date()).length > 0 ? (
+          {meetings?.filter((m) => {
+            let date1 = new Date(m.datetime);
+            let date2 = new Date();
+            date1.setHours(0, 0, 0, 0);
+            date2.setHours(0, 0, 0, 0);
+            return date1 >= date2;
+          }).length > 0 ? (
             <>
               {meetings
-                ?.filter((m) => new Date(m.datetime) > new Date())
+                ?.filter((m) => {
+                  let date1 = new Date(m.datetime);
+                  let date2 = new Date();
+                  date1.setHours(0, 0, 0, 0);
+                  date2.setHours(0, 0, 0, 0);
+                  return date1 >= date2;
+                })
                 .map((m, i) => {
                   return (
                     <button
@@ -41,11 +53,23 @@ const Meetings = ({ meetings, setMeetings, project }) => {
           ) : (
             <p className="font-light text-sm">No upcoming meetings</p>
           )}
-          {meetings?.filter((m) => new Date(m.datetime) < new Date()).length > 0 && (
+          {meetings?.filter((m) => {
+            let date1 = new Date(m.datetime);
+            let date2 = new Date();
+            date1.setHours(0, 0, 0, 0);
+            date2.setHours(0, 0, 0, 0);
+            return date1 < date2;
+          }).length > 0 && (
             <>
               <h3 className="font-semibold">Previous meetings</h3>
               {meetings
-                ?.filter((m) => new Date(m.datetime) < new Date())
+                ?.filter((m) => {
+                  let date1 = new Date(m.datetime);
+                  let date2 = new Date();
+                  date1.setHours(0, 0, 0, 0);
+                  date2.setHours(0, 0, 0, 0);
+                  return date1 < date2;
+                })
                 .map((m, i) => {
                   return (
                     <button

@@ -160,45 +160,6 @@ const LandingPage = () => {
                 />{" "}
                 Idea.
               </p>
-              {/* <Link
-                target="_blank"
-                href={"/create-project"}
-                className="text-center dark:bg-black bg-neutral-100 hover:border-white border-transparent hover:bg-black dark:hover:bg-white border-2 py-2 px-4 text-xl mt-8 hover:text-white dark:hover:text-black  dark:text-white text-black dark:border-white transition duration-200 font-semibold"
-              >
-                Try now
-              </Link> */}
-            </div>
-          </div>
-        </section>
-
-        <section className="py-16 lg:py-24 px-14 relative mb-36">
-          <div className="flex flex-col lg:flex-row gap-14 lg:gap-16 2xl:gap-24 items-center justify-center xl:w-3/4 mx-auto ">
-            <div className={`text-left lg:text-right flex flex-col justify-center ${montserrat.className} lg:order-2`}>
-              <h4 className={"text-3xl font-bold"}>Built-in chat for all your communication needs</h4>
-              <p className="max-sm:mr-auto lg:ml-auto">Discuss features and make decisions</p>
-            </div>
-            <div className="flex flex-col justify-center items-start select-none lg:order-1">
-              {[
-                { username: "Alex", message: "Hey Jamie, let's discuss new features." },
-                { username: "Jamie", message: "Sure, what's up?" },
-                { username: "Alex", message: "We need user authentication." },
-                { username: "Jamie", message: "OAuth or something else?" },
-                { username: "Alex", message: "OAuth is best." },
-              ].map((m, i) => (
-                <div
-                  key={i}
-                  className={`${
-                    m.username === "Alex" ? "" : "text-right self-end"
-                  } px-3 py-2 rounded-lg bg-[#f1f1f1] text-black mb-4 text-sm`}
-                >
-                  <p key={i}>
-                    <span className="font-semibold ">{m.username}</span>
-                    <br />
-                    {m.message}
-                    <br />
-                  </p>
-                </div>
-              ))}
             </div>
           </div>
         </section>

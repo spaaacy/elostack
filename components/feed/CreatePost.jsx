@@ -77,7 +77,6 @@ const CreatePost = ({ setPosts, project, showBorder, onSuccess, isPublic }) => {
         setPosts((prevPosts) =>
           prevPosts.map((post) => (post.id === "0" ? { ...post, id: postId, image_id: newImageIds } : post))
         );
-        console.log(onSuccess);
         if (onSuccess) onSuccess();
       } else {
         const { error } = await response.json();

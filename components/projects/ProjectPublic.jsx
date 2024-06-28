@@ -19,7 +19,7 @@ const ProjectPublic = ({ project, members }) => {
   const { session, projects } = useContext(UserContext);
   const [showAgreement, setShowAgreement] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState();
   const [currentState, setCurrentState] = useState("overview");
   const banned = members.some((m) => m.banned && m.user_id === session.data.session?.user.id);
@@ -31,14 +31,34 @@ const ProjectPublic = ({ project, members }) => {
       : true;
 
   useEffect(() => {
+    const loadData = async () => {
+      setDataLoaded(true);
+      await fetchPosts();
+      setLoading(false);
+    };
+
     if (session) {
       if (session.data.session) {
-        if (!dataLoaded) {
-          setDataLoaded(true);
-        }
+        if (!dataLoaded) loadData();
       }
     }
   }, [session]);
+
+  const fetchPosts = async () => {
+    try {
+      setShowLoadMorePosts(false);
+      const response = await fetch(`/api/post/${project.id}/public`, {
+        method: "POST",
+        body: JSON.stringify({ pageNumber: nextPostsPage }),
+      });
+      if (response.status === 200) {
+        const { posts } = await response.json();
+        setPosts(posts);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handleModalClose = (e) => {
     if (e.target === e.currentTarget) {

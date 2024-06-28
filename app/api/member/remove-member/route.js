@@ -19,8 +19,6 @@ export async function DELETE(req, res) {
     if (results.error) throw results.error;
     results = await supabase.from("member").delete().match({ project_id: projectId, user_id: userId });
     if (results.error) throw results.error;
-    results = await supabase.from("request").delete().match({ project_id: projectId, user_id: userId });
-    if (results.error) throw results.error;
 
     return NextResponse.json({ message: "Member has been removed!" }, { status: 200 });
   } catch (error) {
