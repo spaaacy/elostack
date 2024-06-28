@@ -166,7 +166,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen overflow-y-auto mb-10">
+    <div className="flex flex-col min-h-screen overflow-y-auto">
       <NavBar />
       {loading ? (
         <Loader />
@@ -287,13 +287,10 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
           setMembers={setMembers}
           setShowNextModal={setShowTutorialModal}
         />
-      ) : showTutorialModal && (
-          <TutorialModal setPosts={setPosts} project={project} setShowTutorialModal={setShowTutorialModal} />
-        ) ? (
-        !user?.admin &&
-        pendingMeetings?.length > 0 && (
-          <MeetingModal pendingMeetings={pendingMeetings} setPendingMeetings={setPendingMeetings} project={project} />
-        )
+      ) : showTutorialModal ? (
+        <TutorialModal setPosts={setPosts} project={project} setShowTutorialModal={setShowTutorialModal} />
+      ) : !user?.admin && pendingMeetings?.length > 0 ? (
+        <MeetingModal pendingMeetings={pendingMeetings} setPendingMeetings={setPendingMeetings} project={project} />
       ) : project.pending_post ? (
         <PendingPostModal project={project} setPosts={setPosts} setProject={setProject} />
       ) : (
