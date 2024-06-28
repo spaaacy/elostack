@@ -85,8 +85,9 @@ const LandingPage = () => {
         </div>
       </section>
 
-      <div className=" bg-gradient-to-t to-slate-500 from-backgroundlight dark:to-slate-800 dark:from-backgrounddark relative">
-        <div className="absolute top-0 left-0 h-[200px] w-full z-60 bg-gradient-to-t from-transparent to-black"></div>
+      {/* <div className=" bg-gradient-to-t to-slate-500 from-backgroundlight dark:to-slate-800 dark:from-backgrounddark relative"> */}
+      <div className=" bg-gradient-to-t to-violet-300 from-backgroundlight dark:to-[#170048] dark:from-backgrounddark relative">
+        <div className="absolute top-0 left-0 h-32 w-full z-60 bg-gradient-to-t from-transparent to-black"></div>
         {/* <div className="absolute bottom-0 left-0 h-1/6 w-full z-40 bg-gradient-to-b  from-transparent to-black"></div> */}
         <section ref={sectionRef} className="z-10 py-24 sm:py-32 lg:py-48 mt-32">
           <div className="flex flex-col lg:flex-row gap-20 sm:gap-32 lg:gap-44  items-center justify-center w-3/4 text-left mx-auto ">
@@ -112,7 +113,7 @@ const LandingPage = () => {
               </div>
             </div>
 
-            <div className="lg:w-1/2 text-white">
+            <div className="lg:w-1/2">
               <h4 className={`text-4xl ${montserrat.className}`}>
                 What is <span className={`${kanit.className}`}>EloStack</span>?
               </h4>
