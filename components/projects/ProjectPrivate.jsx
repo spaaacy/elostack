@@ -117,25 +117,30 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
         setTasks(tasks);
         let assigned = false;
         let taskRemaining = false;
-        if (project.current_sprint || user.admin) {
-          tasks.forEach((t) => {
-            if (t.sprint_id === project.current_sprint) {
-              if (t.assignee === session.data.session.user.id) assigned = true;
-              if (!t.assignee && members.find((m) => m.user_id === session.data.session.user.id).role.includes(t.role))
-                taskRemaining = true;
-            }
-          });
-        } else assigned = true;
-        if (!assigned || taskRemaining) {
-          setShowLinks(false);
-          setCurrentState("sprints");
-          setShowAlertModal(true);
-          if (!assigned) {
-            setAlertMessage("Please assign tasks to yourself for the current sprint to continue");
-          } else if (taskRemaining)
-            setAlertMessage(
-              "There are some unassigned tasks that fit your role. Please assign yourself to them or alert your team member of the similar role to assign themselves"
-            );
+        if (!user.admin) {
+          if (project.current_sprint) {
+            tasks.forEach((t) => {
+              if (t.sprint_id === project.current_sprint) {
+                if (t.assignee === session.data.session.user.id) assigned = true;
+                if (
+                  !t.assignee &&
+                  members.find((m) => m.user_id === session.data.session.user.id).role.includes(t.role)
+                )
+                  taskRemaining = true;
+              }
+            });
+          } else assigned = true;
+          if (!assigned || taskRemaining) {
+            setShowLinks(false);
+            setCurrentState("sprints");
+            setShowAlertModal(true);
+            if (!assigned) {
+              setAlertMessage("Please assign tasks to yourself for the current sprint to continue");
+            } else if (taskRemaining)
+              setAlertMessage(
+                "There are some unassigned tasks that fit your role. Please assign yourself to them or alert your team member of the similar role to assign themselves"
+              );
+          }
         }
       } else {
         const { error } = await response.json();
@@ -301,7 +306,17 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
           setShowNextModal={setShowTutorialModal}
         />
       ) : showTutorialModal ? (
-        <TutorialModal setPosts={setPosts} project={project} setShowTutorialModal={setShowTutorialModal} />
+        <TutorialModal
+          onComplete={() => {
+            setShowLinks(false);
+            setCurrentState("sprints");
+            setShowAlertModal(true);
+            setAlertMessage("Please assign tasks to yourself for the current sprint to continue");
+          }}
+          setPosts={setPosts}
+          project={project}
+          setShowTutorialModal={setShowTutorialModal}
+        />
       ) : showAlertModal ? (
         <AlertModal message={alertMessage} setShowModal={setShowAlertModal} />
       ) : !user?.admin && pendingMeetings?.length > 0 ? (

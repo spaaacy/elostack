@@ -7,7 +7,7 @@ import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
-const TutorialModal = ({ setPosts, project, setShowTutorialModal }) => {
+const TutorialModal = ({ setPosts, project, setShowTutorialModal, onComplete }) => {
   const { session, profile } = useContext(UserContext);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState();
@@ -90,6 +90,7 @@ const TutorialModal = ({ setPosts, project, setShowTutorialModal }) => {
       console.error(error);
     }
     setLoading(false);
+    onComplete();
   };
 
   return (

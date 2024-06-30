@@ -197,6 +197,7 @@ const ProjectAgreement = ({ handleModalClose, project, members, setLoading, setS
         body: JSON.stringify({
           userId: session.data.session.user.id,
           projectId: project.id,
+          projectTitle: project.title,
         }),
       });
       if (response.status === 201) {

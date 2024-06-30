@@ -28,6 +28,7 @@ export async function POST(req, res) {
       results = data;
     }
 
+    // All members created availability
     const attendees = results.map((item) => ({ email: item.email }));
     if (results.length > 0) {
       const commonSlot = findCommonTime(results);
