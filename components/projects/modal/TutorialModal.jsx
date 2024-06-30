@@ -1,11 +1,11 @@
 "use client";
 
+import Loader from "@/components/common/Loader";
 import { UserContext } from "@/context/UserContext";
 import Image from "next/image";
 import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import Loader from "../common/Loader";
 
 const TutorialModal = ({ setPosts, project, setShowTutorialModal }) => {
   const { session, profile } = useContext(UserContext);

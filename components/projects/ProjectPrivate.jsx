@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import NavBar from "../navbar/NavBar";
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "@/context/UserContext";
@@ -11,17 +11,13 @@ import Feed from "../feed/Feed";
 import Image from "next/image";
 import ProjectOverview from "./ProjectOverview";
 import Requirements from "./Requirements";
-import SetupModal from "./SetupModal";
-import CreateMeeting from "./CreateMeeting";
-import TutorialModal from "./TutorialModal";
+import SetupModal from "./modal/SetupModal";
 import Meetings from "./Meetings";
-import MeetingModal from "./MeetingModal";
 import arrangeSprints from "@/utils/arrangeSprints";
-import PendingPostModal from "./PendingPostModal";
-import { FaGithubAlt } from "react-icons/fa6";
 import Link from "next/link";
-import generateRandomString from "@/utils/generateRandomString";
-import { useRouter } from "next/navigation";
+import GithubModal from "./modal/GithubModal";
+import TutorialModal from "./modal/TutorialModal";
+import AlertModal from "./modal/AlertModal";
 
 const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
   const { id } = useParams();
@@ -38,6 +34,9 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
   const [dataLoaded, setDataLoaded] = useState(false);
   const [pendingMeetings, setPendingMeetings] = useState([]);
   const searchParams = useSearchParams();
+  const [showAlertModal, setShowAlertModal] = useState(false);
+  const [alertMessage, setAlertMessage] = useState();
+  const [showLinks, setShowLinks] = useState(true);
 
   useEffect(() => {
     const loadSearchParams = () => {
@@ -116,6 +115,28 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
       if (response.status === 200) {
         const { tasks } = await response.json();
         setTasks(tasks);
+        let assigned = false;
+        let taskRemaining = false;
+        if (project.current_sprint || user.admin) {
+          tasks.forEach((t) => {
+            if (t.sprint_id === project.current_sprint) {
+              if (t.assignee === session.data.session.user.id) assigned = true;
+              if (!t.assignee && members.find((m) => m.user_id === session.data.session.user.id).role.includes(t.role))
+                taskRemaining = true;
+            }
+          });
+        } else assigned = true;
+        if (!assigned || taskRemaining) {
+          setShowLinks(false);
+          setCurrentState("sprints");
+          setShowAlertModal(true);
+          if (!assigned) {
+            setAlertMessage("Please assign tasks to yourself for the current sprint to continue");
+          } else if (taskRemaining)
+            setAlertMessage(
+              "There are some unassigned tasks that fit your role. Please assign yourself to them or alert your team member of the similar role to assign themselves"
+            );
+        }
       } else {
         const { error } = await response.json();
         throw error;
@@ -199,52 +220,54 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
             <SettingsDropdown project={project} members={members} setLoading={setLoading} />
           </div>
           <hr className="border-0 h-[1px] bg-gray-400 my-4" />
-          <div className="flex gap-2 text-sm mb-4 flex-wrap">
-            <Link
-              href={`/projects/${id}?overview=true`}
-              onClick={() => setCurrentState("overview")}
-              className={`${
-                currentState === "overview"
-                  ? "bg-primary text-white"
-                  : "bg-gray-200 dark:bg-backgrounddark hover:bg-gray-300 dark:hover:bg-neutral-800"
-              } rounded dark:border dark:border-gray-400 px-2 py-1`}
-            >
-              Overview
-            </Link>
-            <Link
-              href={`/projects/${id}?updates=true`}
-              onClick={() => setCurrentState("updates")}
-              className={`${
-                currentState === "updates"
-                  ? "bg-primary text-white"
-                  : "bg-gray-200 dark:bg-backgrounddark hover:bg-gray-300 dark:hover:bg-neutral-800"
-              } rounded dark:border dark:border-gray-400 px-2 py-1`}
-            >
-              Updates
-            </Link>
-            <Link
-              href={`/projects/${id}?sprints=true`}
-              onClick={() => setCurrentState("sprints")}
-              className={`${
-                currentState === "sprints"
-                  ? "bg-primary text-white"
-                  : "bg-gray-200 dark:bg-backgrounddark hover:bg-gray-300 dark:hover:bg-neutral-800"
-              } rounded dark:border dark:border-gray-400 px-2 py-1`}
-            >
-              Schedule
-            </Link>
-            <Link
-              href={`/projects/${id}?meetings=true`}
-              onClick={() => setCurrentState("meetings")}
-              className={`${
-                currentState === "meetings"
-                  ? "bg-primary text-white"
-                  : "bg-gray-200 dark:bg-backgrounddark hover:bg-gray-300 dark:hover:bg-neutral-800"
-              } rounded dark:border dark:border-gray-400 px-2 py-1`}
-            >
-              Meetings
-            </Link>
-          </div>
+          {showLinks && (
+            <div className="flex gap-2 text-sm mb-4 flex-wrap">
+              <Link
+                href={`/projects/${id}?overview=true`}
+                onClick={() => setCurrentState("overview")}
+                className={`${
+                  currentState === "overview"
+                    ? "bg-primary text-white"
+                    : "bg-gray-200 dark:bg-backgrounddark hover:bg-gray-300 dark:hover:bg-neutral-800"
+                } rounded dark:border dark:border-gray-400 px-2 py-1`}
+              >
+                Overview
+              </Link>
+              <Link
+                href={`/projects/${id}?updates=true`}
+                onClick={() => setCurrentState("updates")}
+                className={`${
+                  currentState === "updates"
+                    ? "bg-primary text-white"
+                    : "bg-gray-200 dark:bg-backgrounddark hover:bg-gray-300 dark:hover:bg-neutral-800"
+                } rounded dark:border dark:border-gray-400 px-2 py-1`}
+              >
+                Updates
+              </Link>
+              <Link
+                href={`/projects/${id}?sprints=true`}
+                onClick={() => setCurrentState("sprints")}
+                className={`${
+                  currentState === "sprints"
+                    ? "bg-primary text-white"
+                    : "bg-gray-200 dark:bg-backgrounddark hover:bg-gray-300 dark:hover:bg-neutral-800"
+                } rounded dark:border dark:border-gray-400 px-2 py-1`}
+              >
+                Schedule
+              </Link>
+              <Link
+                href={`/projects/${id}?meetings=true`}
+                onClick={() => setCurrentState("meetings")}
+                className={`${
+                  currentState === "meetings"
+                    ? "bg-primary text-white"
+                    : "bg-gray-200 dark:bg-backgrounddark hover:bg-gray-300 dark:hover:bg-neutral-800"
+                } rounded dark:border dark:border-gray-400 px-2 py-1`}
+              >
+                Meetings
+              </Link>
+            </div>
+          )}
           {currentState === "overview" ? (
             <ProjectOverview user={user} members={members} project={project} setLoading={setLoading} />
           ) : currentState === "updates" ? (
@@ -268,27 +291,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
       )}
 
       {!profile?.github_username ? (
-        <div className="bg-backgrounddark backdrop-blur bg-opacity-50 h-screen w-screen fixed z-50">
-          <div className="max-sm:w-full sm:w-80 flex flex-col gap-4 items-center dark:border dark:border-gray-400 fixed bg-gray-200 dark:bg-neutral-900 rounded p-4 left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
-            <h3 className="font-semibold text-center">Please connect to GitHub to continue</h3>
-            <Link
-              target="_blank"
-              href={{
-                pathname: "https://github.com/login/oauth/authorize",
-                query: {
-                  client_id: process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID,
-                  state: generateRandomString(),
-                  redirect_uri: `${window.location.origin}/account-settings?github_oauth=true`,
-                  allow_signup: true,
-                },
-              }}
-              className="bg-neutral-800 px-3 py-1 rounded-full text-white flex items-center gap-2 hover:bg-neutral-700 text-sm"
-            >
-              <FaGithubAlt />
-              <p>Connect to GitHub</p>
-            </Link>
-          </div>
-        </div>
+        <GithubModal />
       ) : showSetupModal ? (
         <SetupModal
           project={project}
@@ -299,6 +302,8 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
         />
       ) : showTutorialModal ? (
         <TutorialModal setPosts={setPosts} project={project} setShowTutorialModal={setShowTutorialModal} />
+      ) : showAlertModal ? (
+        <AlertModal message={alertMessage} setShowModal={setShowAlertModal} />
       ) : !user?.admin && pendingMeetings?.length > 0 ? (
         <MeetingModal pendingMeetings={pendingMeetings} setPendingMeetings={setPendingMeetings} project={project} />
       ) : project.pending_post ? (
