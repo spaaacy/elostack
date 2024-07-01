@@ -186,29 +186,17 @@ const DesktopNav = ({
 }) => {
   return (
     <div className="ml-12 flex justify-start items-center gap-4 max-lg:hidden w-full">
-      {!session?.data.session ? (
-        <Link
-          href={"/feed"}
-          className={`p-2  border-b-2 border-transparent  ${
-            (isRootPage && !session?.data.session) || isHomePage
-              ? " hover:text-gray-300"
-              : "hover:text-gray-500 dark:hover:text-gray-300"
-          }`}
-        >
-          Feed
-        </Link>
-      ) : (
-        <Link
-          href={"/home"}
-          className={`p-2  border-b-2 border-transparent  ${
-            (isRootPage && !session?.data.session) || isHomePage
-              ? " hover:text-gray-300"
-              : "hover:text-gray-500 dark:hover:text-gray-300"
-          }`}
-        >
-          Home
-        </Link>
-      )}
+      <Link
+        href={"/feed"}
+        className={`p-2  border-b-2 border-transparent  ${
+          (isRootPage && !session?.data.session) || isHomePage
+            ? " hover:text-gray-300"
+            : "hover:text-gray-500 dark:hover:text-gray-300"
+        }`}
+      >
+        Feed
+      </Link>
+
       <Link
         href={"/projects"}
         className={`p-2  border-b-2 border-transparent  ${
@@ -311,15 +299,9 @@ const MobileDropdown = ({ isHomePage, isRootPage, showSignIn, session, user, sig
         (isRootPage && !session?.data.session) || isHomePage ? "bg-black" : "bg-backgroundlight dark:bg-backgrounddark"
       } flex flex-col justify-center items-center lg:hidden py-2`}
     >
-      {!session?.data.session ? (
-        <Link href={"/feed"} className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center">
-          Feed
-        </Link>
-      ) : (
-        <Link href={"/home"} className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center">
-          Home
-        </Link>
-      )}
+      <Link href={"/feed"} className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center">
+        Feed
+      </Link>
       <Link href={"/projects"} className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center">
         Find Projects
       </Link>

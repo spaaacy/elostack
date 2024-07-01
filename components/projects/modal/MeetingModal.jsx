@@ -7,8 +7,8 @@ import { useContext, useEffect, useState } from "react";
 import { UserContext } from "@/context/UserContext";
 import toast from "react-hot-toast";
 import generateTimestamp from "@/utils/generateTimestamp";
-import Loader from "../common/Loader";
 import getPreviousDay from "@/utils/getPreviousDay";
+import Loader from "@/components/common/Loader";
 
 const MeetingModal = ({ pendingMeetings, setPendingMeetings, project }) => {
   const { session } = useContext(UserContext);
