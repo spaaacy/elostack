@@ -26,6 +26,10 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
   const [showSprints, setShowSprints] = useState(false);
   const roleRef = useRef();
   const buttonRef = useRef();
+  const [daysInput, setDaysInput] = useState([]);
+  const [selectedSprintDaysInput, setSelectedSprintDaysInput] = useState();
+  const daysInputRef = useRef();
+  const daysDebounceRef = useRef(null);
 
   useEffect(() => {
     if (sprints) {
@@ -41,13 +45,22 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
       if (roleRef.current && !roleRef.current.contains(event.target)) {
         setShowRoles(false);
       }
+
+      if (daysInputRef.current && !daysInputRef.current.contains(event.target)) {
+        setSelectedSprintDaysInput(null);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
+
+    if (selectedSprintDaysInput && daysInputRef.current) {
+      daysInputRef.current.focus();
+    }
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [roleRef, buttonRef, sprints, currentSprint]);
+  }, [roleRef, buttonRef, sprints, currentSprint, selectedSprintDaysInput]);
 
   const createSprint = async () => {
     const userId = session.data.session.user.id;
@@ -260,6 +273,41 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
     }
   };
 
+  const onDaysInputChange = async (e, sprintId) => {
+    setDaysInput((prevDays) => ({
+      ...prevDays,
+      [sprintId]: e.target.value,
+    }));
+    const oldDays = sprints.find((s) => s.id === sprintId).days;
+    setSprints((prevSprints) => prevSprints.map((s) => (s.id === sprintId ? { ...s, days: e.target.value } : s)));
+
+    if (daysDebounceRef.current) clearTimeout(daysDebounceRef.current);
+
+    daysDebounceRef.current = setTimeout(async () => {
+      console.log("Updating...");
+      try {
+        const response = await fetch("/api/sprint/change-days", {
+          method: "PATCH",
+          headers: {
+            "X-Supabase-Auth": `${session.data.session.access_token} ${session.data.session.refresh_token}`,
+          },
+          body: JSON.stringify({
+            sprintId,
+            days: e.target.value,
+          }),
+        });
+        if (response.status !== 200) {
+          const { error } = await response.json();
+          throw error;
+        }
+      } catch (error) {
+        console.error(error);
+        toast.error("Oops, something went wrong...");
+        setSprints((prevSprints) => prevSprints.map((s) => (s.id === sprintId ? { ...s, days: oldDays } : s)));
+      }
+    }, 1000);
+  };
+
   const assignYourself = async (taskId, userId) => {
     if (!profile) return;
 
@@ -403,18 +451,41 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
         <div className={`${showSprints ? "max-lg:flex" : "max-lg:hidden"} lg:flex flex-col max-lg:gap-2 items-center`}>
           {sprints?.map((s, i) => {
             return (
-              <button
-                onClick={() => {
-                  setCurrentSprint(s.id);
-                  setCurrentPage("pending");
-                }}
-                key={i}
-                className={`${
-                  s.id === currentSprint ? "text-primary  font-semibold dark:font-medium " : ""
-                } max-lg:text-center text-left text-xs hover:underline rounded-full my-1 w-full max-lg:text-sm`}
-              >
-                {s.title}
-              </button>
+              <div key={i} className="w-full flex items-center justify-between gap-2">
+                <button
+                  onClick={() => {
+                    setCurrentSprint(s.id);
+                    setCurrentPage("pending");
+                  }}
+                  className={`${
+                    s.id === currentSprint ? "text-primary  font-semibold dark:font-medium " : ""
+                  } max-lg:text-center text-left text-xs hover:underline rounded-full my-1 w-full max-lg:text-sm`}
+                >
+                  {s.title}
+                </button>
+                {user?.admin && (
+                  <>
+                    {selectedSprintDaysInput === s.id ? (
+                      <input
+                        ref={daysInputRef}
+                        placeholder="Days"
+                        value={daysInput[i]}
+                        onChange={(e) => onDaysInputChange(e, s.id)}
+                        onKeyDown={sprintKeyDown}
+                        type="text"
+                        className="text-xs min-w-0 w-10 rounded px-1 py-1 focus:ring-0 focus:outline-none focus:bg-neutral-50 dark:focus:bg-neutral-800"
+                      />
+                    ) : (
+                      <label
+                        onClick={() => setSelectedSprintDaysInput(s.id)}
+                        className="text-xs p-1 rounded bg-gray-300 dark:bg-neutral-800"
+                      >
+                        {s.days}
+                      </label>
+                    )}
+                  </>
+                )}
+              </div>
             );
           })}
           {user?.admin && (
