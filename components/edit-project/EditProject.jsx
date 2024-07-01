@@ -63,15 +63,15 @@ const EditProject = () => {
       });
       if (response.status === 200) {
         const { project } = await response.json();
-        if (project.deleted || !user.admin) router.push("/projects");
-        setValue("title", project.title);
-        setValue("description", project.description);
-        setValue("durationType", project.duration_type);
-        setValue("durationLength", project.duration_length);
-        setValue("teamSize", project.team_size);
-        setTechnologies(project.technologies.split(", "));
-        setOriginalImageId(project.image_id);
-        setProject(project);
+        if (project[0].deleted || !user.admin) router.push("/projects");
+        setValue("title", project[0].title);
+        setValue("description", project[0].description);
+        setValue("durationType", project[0].duration_type);
+        setValue("durationLength", project[0].duration_length);
+        setValue("teamSize", project[0].team_size);
+        setTechnologies(project[0].technologies.split(", "));
+        setOriginalImageId(project[0].image_id);
+        setProject(project[0]);
         setLoading(false);
       } else {
         router.push("/projects");

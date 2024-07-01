@@ -107,16 +107,8 @@ const Projects = () => {
         <Loader />
       ) : (
         <main>
-          <div className="flex items-center justify-between flex-wrap gap-2">
-            <h1 className="text-2xl font-semibold">Find Projects</h1>
-            <Link
-              href={"/create-project"}
-              type="button"
-              className="text-gray-200 px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-sm hover:text-gray-300 dark:shadow dark:shadow-neutral-800 flex items-center"
-            >
-              Create Project
-            </Link>
-          </div>
+          <h1 className="text-2xl font-semibold">Find Projects</h1>
+
           <hr className="border-0 h-[1px] bg-gray-400 my-4 " />
           <div className="flex items-center gap-2 flex-wrap ">
             <input

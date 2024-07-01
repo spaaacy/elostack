@@ -5,17 +5,21 @@ import { formatTime } from "@/utils/formatTime";
 import { useContext, useEffect, useState } from "react";
 import CreateMeeting from "./CreateMeeting";
 import Link from "next/link";
+import { IoMdClose } from "react-icons/io";
+import findCommonTime from "@/utils/findCommonTime";
 
 const Meetings = ({ meetings, setMeetings, project }) => {
   const [selectedMeeting, setSelectedMeeting] = useState();
   const [createMeeting, setCreateMeeting] = useState(false);
+  const [showConfirmCreate, setShowConfirmCreate] = useState(false);
+  const [commonTime, setCommonTime] = useState();
 
   if (createMeeting) {
     return <CreateMeeting setCreateMeeting={setCreateMeeting} setMeetings={setMeetings} project={project} />;
   } else {
     return (
       <div className="flex max-sm:flex-col gap-4 flex-1 items-start">
-        <div className="flex flex-col gap-2 max-sm:w-full">
+        <div className="flex flex-col gap-2 max-sm:w-full flex-shrink-0">
           <h3 className="font-semibold">Upcoming meetings</h3>
           {meetings?.filter((m) => {
             let date1 = new Date(m.datetime);
@@ -36,7 +40,21 @@ const Meetings = ({ meetings, setMeetings, project }) => {
                 .map((m, i) => {
                   return (
                     <button
-                      onClick={() => setSelectedMeeting(m)}
+                      onClick={() => {
+                        console.log(m);
+                        setSelectedMeeting(m);
+                        setCommonTime(
+                          findCommonTime(
+                            m.user_id.map((user_id, i) => {
+                              return {
+                                user_id,
+                                start_time: m.start_time[i],
+                                end_time: m.end_time[i],
+                              };
+                            })
+                          ).start_time
+                        );
+                      }}
                       className={`${
                         selectedMeeting?.id === m.id
                           ? "bg-emerald-600 text-white"
@@ -73,7 +91,21 @@ const Meetings = ({ meetings, setMeetings, project }) => {
                 .map((m, i) => {
                   return (
                     <button
-                      onClick={() => setSelectedMeeting(m)}
+                      onClick={() => {
+                        console.log(m);
+                        setSelectedMeeting(m);
+                        setCommonTime(
+                          findCommonTime(
+                            m.user_id.map((user_id, i) => {
+                              return {
+                                user_id,
+                                start_time: m.start_time[i],
+                                end_time: m.end_time[i],
+                              };
+                            })
+                          ).start_time
+                        );
+                      }}
                       className={`${
                         selectedMeeting?.id === m.id
                           ? "bg-emerald-600 text-white"
@@ -90,8 +122,8 @@ const Meetings = ({ meetings, setMeetings, project }) => {
           )}
         </div>
         {selectedMeeting && (
-          <div className=" rounded px-4 py-2 bg-gray-200 dark:bg-backgrounddark dark:border dark:border-gray-400 flex gap-8 max-sm:w-full text-sm  ">
-            <div className="flex flex-col gap-2">
+          <div className=" rounded px-4 py-2 bg-gray-200 dark:bg-backgrounddark dark:border dark:border-gray-400 flex gap-8 max-sm:w-full text-sm  w-full">
+            <div className="flex flex-col gap-2 w-1/2">
               <h4 className="font-semibold text-normal">Meeting Details</h4>
               <p>
                 <span className="font-semibold">Date: </span>
@@ -113,8 +145,50 @@ const Meetings = ({ meetings, setMeetings, project }) => {
                   Meeting Link
                 </Link>
               )}
+              {selectedMeeting.start_time.length > 0 && (
+                <>
+                  {!showConfirmCreate ? (
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmCreate(true)}
+                      className="mt-auto mr-auto bg-primary hover:bg-primarydark rounded-full px-2 py-1 text-sm hover:text-gray-300 text-white"
+                    >
+                      Create Link
+                    </button>
+                  ) : (
+                    <div className="flex flex-col items-start justify-center gap-2 mt-auto">
+                      <p>
+                        A meeting will be created for{` `}
+                        <span className="text-primary font-semibold">
+                          {`${commonTime ? formatTime(commonTime) : formatTime(selectedMeeting.start_time[0])}`}
+                        </span>
+                        {". "}
+                        Continue?
+                      </p>
+                      <div className="flex gap-2 items-center ml-auto">
+                        <button
+                          onClick={() => {
+                            setShowConfirmCreate(false);
+                          }}
+                          type="button"
+                          className="mt-auto mr-auto rounded-full px-2 py-1 text-sm"
+                        >
+                          No
+                        </button>
+                        <button
+                          onClick={() => {}}
+                          type="button"
+                          className="mt-auto mr-auto bg-primary hover:bg-primarydark rounded-full px-2 py-1 text-sm hover:text-gray-300 text-white"
+                        >
+                          Yes
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 w-1/2">
               {selectedMeeting?.username?.length > 0 && (
                 <>
                   <p className="font-semibold text-normal">Availability</p>
@@ -143,7 +217,7 @@ const Meetings = ({ meetings, setMeetings, project }) => {
         <button
           type="button"
           onClick={() => setCreateMeeting(true)}
-          className="ml-auto bg-primary hover:bg-primarydark rounded-full px-2 py-1 text-sm hover:text-gray-300 text-white"
+          className="ml-auto bg-primary hover:bg-primarydark rounded-full px-2 py-1 text-sm hover:text-gray-300 text-white flex-shrink-0"
         >
           Create meeting
         </button>
