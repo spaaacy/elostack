@@ -305,7 +305,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
         toast.error("Oops, something went wrong...");
         setSprints((prevSprints) => prevSprints.map((s) => (s.id === sprintId ? { ...s, days: oldDays } : s)));
       }
-    }, 1000);
+    }, 300);
   };
 
   const assignYourself = async (taskId, userId) => {
