@@ -17,8 +17,8 @@ import arrangeSprints from "@/utils/arrangeSprints";
 import Link from "next/link";
 import GithubModal from "./modal/GithubModal";
 import TutorialModal from "./modal/TutorialModal";
-import AlertModal from "./modal/AlertModal";
 import MeetingModal from "./modal/MeetingModal";
+import { FaArrowRight } from "react-icons/fa6";
 
 const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
   const { id } = useParams();
@@ -35,7 +35,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
   const [dataLoaded, setDataLoaded] = useState(false);
   const [pendingMeetings, setPendingMeetings] = useState([]);
   const searchParams = useSearchParams();
-  const [showAlertModal, setShowAlertModal] = useState(false);
+  const [alertState, setAlertState] = useState();
   const [alertMessage, setAlertMessage] = useState();
   const [showLinks, setShowLinks] = useState(true);
 
@@ -132,10 +132,8 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
             });
           } else assigned = true;
           if (!assigned || taskRemaining) {
-            setCurrentState("sprints");
-            setShowAlertModal(true);
+            setAlertState("sprints");
             if (!assigned) {
-              setShowLinks(false);
               setAlertMessage("Please assign tasks to yourself for the current sprint to continue");
             } else if (taskRemaining)
               setAlertMessage(
@@ -226,8 +224,23 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
             <SettingsDropdown project={project} members={members} setLoading={setLoading} />
           </div>
           <hr className="border-0 h-[1px] bg-gray-400 my-4" />
+          {alertMessage && (
+            <div className="flex gap-2 text-white bg-orange-600 dark:bg-orange-400 rounded p-4 justify-between items-center">
+              <div className="flex flex-col">
+                <h3 className="font-semibold">Attention</h3>
+                <p className="text-sm">{alertMessage}</p>
+              </div>
+              <button
+                onClick={() => setCurrentState(alertState)}
+                className="text-sm px-2 py-1 border rounded flex gap-1 items-center"
+              >
+                Fix Now
+                <FaArrowRight />
+              </button>
+            </div>
+          )}
           {showLinks && (
-            <div className="flex gap-2 text-sm mb-4 flex-wrap">
+            <div className="flex gap-2 text-sm my-4 flex-wrap">
               <Link
                 href={`/projects/${id}?overview=true`}
                 onClick={() => setCurrentState("overview")}
@@ -309,17 +322,13 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
       ) : showTutorialModal ? (
         <TutorialModal
           onComplete={() => {
-            setShowLinks(false);
-            setCurrentState("sprints");
-            setShowAlertModal(true);
+            setAlertState("sprints");
             setAlertMessage("Please assign tasks to yourself for the current sprint to continue");
           }}
           setPosts={setPosts}
           project={project}
           setShowTutorialModal={setShowTutorialModal}
         />
-      ) : showAlertModal ? (
-        <AlertModal message={alertMessage} setShowModal={setShowAlertModal} />
       ) : !user?.admin && pendingMeetings?.length > 0 ? (
         <MeetingModal pendingMeetings={pendingMeetings} setPendingMeetings={setPendingMeetings} project={project} />
       ) : project.pending_post ? (
