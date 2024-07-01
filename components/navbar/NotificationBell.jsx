@@ -65,9 +65,7 @@ const NotificationBell = ({ notifications, setNotifications }) => {
         <div
           ref={notificationsRef}
           id="scrollableDiv"
-          className={`${
-            home ? "dark:bg-backgrounddark dark:text-gray-300" : ""
-          } overflow-y-auto max-h-96 absolute top-8 right-0 bg-gray-200 rounded border border-gray-400 py-2 text-xs z-50 w-56  `}
+          className="overflow-y-auto max-h-96 absolute top-8 right-0 bg-gray-200 rounded border border-gray-400 py-2 text-xs z-50 w-56 dark:bg-backgrounddark dark:text-gray-300 "
         >
           {notifications?.length > 0 ? (
             notifications.map((n, i) => (

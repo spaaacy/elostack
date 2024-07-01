@@ -79,9 +79,14 @@ const SetupModal = ({ project, members, setMembers, setShowModal, setShowNextMod
           )}
         </ul>
         <button
+          disabled={!selectedRole}
           onClick={saveRoles}
           type="button"
-          className="ml-auto bg-primary hover:bg-primarydark px-2 py-1 hover:text-neutral-200 text-white rounded mt-4"
+          className={`${
+            selectedRole
+              ? "bg-primary hover:bg-primarydark hover:text-neutral-200 text-white"
+              : "bg-neutral-600 text-neutral-300 hover:cursor-not-allowed"
+          } ml-auto  px-2 py-1  rounded mt-4`}
         >
           Continue
         </button>

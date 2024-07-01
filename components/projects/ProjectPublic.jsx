@@ -14,6 +14,7 @@ import Image from "next/image";
 import ProjectOverview from "./ProjectOverview";
 import availableRoles from "@/utils/availableRoles";
 import { Tooltip } from "react-tooltip";
+import { formatTime } from "@/utils/formatTime";
 
 const ProjectPublic = ({ project, members }) => {
   const { session, projects } = useContext(UserContext);
@@ -83,6 +84,12 @@ const ProjectPublic = ({ project, members }) => {
             )}
             <div className="flex flex-col justify-start items-start">
               <h1 className="font-bold text-2xl">{project.title}</h1>
+              {project.deadline && (
+                <p className="text-sm font-light">
+                  Due Date:{` `}
+                  {formatTime(project.deadline).replace(" at ", ", ")}
+                </p>
+              )}
               <p className="font-light ">{project.status}</p>
             </div>
 
@@ -247,7 +254,7 @@ const ProjectAgreement = ({ handleModalClose, project, members, setLoading, setS
           type="button"
           className={`${
             isDisabled
-              ? "hover:cursor-progress bg-neutral-600 text-neutral-400"
+              ? "hover:cursor-progress bg-neutral-600 text-neutral-300"
               : "bg-primary hover:bg-primarydark hover:text-gray-300  text-gray-200"
           }  px-2 py-1 rounded mt-2 text-md`}
         >

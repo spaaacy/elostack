@@ -19,6 +19,7 @@ import GithubModal from "./modal/GithubModal";
 import TutorialModal from "./modal/TutorialModal";
 import MeetingModal from "./modal/MeetingModal";
 import { FaArrowRight } from "react-icons/fa6";
+import { formatTime } from "@/utils/formatTime";
 
 const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
   const { id } = useParams();
@@ -119,7 +120,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
         let assigned = false;
         let taskRemaining = false;
         if (!user.admin) {
-          if (project.current_sprint) {
+          if (project.current_sprint && tasks.some((t) => !t.assignee)) {
             tasks.forEach((t) => {
               if (t.sprint_id === project.current_sprint) {
                 if (t.assignee === session.data.session.user.id) assigned = true;
@@ -134,10 +135,10 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
           if (!assigned || taskRemaining) {
             setAlertState("sprints");
             if (!assigned) {
-              setAlertMessage("Please assign tasks to yourself for the current sprint to continue");
+              setAlertMessage("Please assign tasks to yourself for the current sprint to continue.");
             } else if (taskRemaining)
               setAlertMessage(
-                "There are some unassigned tasks that fit your role. Please assign yourself to them or alert your team member of the similar role to assign themselves"
+                "There are some unassigned tasks that fit your role. Please assign yourself to them or alert your team member of the similar role to assign themselves."
               );
           }
         }
@@ -207,7 +208,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
         <Loader />
       ) : (
         <main>
-          <div className="flex items-center gap-4 relative">
+          <div className="flex items-center gap-4 relative ">
             {project.image_id && (
               <Image
                 src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}${process.env.NEXT_PUBLIC_STORAGE_PATH}/project-image/${project.id}/${project.image_id}`}
@@ -219,7 +220,18 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
             )}
             <div className="flex flex-col justify-start items-start">
               <h1 className="font-bold text-2xl">{project.title}</h1>
-              <p className="font-light ">{project.status}</p>
+              {project.next_deadline && (
+                <p className="text-primary dark:font-normal font-semibold">
+                  Next Deadline:{` `}
+                  {formatTime(project.next_deadline).replace(" at ", ", ")}
+                </p>
+              )}
+              {project.deadline && (
+                <p className="text-sm font-light">
+                  Due Date:{` `}
+                  {formatTime(project.deadline).replace(" at ", ", ")}
+                </p>
+              )}
             </div>
             <SettingsDropdown project={project} members={members} setLoading={setLoading} />
           </div>
@@ -230,13 +242,15 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
                 <h3 className="font-semibold">Attention</h3>
                 <p className="text-sm">{alertMessage}</p>
               </div>
-              <button
-                onClick={() => setCurrentState(alertState)}
-                className="text-sm px-2 py-1 border rounded flex gap-1 items-center"
-              >
-                Fix Now
-                <FaArrowRight />
-              </button>
+              {currentState !== alertState && (
+                <button
+                  onClick={() => setCurrentState(alertState)}
+                  className="text-sm px-2 py-1 border rounded flex gap-1 items-center"
+                >
+                  Fix Now
+                  <FaArrowRight />
+                </button>
+              )}
             </div>
           )}
           {showLinks && (
@@ -323,7 +337,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
         <TutorialModal
           onComplete={() => {
             setAlertState("sprints");
-            setAlertMessage("Please assign tasks to yourself for the current sprint to continue");
+            setAlertMessage("Please assign tasks to yourself for the current sprint to continue.");
           }}
           setPosts={setPosts}
           project={project}
