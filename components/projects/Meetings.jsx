@@ -7,12 +7,58 @@ import CreateMeeting from "./CreateMeeting";
 import Link from "next/link";
 import { IoMdClose } from "react-icons/io";
 import findCommonTime from "@/utils/findCommonTime";
+import toast from "react-hot-toast";
+import Loader from "../common/Loader";
 
 const Meetings = ({ meetings, setMeetings, project }) => {
+  const { session } = useContext(UserContext);
   const [selectedMeeting, setSelectedMeeting] = useState();
   const [createMeeting, setCreateMeeting] = useState(false);
   const [showConfirmCreate, setShowConfirmCreate] = useState(false);
   const [commonTime, setCommonTime] = useState();
+  const [loading, setLoading] = useState(false);
+
+  const createMeetingLink = async () => {
+    if (!session.data.session) return;
+    setLoading(true);
+    setShowConfirmCreate(false);
+    try {
+      let date = new Date(selectedMeeting.start_time[0]);
+      date.setHours(date.getHours() + 1);
+      const endTime = date.toISOString();
+      const attendees = selectedMeeting.email.map((item) => ({ email: item }));
+      console.log(attendees);
+
+      const response = await fetch("/api/meeting/create-link", {
+        method: "POST",
+        headers: {
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+        },
+        body: JSON.stringify({
+          startTime: commonTime ? commonTime.start_time : selectedMeeting.start_time[0],
+          endTime: commonTime ? commonTime.end_time : endTime,
+          attendees,
+          projectId: project.id,
+          meetingId: selectedMeeting.id,
+          projectTitle: project.title,
+        }),
+      });
+      if (response.status === 201) {
+        toast.success("Meeting link created");
+        const { url } = await response.json();
+        console.log(url);
+        setMeetings((prevMeetings) =>
+          prevMeetings.map((m) => (m.id === selectedMeeting.id ? { ...m, url, time_found: true } : m))
+        );
+        setSelectedMeeting({ ...selectedMeeting, url, time_found: true });
+      }
+    } catch (error) {
+      toast.error("Oops, something went wrong...");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (createMeeting) {
     return <CreateMeeting setCreateMeeting={setCreateMeeting} setMeetings={setMeetings} project={project} />;
@@ -41,7 +87,6 @@ const Meetings = ({ meetings, setMeetings, project }) => {
                   return (
                     <button
                       onClick={() => {
-                        console.log(m);
                         setSelectedMeeting(m);
                         setCommonTime(
                           findCommonTime(
@@ -52,7 +97,7 @@ const Meetings = ({ meetings, setMeetings, project }) => {
                                 end_time: m.end_time[i],
                               };
                             })
-                          ).start_time
+                          )
                         );
                       }}
                       className={`${
@@ -92,7 +137,6 @@ const Meetings = ({ meetings, setMeetings, project }) => {
                   return (
                     <button
                       onClick={() => {
-                        console.log(m);
                         setSelectedMeeting(m);
                         setCommonTime(
                           findCommonTime(
@@ -103,7 +147,7 @@ const Meetings = ({ meetings, setMeetings, project }) => {
                                 end_time: m.end_time[i],
                               };
                             })
-                          ).start_time
+                          )
                         );
                       }}
                       className={`${
@@ -121,7 +165,7 @@ const Meetings = ({ meetings, setMeetings, project }) => {
             </>
           )}
         </div>
-        {selectedMeeting && (
+        {selectedMeeting && !loading && (
           <div className=" rounded px-4 py-2 bg-gray-200 dark:bg-backgrounddark dark:border dark:border-gray-400 flex gap-8 max-sm:w-full text-sm  w-full">
             <div className="flex flex-col gap-2 w-1/2">
               <h4 className="font-semibold text-normal">Meeting Details</h4>
@@ -130,10 +174,10 @@ const Meetings = ({ meetings, setMeetings, project }) => {
                 {formatTime(selectedMeeting.datetime, "date")}
                 <br />
                 <span className="font-semibold">Time: </span>
-                {selectedMeeting.time_found
-                  ? selectedMeeting.time_found === true
-                    ? formatTime(selectedMeeting.datetime, "time")
-                    : "No common time found"
+                {selectedMeeting.time_found === false
+                  ? "No common time found"
+                  : selectedMeeting.time_found === true
+                  ? formatTime(selectedMeeting.datetime, "time")
                   : "TBD—Waiting on Member Availability"}
               </p>
               {selectedMeeting.url && (
@@ -145,7 +189,7 @@ const Meetings = ({ meetings, setMeetings, project }) => {
                   Meeting Link
                 </Link>
               )}
-              {selectedMeeting.start_time.length > 0 && (
+              {selectedMeeting.start_time.length > 0 && !selectedMeeting.url && (
                 <>
                   {!showConfirmCreate ? (
                     <button
@@ -160,7 +204,9 @@ const Meetings = ({ meetings, setMeetings, project }) => {
                       <p>
                         A meeting will be created for{` `}
                         <span className="text-primary font-semibold">
-                          {`${commonTime ? formatTime(commonTime) : formatTime(selectedMeeting.start_time[0])}`}
+                          {`${
+                            commonTime ? formatTime(commonTime.start_time) : formatTime(selectedMeeting.start_time[0])
+                          }`}
                         </span>
                         {". "}
                         Continue?
@@ -176,7 +222,7 @@ const Meetings = ({ meetings, setMeetings, project }) => {
                           No
                         </button>
                         <button
-                          onClick={() => {}}
+                          onClick={() => createMeetingLink()}
                           type="button"
                           className="mt-auto mr-auto bg-primary hover:bg-primarydark rounded-full px-2 py-1 text-sm hover:text-gray-300 text-white"
                         >
@@ -214,6 +260,7 @@ const Meetings = ({ meetings, setMeetings, project }) => {
             </div>
           </div>
         )}
+        {selectedMeeting && loading && <Loader />}
         <button
           type="button"
           onClick={() => setCreateMeeting(true)}

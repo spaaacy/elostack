@@ -18,6 +18,7 @@ import Link from "next/link";
 import GithubModal from "./modal/GithubModal";
 import TutorialModal from "./modal/TutorialModal";
 import AlertModal from "./modal/AlertModal";
+import MeetingModal from "./modal/MeetingModal";
 
 const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
   const { id } = useParams();
@@ -131,10 +132,10 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
             });
           } else assigned = true;
           if (!assigned || taskRemaining) {
-            setShowLinks(false);
             setCurrentState("sprints");
             setShowAlertModal(true);
             if (!assigned) {
+              setShowLinks(false);
               setAlertMessage("Please assign tasks to yourself for the current sprint to continue");
             } else if (taskRemaining)
               setAlertMessage(
