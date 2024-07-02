@@ -13,6 +13,7 @@ const NotificationBell = ({ notifications, setNotifications }) => {
   const notificationsRef = useRef();
   const buttonRef = useRef();
   const router = useRouter();
+  console.log(notifications);
 
   useEffect(() => {
     const handleClickOutside = (event) => {

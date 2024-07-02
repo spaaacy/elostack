@@ -31,6 +31,8 @@ export async function POST(req, res) {
     today.setUTCHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
     tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+
+    // Email deadline notifications
     for (let project of data) {
       if (new Date(project.deadline).getTime() === tomorrow.getTime()) {
         project.member_emails.forEach(async (email, i) => {
@@ -88,6 +90,67 @@ export async function POST(req, res) {
             console.error(`Error sending email to ${email}:`, error);
           }
         });
+      }
+    }
+
+    // Mark blackpoints
+    for (let project of data) {
+      if (
+        today.getTime() !== new Date(project.current_sprint_deadline).getTime() &&
+        today.getTime() !== new Date(project.deadline).getTime()
+      ) {
+        continue;
+      }
+      let contributions = {};
+      project.user_ids.forEach((user_id, i) => {
+        contributions[user_id] = { total: 0, email: project.member_emails[i], username: project.member_usernames[i] };
+        project.current_tasks.forEach((task) => {
+          if (user_id === task.assignee && task.complete === true)
+            contributions[user_id]["total"] = contributions[user_id]["total"] + 1;
+        });
+      });
+      for (let userId in contributions) {
+        if (contributions[userId]["total"] === 0) {
+          const { data, error } = await supabase.rpc("increment_blackpoint", {
+            p_user_id: userId,
+            p_project_id: project.id,
+          });
+          if (error) throw error;
+          // Member hit 5 blackpoints
+          if (data === true) {
+            // Send notification
+            const { error } = await supabase.from("notification").insert({
+              user_id: userId,
+              payload: { projectTitle: project.title, projectId: project.id },
+              type: "member-remove",
+            });
+            if (error) throw error;
+
+            // Email
+            const message = {
+              from: { email: "aakifmohamed@elostack.com", name: "EloStack" },
+              template_id: "d-6dfdcb11aab64c75ab34d01c218b89b7",
+              asm: {
+                groupId: 26311,
+              },
+              personalizations: [
+                {
+                  to: [{ email: contributions[userId]["email"] }],
+                  dynamic_template_data: {
+                    project_title: project.title,
+                    username: contributions[userId]["username"],
+                  },
+                },
+              ],
+            };
+
+            try {
+              await sgMail.send(message);
+            } catch (error) {
+              console.error(`Error sending email to ${email}:`, error);
+            }
+          }
+        }
       }
     }
 
