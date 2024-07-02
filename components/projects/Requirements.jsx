@@ -8,10 +8,11 @@ import toast from "react-hot-toast";
 import { UserContext } from "@/context/UserContext";
 import { extractMarkdownLink } from "@/utils/extractMarkdownLink";
 import Link from "next/link";
+import { formatTime } from "@/utils/formatTime";
 
 const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, setTasks, resources, setResources }) => {
   const { session, user, profile } = useContext(UserContext);
-  const [currentSprint, setCurrentSprint] = useState(project.current_sprint);
+  const [currentSprint, setCurrentSprint] = useState(sprints.find((s) => s.id === project.current_sprint));
   const [currentSprintIndex, setCurrentSprintIndex] = useState();
   const [projectSprintIndex, setProjectSprintIndex] = useState();
   const [showRoles, setShowRoles] = useState(false);
@@ -153,7 +154,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
         id: "0",
         role: currentRole.toLowerCase(),
         title: taskResourceTitle,
-        sprint_id: currentSprint,
+        sprint_id: currentSprint.id,
         complete: false,
         assignee: null,
       },
@@ -168,7 +169,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
         body: JSON.stringify({
           role: currentRole.toLowerCase(),
           title: taskResourceTitle,
-          sprint_id: currentSprint,
+          sprint_id: currentSprint.id,
           complete: false,
           assignee: null,
         }),
@@ -205,7 +206,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
         role: currentRole.toLowerCase(),
         title: linkObject.label,
         url: linkObject.url,
-        sprint_id: currentSprint,
+        sprint_id: currentSprint.id,
       },
     ]);
 
@@ -219,7 +220,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
           role: currentRole.toLowerCase(),
           title: linkObject.label,
           url: linkObject.url,
-          sprint_id: currentSprint,
+          sprint_id: currentSprint.id,
         }),
       });
       if (response.status === 201) {
@@ -454,11 +455,11 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
               <div key={i} className="w-full flex items-center justify-between gap-2">
                 <button
                   onClick={() => {
-                    setCurrentSprint(s.id);
+                    setCurrentSprint(s);
                     setCurrentPage("pending");
                   }}
                   className={`${
-                    s.id === currentSprint ? "text-primary  font-semibold dark:font-medium " : ""
+                    s.id === currentSprint.id ? "text-primary  font-semibold dark:font-medium " : ""
                   } max-lg:text-center text-left text-xs hover:underline rounded-full my-1 w-full max-lg:text-sm`}
                 >
                   {s.title}
@@ -505,45 +506,55 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
           )}
         </div>
       </div>
-
       {project.roles ? (
         <div className="flex flex-1 gap-2 flex-col lg:px-8  ">
           {(currentSprintIndex <= projectSprintIndex || user?.admin) && (
-            <div className="flex text-sm gap-2 items-center flex-wrap">
-              <button
-                type="button"
-                onClick={() => setCurrentPage("pending")}
-                className={`${
-                  currentPage === "pending"
-                    ? "bg-primary text-white"
-                    : "bg-gray-300 dark:bg-neutral-800 hover:bg-gray-400 dark:hover:bg-neutral-700"
-                } px-2 py-1 rounded `}
-              >
-                Pending Tasks
-              </button>
-              <button
-                type="button"
-                onClick={() => setCurrentPage("completed")}
-                className={`${
-                  currentPage === "completed"
-                    ? "bg-primary text-white"
-                    : "bg-gray-300 dark:bg-neutral-800 hover:bg-gray-400 dark:hover:bg-neutral-700"
-                } px-2 py-1 rounded `}
-              >
-                Completed Tasks
-              </button>
-              <button
-                type="button"
-                onClick={() => setCurrentPage("resources")}
-                className={`${
-                  currentPage === "resources"
-                    ? "bg-primary text-white"
-                    : "bg-gray-300 dark:bg-neutral-800 hover:bg-gray-400 dark:hover:bg-neutral-700"
-                } px-2 py-1 rounded `}
-              >
-                Resources
-              </button>
-            </div>
+            <>
+              <div className="flex flex-col">
+                {currentSprint && <h4 className="font-semibold">{currentSprint.title}</h4>}
+                {currentSprint && (
+                  <p className="text-primary text-sm font-semibold dark:font-medium">
+                    {formatTime(currentSprint.deadline)}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex text-sm gap-2 items-center flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage("pending")}
+                  className={`${
+                    currentPage === "pending"
+                      ? "bg-primary text-white"
+                      : "bg-gray-300 dark:bg-neutral-800 hover:bg-gray-400 dark:hover:bg-neutral-700"
+                  } px-2 py-1 rounded `}
+                >
+                  Pending Tasks
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage("completed")}
+                  className={`${
+                    currentPage === "completed"
+                      ? "bg-primary text-white"
+                      : "bg-gray-300 dark:bg-neutral-800 hover:bg-gray-400 dark:hover:bg-neutral-700"
+                  } px-2 py-1 rounded `}
+                >
+                  Completed Tasks
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage("resources")}
+                  className={`${
+                    currentPage === "resources"
+                      ? "bg-primary text-white"
+                      : "bg-gray-300 dark:bg-neutral-800 hover:bg-gray-400 dark:hover:bg-neutral-700"
+                  } px-2 py-1 rounded `}
+                >
+                  Resources
+                </button>
+              </div>
+            </>
           )}
           <div className="flex gap-4">
             {currentPage === "pending" ? (
@@ -551,7 +562,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
                 <h3 className="font-semibold mb-2 capitalize">{`${currentRole} pending tasks`}</h3>
                 <ul className="flex flex-col gap-1">
                   {tasks
-                    ?.filter((t) => !t.complete && t.role === currentRole && t.sprint_id === currentSprint)
+                    ?.filter((t) => !t.complete && t.role === currentRole && t.sprint_id === currentSprint.id)
                     .map((t, i) => {
                       return (
                         <div key={i} className="flex items-start gap-2  flex-wrap">
@@ -620,7 +631,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
                 <h3 className="font-semibold capitalize">{`${currentRole} completed tasks`}</h3>
                 <ul className="mt-2 flex flex-col gap-1">
                   {tasks
-                    ?.filter((t) => t.complete && t.role === currentRole && t.sprint_id === currentSprint)
+                    ?.filter((t) => t.complete && t.role === currentRole && t.sprint_id === currentSprint.id)
                     .map((t, i) => {
                       return (
                         <div key={i} className="flex items-start gap-2  flex-wrap">
@@ -648,7 +659,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
                 <h3 className="font-semibold capitalize">{`${currentRole} resource`}</h3>
                 <ul className="mt-2 flex flex-col gap-1">
                   {resources
-                    .filter((r) => r.sprint_id === currentSprint && r.role === currentRole)
+                    .filter((r) => r.sprint_id === currentSprint.id && r.role === currentRole)
                     .map((r, i) => {
                       return (
                         <Link
