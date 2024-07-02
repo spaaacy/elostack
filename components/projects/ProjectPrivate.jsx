@@ -20,6 +20,7 @@ import TutorialModal from "./modal/TutorialModal";
 import MeetingModal from "./modal/MeetingModal";
 import { FaArrowRight } from "react-icons/fa6";
 import { formatTime } from "@/utils/formatTime";
+import MembersSidebar from "./Members";
 
 const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
   const { id } = useParams();
@@ -218,7 +219,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
                 className="object-cover w-16 h-16 rounded-full"
               />
             )}
-            <div className="flex flex-col justify-start items-start">
+            <div className="flex flex-col justify-start items-start z-10">
               <h1 className="font-bold text-2xl">{project.title}</h1>
               {project.next_deadline && (
                 <p className="text-primary dark:font-normal font-semibold">
@@ -350,6 +351,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
       ) : (
         <></>
       )}
+      <MembersSidebar members={members} />
 
       <Toaster />
     </div>
