@@ -17,14 +17,12 @@ export async function POST(req, res) {
 
     // Project is now full
     if (data.length > 0) {
-      console.log("Sending emails...");
       sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
       // Send individual emails to each recipient
       for (const item of data) {
         const message = {
           from: { email: "aakifmohamed@elostack.com", name: "EloStack" },
-          to: { email: item.email },
           template_id: "d-2d849ded45cc434e8b872eaf34d79629",
           asm: {
             groupId: 26311,
@@ -42,13 +40,10 @@ export async function POST(req, res) {
 
         try {
           await sgMail.send(message);
-          console.log(`Email sent to ${item.email}`);
         } catch (error) {
           console.error(`Error sending email to ${item.email}:`, error);
         }
       }
-
-      console.log("All emails sent!");
 
       let results = await supabase.rpc("update_project_deadline", {
         p_project_id: projectId,
