@@ -220,14 +220,24 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
               />
             )}
             <div className="flex flex-col justify-start items-start z-10">
-              <h1 className="font-bold text-2xl">{project.title}</h1>
+              <div className="flex gap-2 items-center">
+                <h1 className="font-bold text-2xl">{project.title}</h1>
+                {new Date() >= new Date(project.deadline) && project.status !== "Complete" && (
+                  <p className="bg-red-600 text-xs text-white rounded px-2 py-1">OVERDUE</p>
+                )}
+              </div>
               {project.next_deadline && (
-                <p className="text-primary dark:font-normal font-semibold">
-                  Next Deadline:{` `}
-                  {formatTime(project.next_deadline).replace(" at ", ", ")}
-                </p>
+                <div className="flex gap-2 items-center">
+                  <p className="text-primary dark:font-normal font-semibold">
+                    Next Deadline:{` `}
+                    {formatTime(project.next_deadline).replace(" at ", ", ")}
+                  </p>
+                  {new Date() >= new Date(project.next_deadline) && (
+                    <p className="bg-red-600 text-xs text-white rounded px-2 py-1">OVERDUE</p>
+                  )}
+                </div>
               )}
-              {project.deadline && (
+              {project.deadline && project.deadline !== project.next_deadline && (
                 <p className="text-sm font-light">
                   Due Date:{` `}
                   {formatTime(project.deadline).replace(" at ", ", ")}

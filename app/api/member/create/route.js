@@ -11,16 +11,14 @@ export async function POST(req, res) {
     });
     if (auth.error) throw auth.error;
 
-    const { userId, projectId, projectTitle } = await req.json();
+    const { userId, projectId, projectTitle, username } = await req.json();
     const { data, error } = await supabase.rpc("add_member", { p_user_id: userId, p_project_id: projectId });
     if (error) throw error;
 
-    // Project is now full
-    if (data.length > 0) {
-      sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
-      // Send individual emails to each recipient
-      for (const item of data) {
+    console.log(data);
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    if (data[0].is_full && data[0].previous_status === "Just created") {
+      for (const email of data[0].email) {
         const message = {
           from: { email: "aakifmohamed@elostack.com", name: "EloStack" },
           template_id: "d-2d849ded45cc434e8b872eaf34d79629",
@@ -29,10 +27,11 @@ export async function POST(req, res) {
           },
           personalizations: [
             {
-              to: [{ email: item.email }],
+              to: [{ email }],
               dynamic_template_data: {
                 project_title: projectTitle,
                 project_id: projectId,
+                username,
               },
             },
           ],
@@ -41,7 +40,7 @@ export async function POST(req, res) {
         try {
           await sgMail.send(message);
         } catch (error) {
-          console.error(`Error sending email to ${item.email}:`, error);
+          console.error(`Error sending email to ${email}:`, error);
         }
       }
 
@@ -51,6 +50,52 @@ export async function POST(req, res) {
       if (results.error) throw results.error;
       results = await supabase.rpc("update_sprint_deadlines", { p_project_id: projectId });
       if (results.error) throw results.error;
+    } else {
+      data[0].email.forEach(async (email, i) => {
+        let message;
+        if (data[0].username[i] !== username) {
+          message = {
+            from: { email: "aakifmohamed@elostack.com", name: "EloStack" },
+            template_id: "d-ca07c41d02634540985b88c473c1a7f6",
+            asm: {
+              groupId: 26329,
+            },
+            personalizations: [
+              {
+                to: [{ email }],
+                dynamic_template_data: {
+                  project_title: projectTitle,
+                  project_id: projectId,
+                  username,
+                },
+              },
+            ],
+          };
+        } else {
+          message = {
+            from: { email: "aakifmohamed@elostack.com", name: "EloStack" },
+            template_id: "d-2248e75fa01349e19e5046b5fdb512cf",
+            asm: {
+              groupId: 26329,
+            },
+            personalizations: [
+              {
+                to: [{ email }],
+                dynamic_template_data: {
+                  project_title: projectTitle,
+                  project_id: projectId,
+                  username,
+                },
+              },
+            ],
+          };
+        }
+        try {
+          await sgMail.send(message);
+        } catch (error) {
+          console.error(`Error sending email to ${email}:`, error);
+        }
+      });
     }
 
     return NextResponse.json({ message: "Member added successfully!" }, { status: 201 });

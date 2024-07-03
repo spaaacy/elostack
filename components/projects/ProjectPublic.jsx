@@ -84,13 +84,14 @@ const ProjectPublic = ({ project, members }) => {
             )}
             <div className="flex flex-col justify-start items-start">
               <h1 className="font-bold text-2xl">{project.title}</h1>
+              <p className="text-primary dark:font-normal font-semibold">{project.status}</p>
+
               {project.deadline && (
                 <p className="text-sm font-light">
                   Due Date:{` `}
                   {formatTime(project.deadline).replace(" at ", ", ")}
                 </p>
               )}
-              <p className="font-light ">{project.status}</p>
             </div>
 
             <div className="ml-auto flex-shrink-0">
@@ -179,7 +180,7 @@ const ProjectPublic = ({ project, members }) => {
 
 const ProjectAgreement = ({ handleModalClose, project, members, setLoading, setShowAgreement }) => {
   const [isDisabled, setIsDisabled] = useState(true);
-  const { session } = useContext(UserContext);
+  const { session, profile } = useContext(UserContext);
   const rolesAvailable = availableRoles(members, project.roles);
 
   useEffect(() => {
@@ -202,6 +203,7 @@ const ProjectAgreement = ({ handleModalClose, project, members, setLoading, setS
           "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
         },
         body: JSON.stringify({
+          username: profile.username,
           userId: session.data.session.user.id,
           projectId: project.id,
           projectTitle: project.title,
