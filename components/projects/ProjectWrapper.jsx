@@ -38,7 +38,7 @@ const ProjectWrapper = () => {
       });
       if (response.status === 200) {
         const { project } = await response.json();
-        if (project.deleted) router.push("/projects");
+        if (project[0].deleted) router.push("/projects");
         setProject(project[0]);
       } else {
         router.push("/projects");

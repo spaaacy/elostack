@@ -8,6 +8,8 @@ import toast from "react-hot-toast";
 import { UserContext } from "@/context/UserContext";
 import { extractMarkdownLink } from "@/utils/extractMarkdownLink";
 import Link from "next/link";
+import { Tooltip } from "react-tooltip";
+
 import { formatTime } from "@/utils/formatTime";
 
 const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, setTasks, resources, setResources }) => {
@@ -613,13 +615,26 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
                                 {t.username}
                               </button>
                             ) : (
-                              <p
-                                className={`${
-                                  t.username ? " dark:bg-sky-500 bg-sky-400" : "bg-neutral-600"
-                                } text-xs px-2 py-1 rounded-full text-white ml-auto flex-shrink-0`}
-                              >
-                                {t.username ? t.username : "None assigned"}
-                              </p>
+                              <>
+                                <p
+                                  data-tooltip-id="assign-tooltip"
+                                  data-tooltip-content="Your role does not match the task"
+                                  className={`${
+                                    t.username ? " dark:bg-sky-500 bg-sky-400" : "bg-neutral-600"
+                                  } text-xs px-2 py-1 rounded-full text-white ml-auto flex-shrink-0`}
+                                >
+                                  {t.username ? t.username : "None assigned"}
+                                </p>
+                                {!t.username && (
+                                  <Tooltip
+                                    style={{ fontSize: "12px" }}
+                                    id="assign-tooltip"
+                                    place="bottom"
+                                    type="dark"
+                                    effect="float"
+                                  />
+                                )}
+                              </>
                             ))}
                         </div>
                       );

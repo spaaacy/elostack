@@ -20,7 +20,7 @@ import TutorialModal from "./modal/TutorialModal";
 import MeetingModal from "./modal/MeetingModal";
 import { FaArrowRight } from "react-icons/fa6";
 import { formatTime } from "@/utils/formatTime";
-import MembersSidebar from "./Members";
+import MembersSidebar from "./MembersSidebar";
 
 const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
   const { id } = useParams();

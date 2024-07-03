@@ -3,7 +3,7 @@ import { FaCircleInfo } from "react-icons/fa6";
 
 const MembersSidebar = ({ members }) => {
   return (
-    <div className=" z-50 flex xl:block fixed top-[83px] left-0 w-64 2xl:w-80 rounded-r-lg py-3 bg-white dark:bg-backgrounddark drop-shadow-xl dark:border-r dark:border-y dark:border-gray-400">
+    <div className="text-sm z-40 hidden min-[1920px]:block fixed top-[83px] left-0 min-[1920px]:w-72 rounded-r-lg py-3 bg-white dark:bg-backgrounddark drop-shadow-xl dark:border-r dark:border-y dark:border-gray-400">
       <div className="flex mx-4 items-center">
         <h4 className="font-bold">Member</h4>
 
@@ -18,8 +18,8 @@ const MembersSidebar = ({ members }) => {
       <hr className="border-0 h-[1px] dark:bg-gray-400 bg-gray-200   my-1" />
 
       {members.map((m, i) => (
-        <>
-          <div className="mx-4 flex justify-between items-center text-sm">
+        <div key={i}>
+          <div className="mx-4 flex justify-between items-center">
             <p className="">{m.profile.username}</p>
             <div className="flex">
               {[...Array(m.blackpoints)].map((_, index) => (
@@ -28,7 +28,7 @@ const MembersSidebar = ({ members }) => {
             </div>
           </div>
           {i + 1 < members.length && <hr className="border-0 h-[1px] dark:bg-gray-400 bg-gray-200 my-1" />}
-        </>
+        </div>
       ))}
     </div>
   );

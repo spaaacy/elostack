@@ -21,6 +21,7 @@ const AccountSettings = () => {
   const fileInputRef = useRef(null);
   const [avatar, setAvatar] = useState();
   const [file, setFile] = useState();
+  const [hideGithub, setHideGithub] = useState(false);
   const searchParams = useSearchParams();
   const router = useRouter();
   const {
@@ -54,6 +55,7 @@ const AccountSettings = () => {
         },
       });
       if (response.status === 200) {
+        setHideGithub(true);
         toast.success("GitHub connected!");
       } else {
         const { error } = await response.json();
@@ -173,7 +175,7 @@ const AccountSettings = () => {
                 </button>
               </div>
             </div>
-            {!user?.github_access_token && (
+            {!user?.github_access_token && !hideGithub && (
               <Link
                 href={{
                   pathname: "https://github.com/login/oauth/authorize",

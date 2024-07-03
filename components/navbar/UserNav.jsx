@@ -50,9 +50,6 @@ const UserNav = ({ signOut }) => {
           ref={accountRef}
           className="absolute top-12 right-0 dark:bg-backgrounddark bg-backgroundlight border border-gray-400 text-sm rounded-lg py-2 flex flex-col items-end w-28 "
         >
-          <Link href={"/home"} className="w-full hover:dark:bg-neutral-800 hover:bg-gray-200 px-3 py-1 text-right ">
-            Home
-          </Link>
           <Link
             href={"/account-settings"}
             className="w-full hover:dark:bg-neutral-800 hover:bg-gray-200 px-3 py-1 text-right "

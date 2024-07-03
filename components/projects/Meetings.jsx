@@ -27,7 +27,6 @@ const Meetings = ({ meetings, setMeetings, project }) => {
       date.setHours(date.getHours() + 1);
       const endTime = date.toISOString();
       const attendees = selectedMeeting.email.map((item) => ({ email: item }));
-      console.log(attendees);
 
       const response = await fetch("/api/meeting/create-link", {
         method: "POST",
@@ -46,7 +45,6 @@ const Meetings = ({ meetings, setMeetings, project }) => {
       if (response.status === 201) {
         toast.success("Meeting link created");
         const { url } = await response.json();
-        console.log(url);
         setMeetings((prevMeetings) =>
           prevMeetings.map((m) => (m.id === selectedMeeting.id ? { ...m, url, time_found: true } : m))
         );
