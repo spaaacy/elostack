@@ -57,7 +57,7 @@ const ProjectOverview = ({ project, members, user, setLoading }) => {
             .filter((member) => !member.banned)
             .map((member, i) => {
               return (
-                <li key={i}>
+                <li key={i} className="flex items-center justify-start gap-2">
                   <p className=" ">
                     {member.profile.username}
                     {member.role && (
@@ -66,6 +66,20 @@ const ProjectOverview = ({ project, members, user, setLoading }) => {
                       }`}</span>
                     )}
                   </p>
+                  {console.log(member)}
+                  {(member.profile.university || member.profile.other_university) && (
+                    <p
+                      className="text-sm px-2 rounded-full font-bold bg-black dark:bg-white text-white dark:text-black"
+                      style={
+                        member.profile.university && {
+                          color: member.profile.university.secondary_color,
+                          "background-color": member.profile.university.primary_color,
+                        }
+                      }
+                    >
+                      {member.profile.university ? member.profile.university.name : member.profile.other_university}
+                    </p>
+                  )}
                 </li>
               );
             })}

@@ -22,7 +22,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
     role ? role.split(", ")[0] : project.roles ? project.roles.split(", ")[0] : null
   );
   const [sprintTitle, setSprintTitle] = useState("");
-  const [taskResourceTitle, setTaskResoruceTitle] = useState("");
+  const [taskResourceTitle, setTaskResourceTitle] = useState("");
   const [roleTitle, setRoleTitle] = useState("");
   const [currentPage, setCurrentPage] = useState("pending");
 
@@ -179,7 +179,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
       if (response.status === 201) {
         const { taskId } = await response.json();
         setTasks((prevTasks) => prevTasks.map((task) => (task.id === "0" ? { ...task, id: taskId } : task)));
-        setTaskResoruceTitle("");
+        setTaskResourceTitle("");
       } else {
         const { error } = await response.json();
         throw error;
@@ -228,7 +228,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
       if (response.status === 201) {
         const { resourceId } = await response.json();
         setResources((prevRes) => prevRes.map((res) => (res.id === "0" ? { ...res, id: resourceId } : res)));
-        setTaskResoruceTitle("");
+        setTaskResourceTitle("");
       } else {
         const { error } = await response.json();
         throw error;
@@ -699,7 +699,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
                   currentPage === "resources" ? "resource. Use format: [Google](https://www.google.com/)" : "task"
                 }`}
                 value={taskResourceTitle}
-                onChange={(e) => setTaskResoruceTitle(e.target.value)}
+                onChange={(e) => setTaskResourceTitle(e.target.value)}
                 onKeyDown={currentPage === "resources" ? resourceKeyDown : taskKeyDown}
                 type="text"
                 className="rounded text-sm px-2 py-1 focus:ring-0 focus:outline-none focus:bg-neutral-50 dark:focus:bg-neutral-800 w-full"

@@ -15,22 +15,20 @@ export async function PATCH(req, res) {
     const formData = await req.formData();
     const profilePicture = formData.get("profilePicture");
     const oldImageId = formData.get("oldImageId");
-    const userId = formData.get("userId");
-    const username = formData.get("username");
+    const profile = JSON.parse(formData.get("profile"));
 
-    const newProfile = { username };
-
+    const { userId, ...profileWithoutUserId } = profile;
     if (oldImageId && profilePicture) {
-      newProfile["image_id"] = uuidv4();
+      profile["image_id"] = uuidv4();
       let results = await supabase.storage.from("profile-picture").remove([`${userId}/${oldImageId}`]);
       if (results.error) throw results.error;
       results = await supabase.storage
         .from("profile-picture")
-        .upload(`${userId}/${newProfile.image_id}`, profilePicture, { cacheControl: 3600, upsert: true });
+        .upload(`${userId}/${profile.image_id}`, profilePicture, { cacheControl: 3600, upsert: true });
       if (results.error) throw results.error;
     }
 
-    const { error } = await supabase.from("profile").update(newProfile).eq("user_id", userId);
+    const { error } = await supabase.from("profile").update(profileWithoutUserId).eq("user_id", userId);
     if (error) throw error;
 
     return NextResponse.json({ message: "Profile has been edited!" }, { status: 200 });

@@ -8,7 +8,11 @@ export async function GET(req, res) {
     if (error) throw error;
     let members = [];
     for (let member of data) {
-      const { data, error } = await supabase.from("profile").select().eq("user_id", member.user_id).single();
+      const { data, error } = await supabase
+        .from("profile")
+        .select("*, university(*)")
+        .eq("user_id", member.user_id)
+        .single();
       if (error) throw error;
       member["profile"] = data;
       members.push(member);

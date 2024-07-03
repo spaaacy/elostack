@@ -24,6 +24,20 @@ const Comment = ({ comment }) => {
           <UserAvatar size={28} username={comment.username} />
         )}
         <p className="font-medium">{`${comment.username}`}</p>
+        {console.log(comment)}
+        {comment.university_name && (
+          <p
+            className="text-sm px-2 rounded-full font-bold bg-black dark:bg-white text-white dark:text-black"
+            style={
+              comment.university && {
+                color: comment.university[0].secondary_color,
+                "background-color": comment.university[0].primary_color,
+              }
+            }
+          >
+            {comment.university_name}
+          </p>
+        )}
         <p className="ml-auto text-xs font-light">{formatTime(comment.created_at, "date")}</p>
       </div>
       <Markdown className="markdown">{comment.comment}</Markdown>
