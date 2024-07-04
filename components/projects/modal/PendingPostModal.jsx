@@ -2,8 +2,8 @@
 
 import { useContext, useState } from "react";
 import { UserContext } from "@/context/UserContext";
-import Loader from "../common/Loader";
-import CreatePost from "../feed/CreatePost";
+import Loader from "@/components/common/Loader";
+import CreatePost from "@/components/feed/CreatePost";
 
 const PendingPostModal = ({ setPosts, project, setProject }) => {
   const { session } = useContext(UserContext);

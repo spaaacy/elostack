@@ -31,7 +31,14 @@ export async function POST(req, res) {
     today.setUTCHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
     tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
-
+    const yesterday = new Date(today);
+    yesterday.setUTCDate(tomorrow.getUTCDate() - 1);
+    const twentyFourHoursAgo = new Date(
+      Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), today.getUTCHours() - 24)
+    );
+    const twentyFourHoursLater = new Date(
+      Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), today.getUTCHours() + 24)
+    );
     // Email deadline notifications
     for (let project of data) {
       if (new Date(project.deadline).getTime() === tomorrow.getTime()) {
@@ -92,6 +99,42 @@ export async function POST(req, res) {
         });
       }
     }
+
+    // Assign tasks reminder
+    // for (let project of data) {
+    //   if (
+    //     new Date(project.sprint_updated_at) <= twentyFourHoursLater &&
+    //     new Date(project.sprint_updated_at) >= twentyFourHoursAgo &&
+    //     project.current_sprint
+    //   ) {
+    //     console.log(project.title);
+    //     // project.member_emails.forEach(async (email, i) => {
+    //     //   const message = {
+    //     //     from: { email: "aakifmohamed@elostack.com", name: "EloStack" },
+    //     //     template_id: "d-96ce1ec66aab40789841878ef03c8f50",
+    //     //     asm: {
+    //     //       groupId: 26337,
+    //     //     },
+    //     //     personalizations: [
+    //     //       {
+    //     //         to: [{ email }],
+    //     //         dynamic_template_data: {
+    //     //           project_title: project.title,
+    //     //           project_id: project.id,
+    //     //           username: project.member_usernames[i],
+    //     //           sprint_title: project.current_sprint_title,
+    //     //         },
+    //     //       },
+    //     //     ],
+    //     //   };
+    //     //   try {
+    //     //     await sgMail.send(message);
+    //     //   } catch (error) {
+    //     //     console.error(`Error sending email to ${email}:`, error);
+    //     //   }
+    //     // });
+    //   }
+    // }
 
     // Mark blackpoints
     for (let project of data) {

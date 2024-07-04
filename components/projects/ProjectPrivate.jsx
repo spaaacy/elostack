@@ -21,6 +21,7 @@ import MeetingModal from "./modal/MeetingModal";
 import { FaArrowRight } from "react-icons/fa6";
 import { formatTime } from "@/utils/formatTime";
 import MembersSidebar from "./MembersSidebar";
+import PendingPostModal from "./modal/PendingPostModal";
 
 const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
   const { id } = useParams();
