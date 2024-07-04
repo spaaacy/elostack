@@ -90,6 +90,14 @@ const NotificationBell = ({ notifications, setNotifications }) => {
                     ? `New post in ${n.payload?.projectTitle}`
                     : n.type === "meeting"
                     ? `Upcoming meeting for ${n.payload?.projectTitle} on ${formatTime(n.payload?.datetime)}`
+                    : n.type === "project-deadline"
+                    ? `${n.payload?.projectTitle} is due soon`
+                    : n.type === "sprint-deadline"
+                    ? `${n.payload?.projectTitle}'s milestone is due soon`
+                    : n.type === "blackpoint"
+                    ? `You were marked with a blackpoint for ${n.payload?.projectTitle}`
+                    : n.type === "assign-task"
+                    ? `Please assign yourself tasks for ${n.payload?.projectTitle}`
                     : ""}
                 </button>
                 <button type="button" onClick={() => handleNotificationClick(n, false)}>

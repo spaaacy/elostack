@@ -70,8 +70,7 @@ const NavBar = () => {
       });
       if (response.status === 200) {
         const { notifications } = await response.json();
-        const reversed = notifications.reverse();
-        setNotifications(reversed);
+        setNotifications(notifications);
       }
     } catch (error) {
       console.error(error);
