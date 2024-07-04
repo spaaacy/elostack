@@ -2,11 +2,11 @@ import { useContext, useEffect, useState } from "react";
 import Post from "./Post";
 import { UserContext } from "@/context/UserContext";
 import CreatePost from "./CreatePost";
+import { MdRefresh } from "react-icons/md";
 
-const Feed = ({ posts, setPosts, project, isMember }) => {
+const Feed = ({ posts, setPosts, project, isMember, showLoadMorePosts, setShowLoadMorePosts }) => {
   const { session } = useContext(UserContext);
   const [nextPostsPage, setNextPostsPage] = useState(2);
-  const [showLoadMorePosts, setShowLoadMorePosts] = useState(false);
 
   const fetchPosts = async () => {
     try {
@@ -47,6 +47,8 @@ const Feed = ({ posts, setPosts, project, isMember }) => {
     }
   };
 
+  console.log(showLoadMorePosts);
+
   return (
     <div className="flex flex-col w-full max-w-[840px] mx-auto">
       {session?.data.session && (!project || isMember) && <CreatePost project={project} setPosts={setPosts} />}
@@ -70,9 +72,9 @@ const Feed = ({ posts, setPosts, project, isMember }) => {
           onClick={() => {
             fetchPosts();
           }}
-          className="my-10 mx-auto text-gray-400 hover:underline"
+          className="my-10 mx-auto text-2xl text-primary"
         >
-          Load more posts...
+          <MdRefresh />
         </button>
       )}
     </div>

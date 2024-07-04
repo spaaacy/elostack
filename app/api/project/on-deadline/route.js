@@ -36,9 +36,7 @@ export async function POST(req, res) {
     const twentyFourHoursAgo = new Date(
       Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), today.getUTCHours() - 24)
     );
-    const twentyFourHoursLater = new Date(
-      Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), today.getUTCHours() + 24)
-    );
+
     // Email deadline notifications
     for (let project of data) {
       if (new Date(project.deadline).getTime() === tomorrow.getTime()) {
@@ -64,7 +62,6 @@ export async function POST(req, res) {
 
           try {
             await sgMail.send(message);
-            console.log(`Email sent to ${email}`);
           } catch (error) {
             console.error(`Error sending email to ${email}:`, error);
           }
@@ -101,43 +98,39 @@ export async function POST(req, res) {
     }
 
     // Assign tasks reminder
-    // for (let project of data) {
-    //   if (
-    //     new Date(project.sprint_updated_at) <= twentyFourHoursLater &&
-    //     new Date(project.sprint_updated_at) >= twentyFourHoursAgo &&
-    //     project.current_sprint
-    //   ) {
-    //     console.log(project.title);
-    //     // project.member_emails.forEach(async (email, i) => {
-    //     //   const message = {
-    //     //     from: { email: "aakifmohamed@elostack.com", name: "EloStack" },
-    //     //     template_id: "d-96ce1ec66aab40789841878ef03c8f50",
-    //     //     asm: {
-    //     //       groupId: 26337,
-    //     //     },
-    //     //     personalizations: [
-    //     //       {
-    //     //         to: [{ email }],
-    //     //         dynamic_template_data: {
-    //     //           project_title: project.title,
-    //     //           project_id: project.id,
-    //     //           username: project.member_usernames[i],
-    //     //           sprint_title: project.current_sprint_title,
-    //     //         },
-    //     //       },
-    //     //     ],
-    //     //   };
-    //     //   try {
-    //     //     await sgMail.send(message);
-    //     //   } catch (error) {
-    //     //     console.error(`Error sending email to ${email}:`, error);
-    //     //   }
-    //     // });
-    //   }
-    // }
+    for (let project of data) {
+      if (new Date(project.sprint_updated_at).getTime() >= twentyFourHoursAgo.getTime() && project.current_sprint) {
+        project.member_emails.forEach(async (email, i) => {
+          const message = {
+            from: { email: "aakifmohamed@elostack.com", name: "EloStack" },
+            template_id: "d-96ce1ec66aab40789841878ef03c8f50",
+            asm: {
+              groupId: 26337,
+            },
+            personalizations: [
+              {
+                to: [{ email }],
+                dynamic_template_data: {
+                  project_title: project.title,
+                  project_id: project.id,
+                  username: project.member_usernames[i],
+                  sprint_title: project.current_sprint_title,
+                },
+              },
+            ],
+          };
+          try {
+            await sgMail.send(message);
+          } catch (error) {
+            console.error(`Error sending email to ${email}:`, error);
+          }
+        });
+      }
+    }
 
     // Mark blackpoints
     for (let project of data) {
+      if (project.id !== "6d8b9e5c-0494-4893-9248-14554caf3b90") continue;
       if (
         today.getTime() !== new Date(project.current_sprint_deadline).getTime() &&
         today.getTime() !== new Date(project.deadline).getTime()
@@ -160,7 +153,8 @@ export async function POST(req, res) {
           });
           if (error) throw error;
           // Member hit 5 blackpoints
-          if (data === true) {
+          let message;
+          if (data >= 3) {
             // Send notification
             const { error } = await supabase.from("notification").insert({
               user_id: userId,
@@ -169,8 +163,7 @@ export async function POST(req, res) {
             });
             if (error) throw error;
 
-            // Email
-            const message = {
+            message = {
               from: { email: "aakifmohamed@elostack.com", name: "EloStack" },
               template_id: "d-6dfdcb11aab64c75ab34d01c218b89b7",
               asm: {
@@ -186,12 +179,29 @@ export async function POST(req, res) {
                 },
               ],
             };
-
-            try {
-              await sgMail.send(message);
-            } catch (error) {
-              console.error(`Error sending email to ${email}:`, error);
-            }
+          } else {
+            message = {
+              from: { email: "aakifmohamed@elostack.com", name: "EloStack" },
+              template_id: "d-2eb1e2dfb7c94dc8bc557ef686932fba",
+              asm: {
+                groupId: 26350,
+              },
+              personalizations: [
+                {
+                  to: [{ email: contributions[userId]["email"] }],
+                  dynamic_template_data: {
+                    project_title: project.title,
+                    username: contributions[userId]["username"],
+                    project_id: project.id,
+                  },
+                },
+              ],
+            };
+          }
+          try {
+            await sgMail.send(message);
+          } catch (error) {
+            console.error(`Error sending email to ${email}:`, error);
           }
         }
       }

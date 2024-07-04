@@ -29,6 +29,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
   const { session, user, profile } = useContext(UserContext);
   const [currentState, setCurrentState] = useState("overview");
   const [posts, setPosts] = useState([]);
+  const [showLoadMorePosts, setShowLoadMorePosts] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [resources, setResources] = useState([]);
   const [meetings, setMeetings] = useState();
@@ -81,6 +82,9 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
       if (response.status === 200) {
         const { posts } = await response.json();
         setPosts(posts);
+        if (posts.length === 5) {
+          setShowLoadMorePosts(true);
+        } else setShowLoadMorePosts(false);
       }
     } catch (error) {
       console.error(error);
@@ -316,7 +320,14 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
           {currentState === "overview" ? (
             <ProjectOverview user={user} members={members} project={project} setLoading={setLoading} />
           ) : currentState === "updates" ? (
-            <Feed posts={posts} setPosts={setPosts} project={project} isMember={true} />
+            <Feed
+              posts={posts}
+              setPosts={setPosts}
+              project={project}
+              isMember={true}
+              showLoadMorePosts={showLoadMorePosts}
+              setShowLoadMorePosts={setShowLoadMorePosts}
+            />
           ) : currentState === "sprints" ? (
             <Requirements
               role={members.find((m) => m.user_id === session.data.session.user.id)?.role}

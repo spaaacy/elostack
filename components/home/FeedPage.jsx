@@ -11,6 +11,7 @@ const FeedPage = () => {
   const { session } = useContext(UserContext);
   const [posts, setPosts] = useState();
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [showLoadMorePosts, setShowLoadMorePosts] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -35,6 +36,9 @@ const FeedPage = () => {
       if (response.status === 200) {
         const { posts } = await response.json();
         setPosts(posts);
+        if (posts.length === 5) {
+          setShowLoadMorePosts(true);
+        } else setShowLoadMorePosts(false);
       }
     } catch (error) {
       console.error(error);
@@ -46,7 +50,12 @@ const FeedPage = () => {
       <NavBar />
       <MyProjectsSideBar />
       <main>
-        <Feed posts={posts} setPosts={setPosts} />
+        <Feed
+          posts={posts}
+          setPosts={setPosts}
+          showLoadMorePosts={showLoadMorePosts}
+          setShowLoadMorePosts={setShowLoadMorePosts}
+        />
       </main>
       <Toaster />
     </div>

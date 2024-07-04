@@ -22,6 +22,7 @@ const ProjectPublic = ({ project, members }) => {
   const [dataLoaded, setDataLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState();
+  const [showLoadMorePosts, setShowLoadMorePosts] = useState(false);
   const [currentState, setCurrentState] = useState("overview");
   const banned = members.some((m) => m.banned && m.user_id === session.data.session?.user.id);
   const canJoin =
@@ -52,6 +53,9 @@ const ProjectPublic = ({ project, members }) => {
       if (response.status === 200) {
         const { posts } = await response.json();
         setPosts(posts);
+        if (posts.length === 5) {
+          setShowLoadMorePosts(true);
+        } else setShowLoadMorePosts(false);
       }
     } catch (error) {
       console.error(error);
@@ -160,7 +164,14 @@ const ProjectPublic = ({ project, members }) => {
           {currentState === "overview" ? (
             <ProjectOverview members={members} project={project} />
           ) : (
-            <Feed posts={posts} setPosts={setPosts} project={project} isMember={false} />
+            <Feed
+              posts={posts}
+              setPosts={setPosts}
+              project={project}
+              isMember={false}
+              showLoadMorePosts={showLoadMorePosts}
+              setShowLoadMorePosts={setShowLoadMorePosts}
+            />
           )}
         </main>
       )}
