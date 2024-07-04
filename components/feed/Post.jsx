@@ -234,7 +234,6 @@ const Post = ({ post, setPosts, project }) => {
           <UserAvatar size={36} username={post.username} />
         )}
         <p className="font-bold">{post.username}</p>
-        {console.log(post)}
         {post.university_name && (
           <p
             className="text-sm px-2 rounded-full font-bold bg-black dark:bg-white text-white dark:text-black"

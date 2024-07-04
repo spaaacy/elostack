@@ -287,7 +287,6 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
     if (daysDebounceRef.current) clearTimeout(daysDebounceRef.current);
 
     daysDebounceRef.current = setTimeout(async () => {
-      console.log("Updating...");
       try {
         const response = await fetch("/api/sprint/change-days", {
           method: "PATCH",
@@ -461,7 +460,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
                     setCurrentPage("pending");
                   }}
                   className={`${
-                    s.id === currentSprint.id ? "text-primary  font-semibold dark:font-medium " : ""
+                    s.id === currentSprint?.id ? "text-primary  font-semibold dark:font-medium " : ""
                   } max-lg:text-center text-left text-xs hover:underline rounded-full my-1 w-full max-lg:text-sm`}
                 >
                   {s.title}
@@ -564,7 +563,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
                 <h3 className="font-semibold mb-2 capitalize">{`${currentRole} pending tasks`}</h3>
                 <ul className="flex flex-col gap-1">
                   {tasks
-                    ?.filter((t) => !t.complete && t.role === currentRole && t.sprint_id === currentSprint.id)
+                    ?.filter((t) => !t.complete && t.role === currentRole && t.sprint_id === currentSprint?.id)
                     .map((t, i) => {
                       return (
                         <div key={i} className="flex items-start gap-2  flex-wrap">
@@ -574,14 +573,16 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
                                 ? false
                                 : !role?.includes(currentRole) ||
                                   t.assignee !== session.data.session.user.id ||
-                                  currentSprintIndex > projectSprintIndex
+                                  currentSprintIndex > projectSprintIndex ||
+                                  project.status === "Complete"
                             }
                             onClick={() => completeTask(t)}
                             type="button"
                             className={`${
                               !role?.includes(currentRole) ||
                               t.assignee !== session.data.session.user.id ||
-                              currentSprintIndex > projectSprintIndex
+                              currentSprintIndex > projectSprintIndex ||
+                              project.status === "Complete"
                                 ? ""
                                 : "hover:text-neutral-600 dark:hover:text-neutral-300"
                             } flex gap-2 items-start `}
@@ -644,18 +645,29 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
             ) : currentPage === "completed" ? (
               <div className="flex flex-col w-full">
                 <h3 className="font-semibold capitalize">{`${currentRole} completed tasks`}</h3>
+
                 <ul className="mt-2 flex flex-col gap-1">
                   {tasks
-                    ?.filter((t) => t.complete && t.role === currentRole && t.sprint_id === currentSprint.id)
+                    ?.filter((t) => t.complete && t.role === currentRole && t.sprint_id === currentSprint?.id)
                     .map((t, i) => {
                       return (
                         <div key={i} className="flex items-start gap-2  flex-wrap">
                           <button
-                            disabled={user?.admin ? false : !role?.includes(currentRole)}
+                            disabled={
+                              user?.admin
+                                ? false
+                                : !role?.includes(currentRole) ||
+                                  t.assignee !== session.data.session.user.id ||
+                                  project.status === "Complete"
+                            }
                             onClick={() => completeTask(t)}
                             type="button"
                             className={`${
-                              !role?.includes(currentRole) ? "" : "hover:text-neutral-600 dark:hover:text-neutral-300"
+                              !role?.includes(currentRole) ||
+                              t.assignee !== session.data.session.user.id ||
+                              project.status === "Complete"
+                                ? ""
+                                : "hover:text-neutral-600 dark:hover:text-neutral-300"
                             } flex gap-2 items-start `}
                           >
                             <MdOutlineCheckBox className="text-xl flex-shrink-0" />
@@ -674,7 +686,7 @@ const Requirements = ({ role, project, setProject, sprints, setSprints, tasks, s
                 <h3 className="font-semibold capitalize">{`${currentRole} resource`}</h3>
                 <ul className="mt-2 flex flex-col gap-1">
                   {resources
-                    .filter((r) => r.sprint_id === currentSprint.id && r.role === currentRole)
+                    .filter((r) => r.sprint_id === currentSprint?.id && r.role === currentRole)
                     .map((r, i) => {
                       return (
                         <Link

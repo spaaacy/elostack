@@ -230,6 +230,9 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
                 {new Date() >= new Date(project.deadline) && project.status !== "Complete" && (
                   <p className="bg-red-600 text-xs text-white rounded px-2 py-1">OVERDUE</p>
                 )}
+                {project.status === "Complete" && (
+                  <p className="bg-green-600 text-xs text-white rounded px-2 py-1">COMPLETE</p>
+                )}
               </div>
               {project.next_deadline && (
                 <div className="flex gap-2 items-center">

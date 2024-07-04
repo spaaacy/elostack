@@ -10,7 +10,6 @@ export async function PATCH(req, res) {
     });
     if (auth.error) throw auth.error;
 
-    console.log("ASDADS");
     const { pendingPost, projectId } = await req.json();
     const { error } = await supabase.from("project").update({ pending_post: pendingPost }).eq("id", projectId);
     if (error) throw error;

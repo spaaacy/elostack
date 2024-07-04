@@ -11,10 +11,10 @@ export async function PATCH(req, res) {
     if (auth.error) throw auth.error;
 
     const { sprintId, projectId } = await req.json();
-    const { error } = await supabase
-      .from("project")
-      .update({ current_sprint: sprintId, sprint_updated_at: new Date().toISOString() })
-      .eq("id", projectId);
+    const { error } = await supabase.rpc("change_sprint", {
+      p_sprint_id: sprintId,
+      p_project_id: projectId,
+    });
     if (error) throw error;
 
     return NextResponse.json({ message: "Current sprint changed successfully!" }, { status: 200 });

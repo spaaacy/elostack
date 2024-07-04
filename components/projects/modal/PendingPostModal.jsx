@@ -4,6 +4,7 @@ import { useContext, useState } from "react";
 import { UserContext } from "@/context/UserContext";
 import Loader from "@/components/common/Loader";
 import CreatePost from "@/components/feed/CreatePost";
+import toast from "react-hot-toast";
 
 const PendingPostModal = ({ setPosts, project, setProject }) => {
   const { session } = useContext(UserContext);
@@ -34,7 +35,12 @@ const PendingPostModal = ({ setPosts, project, setProject }) => {
         }),
       });
       if (response.status === 200) {
-        setProject({ ...project, pending_post: false, current_sprint: project.next_sprint });
+        setProject({
+          ...project,
+          pending_post: false,
+          current_sprint: project.next_sprint,
+          status: project.next_sprint === null ? "Complete" : project.status,
+        });
       } else {
         const { error } = await response.json();
         throw error;

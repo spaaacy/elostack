@@ -47,8 +47,6 @@ const Feed = ({ posts, setPosts, project, isMember, showLoadMorePosts, setShowLo
     }
   };
 
-  console.log(showLoadMorePosts);
-
   return (
     <div className="flex flex-col w-full max-w-[840px] mx-auto">
       {session?.data.session && (!project || isMember) && <CreatePost project={project} setPosts={setPosts} />}

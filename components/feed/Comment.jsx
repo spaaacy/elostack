@@ -24,7 +24,6 @@ const Comment = ({ comment }) => {
           <UserAvatar size={28} username={comment.username} />
         )}
         <p className="font-medium">{`${comment.username}`}</p>
-        {console.log(comment)}
         {comment.university_name && (
           <p
             className="text-sm px-2 rounded-full font-bold bg-black dark:bg-white text-white dark:text-black"

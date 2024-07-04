@@ -3,45 +3,9 @@
 import Link from "next/link";
 import { FaGithub } from "react-icons/fa";
 import { formatDuration } from "@/utils/formatDuration";
-import { useContext } from "react";
-import { UserContext } from "@/context/UserContext";
-import toast from "react-hot-toast";
-import { useParams } from "next/navigation";
 import Markdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 
 const ProjectOverview = ({ project, members, user, setLoading }) => {
-  const { session } = useContext(UserContext);
-  const { id } = useParams();
-
-  const changeStatus = async (status) => {
-    if (!session.data.session) return;
-    try {
-      setLoading(true);
-      const response = await fetch("/api/project/change-status", {
-        method: "PATCH",
-        headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
-        },
-        body: JSON.stringify({
-          status,
-          projectId: id,
-        }),
-      });
-      if (response.status === 200) {
-        toast.success("Status changed");
-        setTimeout(() => window.location.reload(), 1000);
-      } else {
-        const { error } = await response.json();
-        throw error;
-      }
-    } catch (error) {
-      toast.error("Oops, something went wrong...");
-      console.error(error);
-      setLoading(false);
-    }
-  };
-
   return (
     <div>
       <div className="relative p-2 rounded dark:border bg-gray-200 dark:bg-backgrounddark  dark:border-gray-400 flex flex-col font-light text-sm ">
@@ -66,7 +30,6 @@ const ProjectOverview = ({ project, members, user, setLoading }) => {
                       }`}</span>
                     )}
                   </p>
-                  {console.log(member)}
                   {(member.profile.university || member.profile.other_university) && (
                     <p
                       className="text-sm px-2 rounded-full font-bold bg-black dark:bg-white text-white dark:text-black"
@@ -90,15 +53,6 @@ const ProjectOverview = ({ project, members, user, setLoading }) => {
           {`Duration: ${formatDuration(project.duration_length, project.duration_type)}`}
         </p>
       </div>
-      {user?.admin && project.status.toLowerCase() === "in progress" && (
-        <button
-          onClick={() => changeStatus("Complete")}
-          type="button"
-          className="text-gray-200 bg-primary text-xs px-2 py-1 mt-2 rounded-full dark:shadow dark:shadow-neutral-800 hover:bg-primarydark hover:text-gray-300"
-        >
-          Mark completed
-        </button>
-      )}
     </div>
   );
 };

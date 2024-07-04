@@ -15,7 +15,6 @@ export async function POST(req, res) {
     const { data, error } = await supabase.rpc("add_member", { p_user_id: userId, p_project_id: projectId });
     if (error) throw error;
 
-    console.log(data);
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
     if (data[0].is_full && data[0].previous_status === "Just created") {
       for (const email of data[0].email) {
