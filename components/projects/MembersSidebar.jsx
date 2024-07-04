@@ -17,23 +17,25 @@ const MembersSidebar = ({ members }) => {
       </div>
       <hr className="border-0 h-[1px] dark:bg-gray-400 bg-gray-200   my-1" />
 
-      {members.map((m, i) => (
-        <div key={i}>
-          <div className="mx-4 flex justify-between items-center">
-            <p className="">{m.profile.username}</p>
-            {m.blackpoints > 0 ? (
-              <div className="flex">
-                {[...Array(m.blackpoints)].map((_, index) => (
-                  <div key={index} className="dark:bg-white bg-black rounded-full w-3 h-3 mx-0.5" />
-                ))}
-              </div>
-            ) : (
-              <p>None</p>
-            )}
+      {members
+        .filter((m) => m.banned === false)
+        .map((m, i) => (
+          <div key={i}>
+            <div className="mx-4 flex justify-between items-center">
+              <p className="">{m.profile.username}</p>
+              {m.blackpoints > 0 ? (
+                <div className="flex">
+                  {[...Array(m.blackpoints)].map((_, index) => (
+                    <div key={index} className="dark:bg-white bg-black rounded-full w-3 h-3 mx-0.5" />
+                  ))}
+                </div>
+              ) : (
+                <p>None</p>
+              )}
+            </div>
+            {i + 1 < members.length && <hr className="border-0 h-[1px] dark:bg-gray-400 bg-gray-200 my-1" />}
           </div>
-          {i + 1 < members.length && <hr className="border-0 h-[1px] dark:bg-gray-400 bg-gray-200 my-1" />}
-        </div>
-      ))}
+        ))}
     </div>
   );
 };

@@ -25,6 +25,14 @@ import PendingPostModal from "./modal/PendingPostModal";
 
 const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
   const { id } = useParams();
+  const [itemLoading, setItemLoading] = useState({
+    sprints: true,
+    tasks: true,
+    resources: true,
+    meetings: true,
+    posts: true,
+    votes: true,
+  });
   const [loading, setLoading] = useState(true);
   const { session, user, profile } = useContext(UserContext);
   const [currentState, setCurrentState] = useState("overview");
@@ -42,6 +50,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
   const [alertState, setAlertState] = useState();
   const [alertMessage, setAlertMessage] = useState();
   const [showLinks, setShowLinks] = useState(true);
+  const [votes, setVotes] = useState();
 
   useEffect(() => {
     const loadSearchParams = () => {
@@ -53,12 +62,12 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
 
     const loadData = async () => {
       setDataLoaded(true);
-      await fetchSprints();
-      await fetchTasks();
-      await fetchResources();
-      await fetchMeetings();
-      await fetchPosts();
-      setLoading(false);
+      fetchSprints();
+      fetchTasks();
+      fetchResources();
+      fetchMeetings();
+      fetchPosts();
+      fetchVoteKick();
     };
 
     if (session) {
@@ -69,6 +78,19 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
       if (member && !member.tutorial_complete && member.role) setShowTutorialModal(true);
     }
   }, [session]);
+
+  const finishLoading = (item) => {
+    setItemLoading((prevLoading) => {
+      return { ...prevLoading, [item]: true };
+    });
+    let loading = false;
+    for (let key in loading) {
+      if (loading[key] === true) {
+        loading = true;
+      }
+    }
+    if (!loading) setLoading(false);
+  };
 
   const fetchPosts = async () => {
     try {
@@ -85,6 +107,25 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
         if (posts.length === 5) {
           setShowLoadMorePosts(true);
         } else setShowLoadMorePosts(false);
+        finishLoading("posts");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchVoteKick = async () => {
+    try {
+      const response = await fetch(`/api/vote-kick/${project.id}`, {
+        method: "GET",
+        headers: {
+          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+        },
+      });
+      if (response.status === 200) {
+        const { votes } = await response.json();
+        setVotes(votes);
+        finishLoading("votes");
       }
     } catch (error) {
       console.error(error);
@@ -103,6 +144,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
         const { sprints } = await response.json();
         const sortedSprints = arrangeSprints(sprints);
         setSprints(sortedSprints);
+        finishLoading("sprints");
       } else {
         const { error } = await response.json();
         throw error;
@@ -148,6 +190,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
               );
           }
         }
+        finishLoading("tasks");
       } else {
         const { error } = await response.json();
         throw error;
@@ -168,6 +211,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
       if (response.status === 200) {
         const { resources } = await response.json();
         setResources(resources);
+        finishLoading("resources");
       } else {
         const { error } = await response.json();
         throw error;
@@ -198,6 +242,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
               setPendingMeetings((prevMeetings) => [...prevMeetings, m]);
             }
           });
+        finishLoading("meetings");
       } else {
         const { error } = await response.json();
         throw error;
@@ -252,7 +297,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
                 </p>
               )}
             </div>
-            <SettingsDropdown project={project} members={members} setLoading={setLoading} />
+            <SettingsDropdown project={project} members={members} setLoading={setItemLoading} votes={votes} />
           </div>
           <hr className="border-0 h-[1px] bg-gray-400 my-4" />
           {alertMessage && (
@@ -321,7 +366,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
             </div>
           )}
           {currentState === "overview" ? (
-            <ProjectOverview user={user} members={members} project={project} setLoading={setLoading} />
+            <ProjectOverview user={user} members={members} project={project} setLoading={setItemLoading} />
           ) : currentState === "updates" ? (
             <Feed
               posts={posts}
