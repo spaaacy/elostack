@@ -40,6 +40,7 @@ export async function POST(req, res) {
 
     // Email deadline notifications
     for (let project of data) {
+      if (project.id !== "6d8b9e5c-0494-4893-9248-14554caf3b90") continue;
       if (new Date(project.deadline).getTime() === tomorrow.getTime()) {
         project.member_emails.forEach(async (email, i) => {
           await notifyMembers(project.user_ids[i], project.title, project.id, "project-deadline");
@@ -50,6 +51,12 @@ export async function POST(req, res) {
             deadline: `${formatTime(project.deadline)} UTC`,
           });
         });
+        notifySlack(
+          `Hey everyone! Just a reminder that your project is due on ${formatTime(
+            project.deadline
+          )} UTC. Good luck! <https://www.elostack.com/projects/${project.id}?sprints=true|View Tasks>`,
+          project.slack_channel_id
+        );
       } else if (new Date(project.current_sprint_deadline).getTime() === tomorrow.getTime()) {
         project.member_emails.forEach(async (email, i) => {
           await notifyMembers(project.user_ids[i], project.title, project.id, "sprint-deadline");
@@ -61,6 +68,12 @@ export async function POST(req, res) {
             deadline: `${formatTime(project.current_sprint_deadline)} UTC`,
           });
         });
+        notifySlack(
+          `Hey everyone! Just a reminder that your next milestone is due on ${formatTime(
+            project.deadline
+          )} UTC. Good luck! <https://www.elostack.com/projects/${project.id}?sprints=true|View Tasks>`,
+          project.slack_channel_id
+        );
       }
     }
 
@@ -76,6 +89,10 @@ export async function POST(req, res) {
             sprint_title: project.current_sprint_title,
           });
         });
+        notifySlack(
+          `Hey everyone! Congrats on finishing a sprint! Don't forget to assign yourself to the next sprints tasks! <https://www.elostack.com/projects/${project.id}?sprints=true|Assign Tasks>`,
+          project.slack_channel_id
+        );
       }
     }
 
@@ -161,5 +178,25 @@ const sendEmail = async (templateId, email, asmGroupId, dynamicTemplateData) => 
     await sgMail.send(message);
   } catch (error) {
     console.error(`Error sending email to ${email}:`, error);
+  }
+};
+
+const notifySlack = async (text, channel) => {
+  if (!channel) return;
+  try {
+    const response = await fetch("https://slack.com/api/chat.postMessage", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env.SLACK_APP_OAUTH_TOKEN}` },
+      body: JSON.stringify({
+        channel,
+        blocks: [{ type: "section", text: { type: "mrkdwn", text } }],
+      }),
+    });
+    const result = await response.json();
+    if (result.ok === false) {
+      throw result.error;
+    }
+  } catch (error) {
+    console.error(error);
   }
 };

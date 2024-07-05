@@ -290,7 +290,7 @@ const SettingsDropdown = ({ project, members, setLoading, votes }) => {
               Set GitHub URL
             </button>
           )}
-          {user && !user.admin && (
+          {/* {user && !user.admin && (
             <button
               type="button"
               onClick={() => {
@@ -303,7 +303,7 @@ const SettingsDropdown = ({ project, members, setLoading, votes }) => {
             >
               Vote Kick Member
             </button>
-          )}
+          )} */}
           {user && !user.admin && (
             <button
               type="button"
