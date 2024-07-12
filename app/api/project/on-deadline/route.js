@@ -40,7 +40,6 @@ export async function POST(req, res) {
 
     // Email deadline notifications
     for (let project of data) {
-      if (project.id !== "6d8b9e5c-0494-4893-9248-14554caf3b90") continue;
       if (new Date(project.deadline).getTime() === tomorrow.getTime()) {
         project.member_emails.forEach(async (email, i) => {
           await notifyMembers(project.user_ids[i], project.title, project.id, "project-deadline");
@@ -121,7 +120,7 @@ export async function POST(req, res) {
             p_project_id: project.id,
           });
           if (error) throw error;
-          // Member hit 5 blackpoints
+          // Member hit 3 blackpoints
           if (data >= 3) {
             await notifyMembers(userId, project.title, project.id, "member-remove");
             sendEmail("d-6dfdcb11aab64c75ab34d01c218b89b7", contributions[userId]["email"], 26311, {

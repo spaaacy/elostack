@@ -129,41 +129,7 @@ const LandingPage = () => {
           </div>
         </section>
 
-        <section className="h-[540px] z-10 relative">
-          <div className="absolute h-full w-full opacity-50 -z-10 "></div>
 
-          {/* <div className="absolute top-0 left-0 h-1/3 w-full -z-40 bg-gradient-to-t  from-transparent to-black"></div> */}
-          {/* <div className="absolute bottom-0 left-0 h-1/6 w-full -z-40 bg-gradient-to-b  from-transparent to-black"></div> */}
-          <div
-            className={`absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center flex flex-col items-center justify-center  w-full  ${cormorant.className}`}
-          >
-            <div className="max-sm:h-72 h-1/3 w-3/4 xl:w-1/2 flex flex-col justify-center items-center py-16  px-8 relative rounded text-white">
-              <Image className="-z-50 object-cover rounded-[20px]" src={"/wormhole.jpg"} alt="wormhole" fill={true} />
-              <div className="absolute top-0 bottom-0 h-full w-full opacity-50 -z-40 bg-black rounded-[20px]"></div>
-              <h3 className="max-sm:text-2xl sm:text-4xl md:text-5xl">No ideas? No problem.</h3>
-
-              <p className={"max-sm:text-xl sm:text-3xl md:text-4xl mt-4 sm:mt-6 md:mt-8"}>
-                Generate a{" "}
-                <TypeAnimation
-                  sequence={[
-                    "Full-Stack Website",
-                    1000,
-                    "Game Development",
-                    1000,
-                    "Mobile App",
-                    1000,
-                    "Machine Learning",
-                    1000,
-                  ]}
-                  wrapper="span"
-                  speed={50}
-                  repeat={Infinity}
-                />{" "}
-                Idea.
-              </p>
-            </div>
-          </div>
-        </section>
       </div>
 
       <section className={`px-12 text-center py-32 flex flex-col items-center justify-center ${cormorant.className} `}>

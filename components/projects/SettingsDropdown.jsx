@@ -290,20 +290,6 @@ const SettingsDropdown = ({ project, members, setLoading, votes }) => {
               Set GitHub URL
             </button>
           )}
-          {/* {user && !user.admin && (
-            <button
-              type="button"
-              onClick={() => {
-                setShowVoteKick(true);
-                setShowDropdown(false);
-              }}
-              className={
-                "hover:bg-gray-200 dark:hover:bg-neutral-800 font-medium text-red-600 dark:font-normal dark:text-red-500  hover:text-red-600 p-1 w-full text-right"
-              }
-            >
-              Vote Kick Member
-            </button>
-          )} */}
           {user && !user.admin && (
             <button
               type="button"

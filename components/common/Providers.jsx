@@ -4,7 +4,7 @@ import { ThemeProvider } from "next-themes";
 
 export const Providers = (props) => {
   const pathname = usePathname();
-  const forcedThemeFromPathname = pathname === "/" ? undefined : undefined;
+  const forcedThemeFromPathname = pathname === "/" ? "dark" : undefined;
 
   return (
     <ThemeProvider attribute="class" forcedTheme={forcedThemeFromPathname}>

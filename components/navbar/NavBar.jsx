@@ -35,7 +35,11 @@ const NavBar = () => {
       listenToNotifications();
     };
 
-    if (session && window.location.pathname !== "/signup" && window.location.pathname !== "/signin") {
+    if (
+      session &&
+      window.location.pathname !== "/signup" &&
+      window.location.pathname !== "/signin"
+    ) {
       if (session.data.session) {
         if (!dataLoaded) loadData();
       }
@@ -65,7 +69,10 @@ const NavBar = () => {
       const response = await fetch(`/api/notification/${userId}`, {
         method: "GET",
         headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
+          "X-Supabase-Auth":
+            session.data.session.access_token +
+            " " +
+            session.data.session.refresh_token,
         },
       });
       if (response.status === 200) {
@@ -97,7 +104,10 @@ const NavBar = () => {
             filter: `user_id=eq.${session.data.session.user.id}`,
           },
           (payload) => {
-            setNotifications((prevNotifications) => [payload.new, ...prevNotifications]);
+            setNotifications((prevNotifications) => [
+              payload.new,
+              ...prevNotifications,
+            ]);
           }
         )
         .subscribe();
@@ -109,20 +119,28 @@ const NavBar = () => {
   return (
     <nav
       className={`${
-        isRootPage && !session?.data.session
+        isRootPage
           ? "text-white"
           : "sticky top-0 bg-backgroundlight  dark:bg-backgrounddark border-b border-b-1 border-gray-400 drop-shadow z-40"
       } h-[67px] `}
     >
       <div
         className={`px-8 lg:px-16 py-2 flex items-center justify-start ${
-          isRootPage && !session?.data.session ? "max-lg:bg-black" : ""
+          isRootPage ? "max-lg:bg-black" : ""
         }`}
       >
-        <Link href={"/"} className={`${kanit.className} flex justify-center items-center text-2xl flex-shrink-0`}>
+        <Link
+          href={"/"}
+          className={`${kanit.className} flex justify-center items-center text-2xl flex-shrink-0`}
+        >
           {currentTheme && (
             <Image
-              src={(isRootPage && !session?.data.session) || currentTheme === "dark" ? "/logo.png" : "/logo_black.png"}
+              src={
+                (isRootPage) ||
+                currentTheme === "dark"
+                  ? "/logo.png"
+                  : "/logo_black.png"
+              }
               alt={"logo"}
               width={50}
               height={50}
@@ -149,6 +167,7 @@ const NavBar = () => {
           currentTheme={currentTheme}
           toggleTheme={toggleTheme}
           session={session}
+          isRootPage={isRootPage}
         />
       </div>
       {showMobileDropdown && (
@@ -180,7 +199,9 @@ const DesktopNav = ({
       <Link
         href={"/feed"}
         className={`p-2  border-b-2 border-transparent  ${
-          isRootPage && !session?.data.session ? " hover:text-gray-300" : "hover:text-gray-500 dark:hover:text-gray-300"
+          isRootPage
+            ? " hover:text-gray-300"
+            : "hover:text-gray-500 dark:hover:text-gray-300"
         }`}
       >
         Feed
@@ -189,7 +210,9 @@ const DesktopNav = ({
       <Link
         href={"/projects"}
         className={`p-2  border-b-2 border-transparent  ${
-          isRootPage && !session?.data.session ? " hover:text-gray-300" : "hover:text-gray-500 dark:hover:text-gray-300"
+          isRootPage
+            ? " hover:text-gray-300"
+            : "hover:text-gray-500 dark:hover:text-gray-300"
         }`}
       >
         Find Projects
@@ -198,7 +221,7 @@ const DesktopNav = ({
         <Link
           href={"/create-project"}
           className={`p-2  border-b-2 border-transparent  ${
-            isRootPage && !session?.data.session
+            isRootPage
               ? " hover:text-gray-300"
               : "hover:text-gray-500 dark:hover:text-gray-300"
           }`}
@@ -210,7 +233,9 @@ const DesktopNav = ({
         target="_blank"
         href={"https://elostack.slack.com"}
         className={`p-2 border-b-2 border-transparent  ${
-          isRootPage && !session?.data.session ? " hover:text-gray-300" : "hover:text-gray-500 dark:hover:text-gray-300"
+          isRootPage
+            ? " hover:text-gray-300"
+            : "hover:text-gray-500 dark:hover:text-gray-300"
         }`}
       >
         Slack
@@ -218,12 +243,19 @@ const DesktopNav = ({
 
       <div className="flex justify-center items-center ml-auto relative">
         {session?.data.session && (
-          <NotificationBell notifications={notifications} setNotifications={setNotifications} />
+          <NotificationBell
+            notifications={notifications}
+            setNotifications={setNotifications}
+          />
         )}
-        {currentTheme && (
+        {currentTheme && !isRootPage && (
           <button
             type="button"
-            onClick={() => (currentTheme == "dark" ? toggleTheme("light") : toggleTheme("dark"))}
+            onClick={() =>
+              currentTheme == "dark"
+                ? toggleTheme("light")
+                : toggleTheme("dark")
+            }
             className="mr-8 self-center text-xl"
           >
             {currentTheme === "light" ? <MdDarkMode /> : <MdLightMode />}
@@ -236,7 +268,7 @@ const DesktopNav = ({
             <Link
               href={"/signin"}
               className={`${
-                isRootPage && !session?.data.session
+                isRootPage
                   ? "hover:bg-neutral-600 "
                   : "hover:bg-gray-300 dark:hover:bg-neutral-600 "
               } ml-4  px-3 py-1 rounded-full text-sm`}
@@ -257,20 +289,31 @@ const MobileNav = ({
   currentTheme,
   toggleTheme,
   session,
+  isRootPage
 }) => {
   return (
     <div className="flex items-center gap-2 ml-auto lg:hidden">
-      {currentTheme && (
+      {currentTheme && !isRootPage && (
         <button
           type="button"
-          onClick={() => (currentTheme == "dark" ? toggleTheme("light") : toggleTheme("dark"))}
+          onClick={() =>
+            currentTheme == "dark" ? toggleTheme("light") : toggleTheme("dark")
+          }
           className="mr-4 self-center text-xl"
         >
           {currentTheme === "light" ? <MdDarkMode /> : <MdLightMode />}
         </button>
       )}
-      {session?.data.session && <NotificationBell notifications={notifications} setNotifications={setNotifications} />}
-      <button type="button" onClick={() => setShowMobileDropdown(!showMobileDropdown)}>
+      {session?.data.session && (
+        <NotificationBell
+          notifications={notifications}
+          setNotifications={setNotifications}
+        />
+      )}
+      <button
+        type="button"
+        onClick={() => setShowMobileDropdown(!showMobileDropdown)}
+      >
         <IoMenu className="text-2xl" />
       </button>
     </div>
@@ -281,17 +324,28 @@ const MobileDropdown = ({ isRootPage, showSignIn, session, user, signOut }) => {
   return (
     <div
       className={`${
-        isRootPage && !session?.data.session ? "bg-black" : "bg-backgroundlight dark:bg-backgrounddark"
+        isRootPage
+          ? "bg-black"
+          : "bg-backgroundlight dark:bg-backgrounddark"
       } flex flex-col justify-center items-center lg:hidden py-2`}
     >
-      <Link href={"/feed"} className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center">
+      <Link
+        href={"/feed"}
+        className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center"
+      >
         Feed
       </Link>
-      <Link href={"/projects"} className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center">
+      <Link
+        href={"/projects"}
+        className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center"
+      >
         Find Projects
       </Link>
       {user?.admin && (
-        <Link href={"/create-project"} className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center">
+        <Link
+          href={"/create-project"}
+          className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center"
+        >
           Create Project
         </Link>
       )}
@@ -304,13 +358,20 @@ const MobileDropdown = ({ isRootPage, showSignIn, session, user, signOut }) => {
       </Link>
       <hr className="border-0 h-[1px] bg-gray-400 my-2 w-full" />
       {session?.data.session && (
-        <Link href={"/account-settings"} className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center">
+        <Link
+          href={"/account-settings"}
+          className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center"
+        >
           My Account
         </Link>
       )}
       {showSignIn && (
         <div className="p-2 hover:bg-gray-300 dark:hover:bg-neutral-600 w-full text-center">
-          {session?.data.session ? <button onClick={signOut}>Log out</button> : <Link href={"/signin"}>Sign In</Link>}
+          {session?.data.session ? (
+            <button onClick={signOut}>Log out</button>
+          ) : (
+            <Link href={"/signin"}>Sign In</Link>
+          )}
         </div>
       )}
     </div>
