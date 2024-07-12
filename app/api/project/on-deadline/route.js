@@ -95,49 +95,6 @@ export async function POST(req, res) {
       }
     }
 
-    // Mark blackpoints
-    for (let project of data) {
-      if (
-        today.getTime() !== new Date(project.current_sprint_deadline).getTime() &&
-        today.getTime() !== new Date(project.deadline).getTime()
-      ) {
-        continue;
-      }
-      let contributions = {};
-      project.user_ids.forEach((user_id, i) => {
-        contributions[user_id] = { total: 0, email: project.member_emails[i], username: project.member_usernames[i] };
-        project.current_tasks.forEach((task) => {
-          if (user_id === task.assignee && task.complete === true)
-            contributions[user_id]["total"] = contributions[user_id]["total"] + 1;
-        });
-      });
-      for (let userId in contributions) {
-        if (contributions[userId]["total"] === 0) {
-          await notifyMembers(userId, project.title, project.id, "blackpoint");
-
-          const { data, error } = await supabase.rpc("increment_blackpoint", {
-            p_user_id: userId,
-            p_project_id: project.id,
-          });
-          if (error) throw error;
-          // Member hit 3 blackpoints
-          if (data >= 3) {
-            await notifyMembers(userId, project.title, project.id, "member-remove");
-            sendEmail("d-6dfdcb11aab64c75ab34d01c218b89b7", contributions[userId]["email"], 26311, {
-              project_title: project.title,
-              username: contributions[userId]["username"],
-            });
-          } else {
-            sendEmail("d-2eb1e2dfb7c94dc8bc557ef686932fba", contributions[userId]["email"], 26350, {
-              project_title: project.title,
-              username: contributions[userId]["username"],
-              project_id: project.id,
-            });
-          }
-        }
-      }
-    }
-
     return NextResponse.json({ message: "Deadline endpoint successfully executed!" }, { status: 200 });
   } catch (error) {
     console.error(error);

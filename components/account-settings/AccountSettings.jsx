@@ -24,9 +24,6 @@ const AccountSettings = () => {
   const [hideGithub, setHideGithub] = useState(false);
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [uniInput, setUniInput] = useState("");
-  const [universities, setUniversities] = useState();
-  const [uniOtherInput, setUniOtherInput] = useState("");
   const {
     register,
     handleSubmit,
@@ -36,7 +33,6 @@ const AccountSettings = () => {
 
   useEffect(() => {
     const loadData = async () => {
-      await fetchUniversities();
       setLoading(false);
       if (searchParams.has("github_oauth") && searchParams.has("code")) githubOauth();
       if (searchParams.has("github_oauth_success")) {
@@ -44,11 +40,6 @@ const AccountSettings = () => {
         toast.success("GitHub connected");
       }
       setValue("username", profile.username);
-      if (profile.other_university) {
-        setUniOtherInput(profile.other_university);
-      } else {
-        setUniInput(profile.university);
-      }
     };
 
     if (profile) loadData();
@@ -114,8 +105,6 @@ const AccountSettings = () => {
         JSON.stringify({
           userId,
           username: data.username,
-          university: uniInput === "" ? null : uniInput.toUpperCase(),
-          other_university: uniInput === "" ? uniOtherInput.toUpperCase() : null,
         })
       );
 
@@ -137,20 +126,6 @@ const AccountSettings = () => {
     } catch (error) {
       console.error(error);
       toast.error("Oops, something went wrong...");
-    }
-  };
-
-  const fetchUniversities = async () => {
-    try {
-      const response = await fetch("/api/university", {
-        method: "GET",
-      });
-      if (response.status === 200) {
-        const { universities } = await response.json();
-        setUniversities(universities);
-      }
-    } catch (error) {
-      console.error(error);
     }
   };
 
@@ -198,54 +173,7 @@ const AccountSettings = () => {
                   {errors.username.message}
                 </p>
               )}
-              {universities && (
-                <>
-                  <label className="text-xs text-neutral-400 font-light self-start -mb-1">University</label>
-                  <div className="flex flex-col gap-2 items-start">
-                    {universities.map((u, i) => (
-                      <div key={i} className="flex gap-2 items-center justify-center">
-                        <input
-                          type="radio"
-                          id={u.name}
-                          value={u.name}
-                          checked={uniInput === u.name}
-                          onChange={() => setUniInput(u.name)}
-                        />
-                        <label
-                          htmlFor={u.name}
-                          className="text-sm px-2 rounded-full font-bold"
-                          style={{ color: u.secondary_color, "background-color": u.primary_color }}
-                        >
-                          {u.name}
-                        </label>
-                      </div>
-                    ))}
-                    <div className="flex gap-2 items-center justify-center">
-                      <input
-                        type="radio"
-                        id="other"
-                        value=""
-                        checked={uniInput === ""}
-                        onChange={() => setUniInput("")}
-                      />
-                      {uniInput !== "" ? (
-                        <label
-                          htmlFor="other"
-                          className="text-sm px-2 rounded-full dark:bg-white dark:text-black bg-black text-white font-bold"
-                        >
-                          Other
-                        </label>
-                      ) : (
-                        <input
-                          value={uniOtherInput}
-                          onChange={(e) => setUniOtherInput(e.target.value)}
-                          className="w-16 rounded-full px-3 py-1 text-xs bg-gray-200 dark:bg-backgrounddark hover:bg-gray-300 dark:hover:bg-neutral-800 focus:bg-gray-300 dark:focus:bg-neutral-800 border-gray-400 border"
-                        />
-                      )}
-                    </div>
-                  </div>
-                </>
-              )}
+      
               <button
                 type="submit"
                 className="ml-auto text-gray-200 px-2 py-1 bg-primary hover:bg-primarydark rounded-full text-sm hover:text-gray-300 dark:shadow dark:shadow-neutral-800"

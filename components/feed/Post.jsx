@@ -234,19 +234,6 @@ const Post = ({ post, setPosts, project }) => {
           <UserAvatar size={36} username={post.username} />
         )}
         <p className="font-bold">{post.username}</p>
-        {post.university_name && (
-          <p
-            className="text-sm px-2 rounded-full font-bold bg-black dark:bg-white text-white dark:text-black"
-            style={
-              post.university && {
-                color: post.university[0].secondary_color,
-                "background-color": post.university[0].primary_color,
-              }
-            }
-          >
-            {post.university_name}
-          </p>
-        )}
         {post.project_id && post.public && <MdOutlinePublic />}
         <p className="ml-auto font-light text-xs">{formatTime(post.created_at, "date")}</p>
       </div>

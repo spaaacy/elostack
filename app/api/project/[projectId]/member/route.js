@@ -4,13 +4,14 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(req, res) {
   try {
     const { projectId } = res.params;
+    console.log(projectId)
     const { data, error } = await supabase.from("member").select().eq("project_id", projectId);
     if (error) throw error;
     let members = [];
     for (let member of data) {
       const { data, error } = await supabase
         .from("profile")
-        .select("*, university(*)")
+        .select()
         .eq("user_id", member.user_id)
         .single();
       if (error) throw error;

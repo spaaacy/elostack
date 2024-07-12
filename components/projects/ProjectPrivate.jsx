@@ -20,7 +20,6 @@ import TutorialModal from "./modal/TutorialModal";
 import MeetingModal from "./modal/MeetingModal";
 import { FaArrowRight } from "react-icons/fa6";
 import { formatTime } from "@/utils/formatTime";
-import MembersSidebar from "./MembersSidebar";
 import PendingPostModal from "./modal/PendingPostModal";
 
 const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
@@ -31,7 +30,6 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
     resources: true,
     meetings: true,
     posts: true,
-    votes: true,
   });
   const [loading, setLoading] = useState(true);
   const { session, user, profile } = useContext(UserContext);
@@ -50,7 +48,6 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
   const [alertState, setAlertState] = useState();
   const [alertMessage, setAlertMessage] = useState();
   const [showLinks, setShowLinks] = useState(true);
-  const [votes, setVotes] = useState();
 
   useEffect(() => {
     const loadSearchParams = () => {
@@ -67,7 +64,6 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
       fetchResources();
       fetchMeetings();
       fetchPosts();
-      fetchVoteKick();
     };
 
     if (session) {
@@ -108,24 +104,6 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
           setShowLoadMorePosts(true);
         } else setShowLoadMorePosts(false);
         finishLoading("posts");
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const fetchVoteKick = async () => {
-    try {
-      const response = await fetch(`/api/vote-kick/${project.id}`, {
-        method: "GET",
-        headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
-        },
-      });
-      if (response.status === 200) {
-        const { votes } = await response.json();
-        setVotes(votes);
-        finishLoading("votes");
       }
     } catch (error) {
       console.error(error);
@@ -297,7 +275,7 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
                 </p>
               )}
             </div>
-            <SettingsDropdown project={project} members={members} setLoading={setItemLoading} votes={votes} />
+            <SettingsDropdown project={project} members={members} setLoading={setItemLoading} />
           </div>
           <hr className="border-0 h-[1px] bg-gray-400 my-4" />
           {alertMessage && (
@@ -421,7 +399,6 @@ const ProjectPrivate = ({ project, members, setMembers, setProject }) => {
       ) : (
         <></>
       )}
-      <MembersSidebar members={members} />
 
       <Toaster />
     </div>

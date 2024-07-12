@@ -9,7 +9,7 @@ import { UserContext } from "@/context/UserContext";
 
 const githubUrlPattern = /^https?:\/\/(?:www\.)?github\.com\/[\w-]+\/[\w-]+\/?$/;
 
-const SettingsDropdown = ({ project, members, setLoading, votes }) => {
+const SettingsDropdown = ({ project, members, setLoading }) => {
   const { user, session } = useContext(UserContext);
   const dropdownRef = useRef();
   const githubRef = useRef();
@@ -17,7 +17,6 @@ const SettingsDropdown = ({ project, members, setLoading, votes }) => {
   const removeMemberRef = useRef();
   const deleteProjectRef = useRef();
   const leaveProjectRef = useRef();
-  const voteKickRef = useRef();
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [showGithubDropdown, setShowGithubDropdown] = useState(false);
@@ -25,11 +24,9 @@ const SettingsDropdown = ({ project, members, setLoading, votes }) => {
   const [showRemoveMember, setShowRemoveMember] = useState(false);
   const [showDeleteProject, setShowDeleteProject] = useState();
   const [showLeaveProject, setShowLeaveProject] = useState();
-  const [showVoteKick, setShowVoteKick] = useState(false);
 
   const [confirmBanMember, setConfirmBanMember] = useState();
   const [confirmRemoveMember, setConfirmRemoveMember] = useState();
-  const [confirmVoteKick, setConfirmVoteKick] = useState();
 
   const router = useRouter();
   const {
@@ -165,37 +162,6 @@ const SettingsDropdown = ({ project, members, setLoading, votes }) => {
     }
   };
 
-  const voteKick = async (userId) => {
-    if (!session.data.session) return;
-    try {
-      setShowVoteKick(false);
-      setLoading(true);
-      const response = await fetch("/api/vote-kick/create", {
-        method: "POST",
-        headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
-        },
-        body: JSON.stringify({
-          userId: session.data.session.user.id,
-          memberId: userId,
-          projectId: project.id,
-        }),
-      });
-      if (response.status === 201) {
-        toast.success(`You have voted to kick ${members.find((m) => m.user_id === userId).profile.username}`);
-        setTimeout(() => window.location.reload(), 1000);
-      } else {
-        const { error } = await response.json();
-        throw error;
-      }
-    } catch (error) {
-      toast.error("Oops, something went wrong...");
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const deleteProject = async () => {
     const userId = session.data.session.user.id;
     if (!userId) return;
@@ -243,9 +209,6 @@ const SettingsDropdown = ({ project, members, setLoading, votes }) => {
     }
     if (removeMemberRef.current && !removeMemberRef.current.contains(event.target)) {
       setShowLeaveProject(false);
-    }
-    if (voteKickRef.current && !voteKickRef.current.contains(event.target)) {
-      setShowVoteKick(false);
     }
   };
 
@@ -555,67 +518,6 @@ const SettingsDropdown = ({ project, members, setLoading, votes }) => {
               No
             </button>
           </div>
-        </div>
-      )}
-      {showVoteKick && (
-        <div
-          ref={voteKickRef}
-          className="absolute top-10 bg-gray-100 border-gray-400 border right-0 dark:bg-backgrounddark rounded p-2 text-sm flex flex-col text-black dark:text-gray-300 justify-center items-end"
-        >
-          {confirmVoteKick ? (
-            <>
-              <p className="font-medium text-red-600 dark:font-normal dark:text-red-500">Are you sure?</p>
-              <div className="flex justify-center mx-auto gap-4 mt-2">
-                <button
-                  type="button"
-                  onClick={() => voteKick(confirmVoteKick)}
-                  className="hover:bg-gray-200 dark:hover:bg-neutral-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
-                >
-                  Yes
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setConfirmVoteKick(false)}
-                  className="hover:bg-gray-200 dark:hover:bg-neutral-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
-                >
-                  No
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
-              {members
-                .filter(
-                  (m) =>
-                    !m.banned &&
-                    m.user_id !== session.data.session.user.id &&
-                    !votes?.some((v) => v.user_id === session.data.session.user.id && v.member_id === m.user_id)
-                )
-                .map((m) => {
-                  return (
-                    <button
-                      key={m.user_id}
-                      type="button"
-                      onClick={() => setConfirmVoteKick(m.user_id)}
-                      className="w-full hover:bg-gray-200 dark:hover:bg-neutral-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
-                    >
-                      {m.profile.username}
-                    </button>
-                  );
-                })}
-              <hr className="border-0 h-[1px] bg-neutral-600 w-full my-1 rounded-full" />
-              <button
-                type="button"
-                onClick={() => {
-                  setShowVoteKick(false);
-                  setShowDropdown(true);
-                }}
-                className="w-full hover:bg-gray-200 dark:hover:bg-neutral-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
-              >
-                Back
-              </button>
-            </>
-          )}
         </div>
       )}
     </div>

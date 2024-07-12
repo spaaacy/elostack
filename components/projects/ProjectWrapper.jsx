@@ -56,6 +56,7 @@ const ProjectWrapper = () => {
       if (response.status === 200) {
         const { members } = await response.json();
         setMembers(members);
+        console.log(members)
         const userId = session.data.session?.user.id;
         const access = members.some((m) => m.user_id === userId && !m.banned);
         if (access || user?.admin) setAccess(true);
