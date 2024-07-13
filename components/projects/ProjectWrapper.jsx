@@ -40,6 +40,7 @@ const ProjectWrapper = () => {
         const { project } = await response.json();
         if (project[0].deleted) router.push("/projects");
         setProject(project[0]);
+        if (project[0].creator_id === session.data.session.user.id) setAccess(true)
       } else {
         router.push("/projects");
       }
@@ -56,7 +57,6 @@ const ProjectWrapper = () => {
       if (response.status === 200) {
         const { members } = await response.json();
         setMembers(members);
-        console.log(members);
         const userId = session.data.session?.user.id;
         const access = members.some((m) => m.user_id === userId && !m.removed);
         if (access || user?.admin) setAccess(true);

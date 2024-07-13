@@ -198,7 +198,7 @@ const SettingsDropdown = ({ project, members, setLoading }) => {
           ref={dropdownRef}
           className="absolute top-14 bg-gray-100 border-gray-400 border right-0 dark:bg-backgrounddark rounded p-2 text-sm flex flex-col text-black dark:text-gray-300 justify-center items-end"
         >
-          {user?.admin && (
+          {(user?.admin || project.creator_id === session.data.session.user.id) && (
             <Link
               href={`/projects/${project.id}/edit-project`}
               className="hover:bg-gray-200 dark:hover:bg-neutral-800 px-2 py-1 rounded  dark:hover:text-gray-200  w-full text-right"
@@ -206,7 +206,7 @@ const SettingsDropdown = ({ project, members, setLoading }) => {
               Edit Project
             </Link>
           )}
-          {user?.admin && (
+          {(user?.admin || project.creator_id === session.data.session.user.id) && (
             <button
               type="button"
               onClick={() => {
@@ -233,7 +233,7 @@ const SettingsDropdown = ({ project, members, setLoading }) => {
             </button>
           )}
           {user?.admin && <hr className="border-0 h-[1px] bg-neutral-600 w-full my-1 rounded-full" />}
-          {user?.admin && members.some((m) => !m.removed) && (
+          {(user?.admin || project.creator_id === session.data.session.user.id) && members.some((m) => !m.removed) && (
             <button
               type="button"
               onClick={() => {

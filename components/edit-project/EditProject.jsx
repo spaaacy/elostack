@@ -63,7 +63,7 @@ const EditProject = () => {
       });
       if (response.status === 200) {
         const { project } = await response.json();
-        if (project[0].deleted || !user.admin || !user.creator) router.push("/projects");
+        if (project[0].deleted || (!user.admin && project[0].creator_id !== user.user_id)) router.push("/projects");
         setValue("title", project[0].title);
         setValue("description", project[0].description);
         setValue("durationType", project[0].duration_type);
