@@ -13,19 +13,15 @@ const SettingsDropdown = ({ project, members, setLoading }) => {
   const { user, session } = useContext(UserContext);
   const dropdownRef = useRef();
   const githubRef = useRef();
-  const banMemberRef = useRef();
   const removeMemberRef = useRef();
   const deleteProjectRef = useRef();
   const leaveProjectRef = useRef();
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [showGithubDropdown, setShowGithubDropdown] = useState(false);
-  const [showBanMember, setShowBanMember] = useState(false);
   const [showRemoveMember, setShowRemoveMember] = useState(false);
   const [showDeleteProject, setShowDeleteProject] = useState();
   const [showLeaveProject, setShowLeaveProject] = useState();
-
-  const [confirmBanMember, setConfirmBanMember] = useState();
   const [confirmRemoveMember, setConfirmRemoveMember] = useState();
 
   const router = useRouter();
@@ -100,44 +96,13 @@ const SettingsDropdown = ({ project, members, setLoading }) => {
     }
   };
 
-  const banMember = async (userId) => {
-    if (!session.data.session) return;
-    try {
-      setShowBanMember(false);
-      setLoading(true);
-      const response = await fetch("/api/member/ban-member", {
-        method: "PATCH",
-        headers: {
-          "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
-        },
-        body: JSON.stringify({
-          userId,
-          projectId: project.id,
-          projectTitle: project.title,
-        }),
-      });
-      if (response.status === 200) {
-        toast.success("Member has been banned");
-        setTimeout(() => window.location.reload(), 1000);
-      } else {
-        const { error } = await response.json();
-        throw error;
-      }
-    } catch (error) {
-      toast.error("Oops, something went wrong...");
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const removeMember = async (userId) => {
     if (!session.data.session) return;
     try {
       setShowRemoveMember(false);
       setLoading(true);
       const response = await fetch("/api/member/remove-member", {
-        method: "DELETE",
+        method: "PATCH",
         headers: {
           "X-Supabase-Auth": session.data.session.access_token + " " + session.data.session.refresh_token,
         },
@@ -198,8 +163,8 @@ const SettingsDropdown = ({ project, members, setLoading }) => {
     if (githubRef.current && !githubRef.current.contains(event.target)) {
       setShowGithubDropdown(false);
     }
-    if (banMemberRef.current && !banMemberRef.current.contains(event.target)) {
-      setShowBanMember(false);
+    if (removeMemberRef.current && !removeMemberRef.current.contains(event.target)) {
+      setShowRemoveMember(false);
     }
     if (deleteProjectRef.current && !deleteProjectRef.current.contains(event.target)) {
       setShowDeleteProject(false);
@@ -219,7 +184,7 @@ const SettingsDropdown = ({ project, members, setLoading }) => {
         disabled={
           showDropdown ||
           showGithubDropdown ||
-          showBanMember ||
+          showRemoveMember ||
           showRemoveMember ||
           showLeaveProject ||
           showDeleteProject
@@ -268,7 +233,7 @@ const SettingsDropdown = ({ project, members, setLoading }) => {
             </button>
           )}
           {user?.admin && <hr className="border-0 h-[1px] bg-neutral-600 w-full my-1 rounded-full" />}
-          {user?.admin && members.some((m) => !m.banned) && (
+          {user?.admin && members.some((m) => !m.removed) && (
             <button
               type="button"
               onClick={() => {
@@ -280,22 +245,10 @@ const SettingsDropdown = ({ project, members, setLoading }) => {
               Remove member
             </button>
           )}
-          {user?.admin && members.some((m) => !m.banned) && (
-            <button
-              type="button"
-              onClick={() => {
-                setShowBanMember(true);
-                setShowDropdown(false);
-              }}
-              className="hover:bg-gray-200 dark:hover:bg-neutral-800 font-medium text-red-600 dark:font-normal dark:text-red-500  hover:text-red-600 p-1 w-full text-right"
-            >
-              Ban member
-            </button>
-          )}
 
           {user?.admin && (
             <button
-              disabled={members.some((m) => !m.banned)}
+              disabled={members.some((m) => !m.removed)}
               data-tooltip-id="delete-tooltip"
               data-tooltip-content="Members are in this project"
               type="button"
@@ -304,7 +257,7 @@ const SettingsDropdown = ({ project, members, setLoading }) => {
                 setShowDropdown(false);
               }}
               className={`${
-                members.some((m) => !m.banned)
+                members.some((m) => !m.removed)
                   ? "text-gray-500 hover:cursor-not-allowed"
                   : "hover:bg-gray-200 dark:hover:bg-neutral-800 font-medium text-red-600 dark:font-normal dark:text-red-500  hover:text-red-600"
               }  p-1 w-full text-right`}
@@ -312,7 +265,7 @@ const SettingsDropdown = ({ project, members, setLoading }) => {
               Delete project
             </button>
           )}
-          {members.some((m) => !m.banned) && <Tooltip id="delete-tooltip" place="bottom" type="dark" effect="float" />}
+          {members.some((m) => !m.removed) && <Tooltip id="delete-tooltip" place="bottom" type="dark" effect="float" />}
         </div>
       )}
       {showGithubDropdown && (
@@ -352,62 +305,6 @@ const SettingsDropdown = ({ project, members, setLoading }) => {
           </button>
         </div>
       )}
-      {showBanMember && (
-        <div
-          ref={banMemberRef}
-          className="absolute top-10 bg-gray-100 border-gray-400 border right-0 dark:bg-backgrounddark rounded p-2 text-sm flex flex-col text-black dark:text-gray-300 justify-center items-end"
-        >
-          {confirmBanMember ? (
-            <>
-              <p className="font-medium text-red-600 dark:font-normal dark:text-red-500">Are you sure?</p>
-              <div className="flex justify-center mx-auto gap-4 mt-2">
-                <button
-                  type="button"
-                  onClick={() => banMember(confirmBanMember)}
-                  className="hover:bg-gray-200 dark:hover:bg-neutral-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
-                >
-                  Yes
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setConfirmBanMember(false)}
-                  className="hover:bg-gray-200 dark:hover:bg-neutral-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
-                >
-                  No
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
-              {members
-                .filter((m) => !m.banned)
-                .map((m) => {
-                  return (
-                    <button
-                      key={m.user_id}
-                      type="button"
-                      onClick={() => setConfirmBanMember(m.user_id)}
-                      className="w-full hover:bg-gray-200 dark:hover:bg-neutral-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
-                    >
-                      {m.profile.username}
-                    </button>
-                  );
-                })}
-              <hr className="border-0 h-[1px] bg-neutral-600 w-full my-1 rounded-full" />
-              <button
-                type="button"
-                onClick={() => {
-                  setShowBanMember(false);
-                  setShowDropdown(true);
-                }}
-                className="w-full hover:bg-gray-200 dark:hover:bg-neutral-800 px-2 py-1 rounded  dark:hover:text-gray-200 text-right"
-              >
-                Back
-              </button>
-            </>
-          )}
-        </div>
-      )}
       {showRemoveMember && (
         <div
           ref={removeMemberRef}
@@ -436,7 +333,7 @@ const SettingsDropdown = ({ project, members, setLoading }) => {
           ) : (
             <>
               {members
-                .filter((m) => !m.banned)
+                .filter((m) => !m.removed)
                 .map((m) => {
                   return (
                     <button

@@ -77,7 +77,7 @@ const NotificationBell = ({ notifications, setNotifications }) => {
                   {n.type === "member-remove"
                     ? `You were removed from ${n.payload?.projectTitle}`
                     : n.type === "member-ban"
-                    ? `You were banned from ${n.payload?.projectTitle}`
+                    ? `You were removed from ${n.payload?.projectTitle}`
                     : n.type === "like" && n.payload?.projectTitle
                     ? `Your post in ${n.payload?.projectTitle} received a like!`
                     : n.type === "like" && !n.payload?.projectTitle

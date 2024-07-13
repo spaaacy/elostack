@@ -36,7 +36,7 @@ const CreateProject = () => {
 
   useEffect(() => {
     if (user) {
-      if (user.admin) {
+      if (user.admin || user.creator) {
         setLoading(false);
       } else router.push("/projects");
     }
@@ -47,7 +47,8 @@ const CreateProject = () => {
 
   const onSubmit = async (data, e) => {
     e.preventDefault();
-    if (!session.data.session) return;
+    const userId = session.data.session.user.id;
+    if (!userId) return;
     try {
       setLoading(true);
 
@@ -63,6 +64,7 @@ const CreateProject = () => {
           team_size: data.teamSize,
           status: "Just created",
           deleted: false,
+          creator_id: userId,
         })
       );
       if (image) formData.append("projectImage", file);

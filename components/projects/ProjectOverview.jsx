@@ -18,7 +18,7 @@ const ProjectOverview = ({ project, members, user, setLoading }) => {
         <p className="mt-4 font-semibold">Members</p>
         <ul>
           {members
-            .filter((member) => !member.banned)
+            .filter((member) => !member.removed)
             .map((member, i) => {
               return (
                 <li key={i} className="flex items-center justify-start gap-2">

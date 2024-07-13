@@ -24,7 +24,7 @@ const ProjectPublic = ({ project, members }) => {
   const [posts, setPosts] = useState();
   const [showLoadMorePosts, setShowLoadMorePosts] = useState(false);
   const [currentState, setCurrentState] = useState("overview");
-  const banned = members.some((m) => m.banned && m.user_id === session.data.session?.user.id);
+  const removed = members.some((m) => m.removed && m.user_id === session.data.session?.user.id);
   const canJoin =
     projects?.length > 0
       ? !projects.some(
@@ -101,7 +101,7 @@ const ProjectPublic = ({ project, members }) => {
             <div className="ml-auto flex-shrink-0">
               {session?.data.session ? (
                 project.total_members < project.team_size &&
-                !banned && (
+                !removed && (
                   <>
                     <button
                       data-tooltip-id="join-tooltip"
@@ -129,9 +129,9 @@ const ProjectPublic = ({ project, members }) => {
                   Join Project
                 </Link>
               )}
-              {banned && (
+              {removed && (
                 <p className="bg-red-700 mt-auto self-end px-3 py-1  rounded-full text-sm  dark:shadow dark:shadow-neutral-800 flex-shrink-0 text-gray-200">
-                  You were banned
+                  You were removed
                 </p>
               )}
             </div>

@@ -1,8 +1,7 @@
-import HomeWrapper from "@/components/home/HomeWrapper";
-export const dynamic = "force-dynamic";
+import LandingPage from "@/components/home/LandingPage";
 
 const Page = () => {
-  return <HomeWrapper />;
+  return <LandingPage />;
 };
 
 export default Page;
