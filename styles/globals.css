@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --foreground: #291e2a;
+    --background: #ebebeb;
+    --primary: #e63d00;
+    --primarydark: #cc3600;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --foreground: #ebebeb;
+      --background: #0e1113;
+    }
+  }
+
+  body {
+    @apply dark:bg-backgrounddark dark:text-white bg-backgroundlight text-black;
+  }
+
+  main {
+    margin-bottom: auto;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    max-width: 1260px;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+@layer utilities {
+  .markdown > * {
+    all: revert;
+  }
+
+  .line-clamp-14 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 14;
+  }
+
+  .glass-morphism {
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    backdrop-filter: blur(6.5px);
+    -webkit-backdrop-filter: blur(6.5px);
+    border-radius: 10px;
+  }
+
+  .project-card {
+    box-shadow: 0 8px 32px 0 rgba(49, 99, 140, 0.37);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: linear-gradient(to bottom left, #0f172a, #003242);
+  }
+
+  .tilting {
+    transform-style: preserve-3d;
+    transform-origin: center center;
+    transition: transform 0.3s ease-out;
+  }
+}
+
+/* Disable arrows for number input */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Scrollable Div */
+/* width */
+#scrollableDiv::-webkit-scrollbar {
+  width: 5px;
+}
+/* Track */
+#scrollableDiv::-webkit-scrollbar-track {
+  background: transparent;
+}
+/* Handle */
+#scrollableDiv::-webkit-scrollbar-thumb {
+  background: #c9c9c97d;
+  /* border-radius: 5px; */
+}
+/* Handle on hover */
+#scrollableDiv::-webkit-scrollbar-thumb:hover {
+  background: #c9c9c9ff;
+}
